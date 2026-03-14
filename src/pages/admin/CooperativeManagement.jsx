@@ -306,7 +306,7 @@ const CooperativeManagement = () => {
 
       {/* ═══ EMPTY STATE ════════════════════════════════════════════════ */}
       {!loading && cooperatives.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 rounded-[20px] bg-white border border-gray-200/80">
+        <div className="flex flex-col items-center justify-center py-20 rounded-[20px] bg-white/70 backdrop-blur-sm border border-white/60">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 mb-4">
             <Building2 className="h-7 w-7 text-gray-300" />
           </div>
@@ -320,7 +320,7 @@ const CooperativeManagement = () => {
 
       {/* ═══ NO RESULTS STATE ═══════════════════════════════════════════ */}
       {!loading && cooperatives.length > 0 && filtered.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 rounded-[20px] bg-white border border-gray-200/80">
+        <div className="flex flex-col items-center justify-center py-16 rounded-[20px] bg-white/70 backdrop-blur-sm border border-white/60">
           <Search className="h-10 w-10 text-gray-300 mb-3" />
           <p className="text-sm font-semibold text-gray-500">No cooperatives match</p>
           <p className="text-xs text-gray-400 mt-1">Try adjusting your search or filters.</p>
@@ -399,7 +399,7 @@ const CooperativeManagement = () => {
 
       {/* ═══ TABLE VIEW ═════════════════════════════════════════════════ */}
       {!loading && filtered.length > 0 && viewMode === "table" && (
-        <div className="rounded-[20px] bg-white border border-gray-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+        <div className="rounded-[20px] bg-white/70 backdrop-blur-sm border border-white/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>

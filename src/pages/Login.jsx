@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AlertCircle, Leaf, LockKeyhole, UserRound } from "lucide-react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
@@ -153,6 +153,16 @@ const Login = () => {
             >
               {isSubmitting ? "Authenticating..." : "Sign In"}
             </button>
+
+            <p className="text-center text-sm text-gray-500">
+              Don&apos;t have an account?{" "}
+              <Link
+                to="/apply"
+                className="font-semibold text-teal-600 transition-colors hover:text-indigo-600"
+              >
+                Register your cooperative here.
+              </Link>
+            </p>
           </form>
 
           {/* Footer */}

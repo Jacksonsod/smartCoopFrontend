@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Login from "./pages/Login";
+import CooperativeApplication from "./pages/public/CooperativeApplication";
 import CooperativeManagement from "./pages/admin/CooperativeManagement";
 import UserManagement from "./pages/admin/UserManagement";
 import Dashboard from "./pages/admin/Dashboard";
@@ -92,6 +93,7 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/apply" element={<CooperativeApplication />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<DashboardLayout />}>
