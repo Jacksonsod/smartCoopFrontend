@@ -150,6 +150,10 @@ const Login = () => {
     } catch (err) {
       if (err.response?.status === 401) {
         setError("Invalid credentials. Please check your username and password.");
+      } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+        setError("Server is waking up (free tier). Please wait 30 seconds and try again.");
+      } else if (!err.response) {
+        setError("Cannot reach the server. It may be starting up — please try again in a moment.");
       } else {
         setError("Login failed. Please try again.");
       }
