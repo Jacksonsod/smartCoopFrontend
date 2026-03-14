@@ -172,7 +172,7 @@ const Login = () => {
             Cooperative Management, <span className="text-emerald-600">Simplified</span>
           </h2>
           <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-            Streamline your cooperative operations — manage members, track activities, and grow together on one platform.
+            Streamline your cooperative operations manage members, track activities, and grow together on one platform.
           </p>
           <div className="mt-6 flex items-center justify-center gap-6 text-xs text-gray-400">
             <div className="flex items-center gap-1.5">
