@@ -8,9 +8,12 @@ import {
   Shield,
   UserCircle,
   Users,
+  X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 
 const navItems = [
   {
@@ -71,14 +74,13 @@ const navItems = [
   },
 ];
 
-const Sidebar = () => {
+const SidebarContent = ({ onLinkClick }) => {
   const { user } = useAuth();
 
   const allowedNavItems = navItems.filter(
     (item) => Array.isArray(item.allowedRoles) && item.allowedRoles.includes(user?.role)
   );
 
-  // Group items by section
   const sections = [];
   let lastSection = null;
   allowedNavItems.forEach((item) => {
@@ -91,56 +93,50 @@ const Sidebar = () => {
   });
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-72 bg-gradient-to-b from-gray-900 via-gray-900 to-slate-950 text-white md:block">
-      {/* Logo Area */}
-      <div className="flex h-16 items-center gap-3 border-b border-white/10 px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-indigo-500 shadow-lg shadow-teal-500/20">
-          <Leaf className="h-5 w-5 text-white" />
+    <div className="flex h-full flex-col">
+      {/* Logo */}
+      <div className="flex h-16 items-center gap-3 px-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white">
+          <Leaf className="h-5 w-5" />
         </div>
-        <div>
-          <h1 className="text-lg font-bold tracking-wide gradient-text">Smart-Coop</h1>
-        </div>
+        <h1 className="text-lg font-bold text-gray-900 tracking-tight">Smart-Coop</h1>
       </div>
 
+      <Separator />
+
       {/* Navigation */}
-      <nav className="mt-6 space-y-6 px-4">
+      <nav className="mt-4 flex-1 space-y-5 px-3 overflow-y-auto">
         {sections.map((section) => (
           <div key={section.label}>
-            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+            <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
               {section.label}
             </p>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {section.items.map((item) => {
                 const Icon = item.icon;
                 return (
                   <NavLink
                     key={item.path}
                     to={item.path}
+                    onClick={onLinkClick}
                     className={({ isActive }) =>
                       [
-                        "group flex items-center gap-3.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                         isActive
-                          ? "border-l-[3px] border-teal-400 bg-gradient-to-r from-teal-500/15 to-transparent text-white shadow-[0_0_20px_rgba(20,184,166,0.08)]"
-                          : "border-l-[3px] border-transparent text-gray-400 hover:translate-x-1 hover:bg-white/[0.04] hover:text-white",
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                       ].join(" ")
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <div
+                        <Icon
                           className={[
-                            "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200",
-                            isActive
-                              ? "bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-md shadow-teal-500/30"
-                              : "bg-white/[0.06] text-gray-400 group-hover:bg-white/[0.1] group-hover:text-white",
+                            "h-[18px] w-[18px]",
+                            isActive ? "text-emerald-600" : "text-gray-400 group-hover:text-gray-500",
                           ].join(" ")}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </div>
+                        />
                         <span>{item.title}</span>
-                        {isActive && (
-                          <div className="ml-auto h-1.5 w-1.5 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
-                        )}
                       </>
                     )}
                   </NavLink>
@@ -150,10 +146,31 @@ const Sidebar = () => {
           </div>
         ))}
       </nav>
+    </div>
+  );
+};
 
-      {/* Bottom decorative gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-teal-950/30 to-transparent pointer-events-none" />
-    </aside>
+const Sidebar = ({ open, onOpenChange }) => {
+  return (
+    <>
+      {/* Desktop */}
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-gray-200 bg-white md:block">
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile */}
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="left" className="w-64 border-r border-gray-200 bg-white p-0 [&>button]:hidden">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="absolute right-3 top-3 z-50 flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <SidebarContent onLinkClick={() => onOpenChange(false)} />
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 

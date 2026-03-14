@@ -9,18 +9,21 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import { getAllItems, createItem, updateItem, deleteItem } from "@/services/itemService";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  getAllItems,
-  createItem,
-  updateItem,
-  deleteItem,
-} from "../../services/itemService";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
-const initialFormState = {
-  name: "",
-  unitOfMeasure: "",
-  defaultUnitPrice: "",
-};
+const initialFormState = { name: "", unitOfMeasure: "", defaultUnitPrice: "" };
 
 const CatalogItems = () => {
   const [items, setItems] = useState([]);
@@ -34,259 +37,149 @@ const CatalogItems = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // ─── Fetch Items ─────────────────────────────────────────────────────────
   const fetchItems = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
-      const response = await getAllItems();
-      const data = response.data;
-      const list = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.content)
-          ? data.content
-          : Array.isArray(data?.data)
-            ? data.data
-            : [];
-      setItems(list);
-    } catch (err) {
-      console.error("Failed to fetch items:", err);
-      setError("Failed to load catalog items. Please try again.");
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
+      const data = (await getAllItems()).data;
+      setItems(Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : Array.isArray(data?.data) ? data.data : []);
+    } catch {
+      setError("Failed to load catalog items."); setItems([]);
+    } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+  useEffect(() => { fetchItems(); }, [fetchItems]);
 
-  // ─── Filtering ───────────────────────────────────────────────────────────
-  const filteredItems = items.filter((item) => {
+  const filteredItems = items.filter(item => {
     if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      (item.name || "").toLowerCase().includes(term) ||
-      (item.unitOfMeasure || "").toLowerCase().includes(term)
-    );
+    const t = searchTerm.toLowerCase();
+    return (item.name || "").toLowerCase().includes(t) || (item.unitOfMeasure || "").toLowerCase().includes(t);
   });
 
-  // ─── Form Handlers ──────────────────────────────────────────────────────
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const handleInputChange = (e) => { const { name, value } = e.target; setFormData(p => ({ ...p, [name]: value })); };
 
-  const openCreateModal = () => {
-    setEditingItem(null);
-    setFormData(initialFormState);
-    setError(null);
-    setIsModalOpen(true);
-  };
-
+  const openCreateModal = () => { setEditingItem(null); setFormData(initialFormState); setError(null); setIsModalOpen(true); };
   const openEditModal = (item) => {
     setEditingItem(item);
-    setFormData({
-      name: item.name || "",
-      unitOfMeasure: item.unitOfMeasure || "",
-      defaultUnitPrice: item.defaultUnitPrice ?? "",
-    });
-    setError(null);
-    setIsModalOpen(true);
+    setFormData({ name: item.name || "", unitOfMeasure: item.unitOfMeasure || "", defaultUnitPrice: item.defaultUnitPrice ?? "" });
+    setError(null); setIsModalOpen(true);
   };
+  const closeModal = () => { setIsModalOpen(false); setEditingItem(null); setFormData(initialFormState); setError(null); };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-    setFormData(initialFormState);
-    setError(null);
-  };
-
-  // ─── Submit (Create / Update) ────────────────────────────────────────────
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError(null);
-    setSuccessMsg(null);
-
-    const payload = {
-      name: formData.name.trim(),
-      unitOfMeasure: formData.unitOfMeasure.trim(),
-      defaultUnitPrice: parseFloat(formData.defaultUnitPrice),
-    };
-
+    e.preventDefault(); setSubmitting(true); setError(null); setSuccessMsg(null);
+    const payload = { name: formData.name.trim(), unitOfMeasure: formData.unitOfMeasure.trim(), defaultUnitPrice: parseFloat(formData.defaultUnitPrice) };
     try {
-      if (editingItem) {
-        await updateItem(editingItem.id, payload);
-        setSuccessMsg("Item updated successfully!");
-      } else {
-        await createItem(payload);
-        setSuccessMsg("Item created successfully!");
-      }
-      closeModal();
-      await fetchItems();
-      setTimeout(() => setSuccessMsg(null), 4000);
+      if (editingItem) { await updateItem(editingItem.id, payload); setSuccessMsg("Item updated!"); }
+      else { await createItem(payload); setSuccessMsg("Item created!"); }
+      closeModal(); await fetchItems(); setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err) {
-      console.error("Failed to save item:", err);
-      setError(
-        err.response?.data?.message ||
-          `Failed to ${editingItem ? "update" : "create"} item. Please try again.`
-      );
-    } finally {
-      setSubmitting(false);
-    }
+      setError(err.response?.data?.message || `Failed to ${editingItem ? "update" : "create"} item.`);
+    } finally { setSubmitting(false); }
   };
 
-  // ─── Delete ──────────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
-      return;
-    }
-    setDeletingId(id);
-    setError(null);
-    setSuccessMsg(null);
+    if (!window.confirm("Delete this item permanently?")) return;
+    setDeletingId(id); setError(null); setSuccessMsg(null);
     try {
       await deleteItem(id);
-      setItems((prev) => prev.filter((item) => item.id !== id));
-      setSuccessMsg("Item deleted successfully!");
-      setTimeout(() => setSuccessMsg(null), 4000);
+      setItems(prev => prev.filter(item => item.id !== id));
+      setSuccessMsg("Item deleted!"); setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err) {
-      console.error("Failed to delete item:", err);
-      setError(
-        err.response?.data?.message ||
-          "Failed to delete item. Please try again."
-      );
-    } finally {
-      setDeletingId(null);
-    }
+      setError(err.response?.data?.message || "Failed to delete item.");
+    } finally { setDeletingId(null); }
   };
 
-  // ─── Format currency ────────────────────────────────────────────────────
   const formatRWF = (amount) => {
     if (amount == null || isNaN(amount)) return "—";
-    return new Intl.NumberFormat("en-RW", {
-      style: "decimal",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(amount);
+    return new Intl.NumberFormat("en-RW", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
   };
 
-  // ─── Render ──────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-slide-up">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-500/25">
-            <Package className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900">Catalog Items</h1>
-            <p className="text-sm text-gray-400">Manage the commodities and services your cooperative handles</p>
-          </div>
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Catalog Items</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage the commodities and services your cooperative handles</p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={fetchItems}
-            disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md disabled:opacity-50"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </button>
-          <button
-            onClick={openCreateModal}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-indigo-600 hover:shadow-xl hover:-translate-y-0.5"
-          >
-            <Plus className="h-4 w-4" />
-            Add Item
-          </button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={fetchItems} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+          </Button>
+          <Button onClick={openCreateModal} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+            <Plus className="mr-2 h-4 w-4" /> Add Item
+          </Button>
         </div>
       </div>
 
-      {/* Banners */}
+      {/* Alerts */}
       {successMsg && (
-        <div className="flex items-center gap-3 rounded-xl border border-emerald-200/60 bg-emerald-50 p-4 text-sm font-medium text-emerald-700 animate-slide-down">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">✓</span>
-          {successMsg}
-        </div>
+        <Alert className="bg-emerald-50 border-emerald-200 text-emerald-700 animate-slide-down">
+          <AlertDescription>{successMsg}</AlertDescription>
+        </Alert>
       )}
       {error && !isModalOpen && (
-        <div className="rounded-xl border border-red-200/60 bg-red-50 p-4 text-sm font-medium text-red-700 animate-slide-down">{error}</div>
+        <Alert variant="destructive" className="animate-slide-down">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
-      {/* Search Bar */}
-      <div className="relative max-w-md animate-slide-up" style={{ animationDelay: "100ms", animationFillMode: "both" }}>
-        <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search items by name or unit…"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
-        />
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Input placeholder="Search items by name or unit…" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
       </div>
 
-      {/* Items Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm animate-slide-up" style={{ animationDelay: "200ms", animationFillMode: "both" }}>
+      {/* Table */}
+      <Card>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-100">
+          <table className="min-w-full">
             <thead>
-              <tr className="bg-gradient-to-r from-gray-50 to-gray-50/50">
-                {["Name", "Unit of Measure", "Default Unit Price (RWF)", "Actions"].map((header) => (
-                  <th key={header} className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{header}</th>
+              <tr className="border-b bg-gray-50/50">
+                {["Name", "Unit of Measure", "Default Unit Price (RWF)", "Actions"].map(h => (
+                  <th key={h} className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-50">
               {loading ? (
                 <tr>
                   <td colSpan={4} className="py-16 text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-indigo-500" />
-                    <p className="mt-3 text-sm text-gray-400">Loading items…</p>
+                    <Loader2 className="mx-auto h-6 w-6 animate-spin text-emerald-500" />
+                    <p className="mt-2 text-sm text-gray-400">Loading items…</p>
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-16 text-center">
                     <Package className="mx-auto h-10 w-10 text-gray-300" />
-                    <p className="mt-3 text-sm text-gray-400">No catalog items found. Add one to get started.</p>
+                    <p className="mt-2 text-sm text-gray-400">No catalog items yet. Add one to get started.</p>
                   </td>
                 </tr>
               ) : filteredItems.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-16 text-center">
                     <Search className="mx-auto h-10 w-10 text-gray-300" />
-                    <p className="mt-3 text-sm text-gray-400">No items match your search.</p>
+                    <p className="mt-2 text-sm text-gray-400">No items match your search.</p>
                   </td>
                 </tr>
               ) : (
-                filteredItems.map((item) => (
-                  <tr key={item.id} className="transition-colors duration-150 hover:bg-indigo-50/30">
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">{item.name}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{item.unitOfMeasure}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-700">{formatRWF(item.defaultUnitPrice)} RWF</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => openEditModal(item)}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-amber-200/60 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 transition-all hover:bg-amber-100 hover:shadow-sm hover:-translate-y-0.5"
-                          title="Edit item"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          disabled={deletingId === item.id}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-red-200/60 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition-all hover:bg-red-100 hover:shadow-sm hover:-translate-y-0.5 disabled:opacity-50"
-                          title="Delete item"
-                        >
-                          {deletingId === item.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                filteredItems.map(item => (
+                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="whitespace-nowrap px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
+                    <td className="whitespace-nowrap px-5 py-3 text-sm text-gray-500">{item.unitOfMeasure}</td>
+                    <td className="whitespace-nowrap px-5 py-3 text-sm font-mono text-gray-700">{formatRWF(item.defaultUnitPrice)} RWF</td>
+                    <td className="whitespace-nowrap px-5 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <Button size="sm" variant="outline" onClick={() => openEditModal(item)}
+                          className="text-xs text-amber-700 border-amber-200 hover:bg-amber-50">
+                          <Pencil className="h-3 w-3 mr-1" /> Edit
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleDelete(item.id)} disabled={deletingId === item.id}
+                          className="text-xs text-red-600 border-red-200 hover:bg-red-50">
+                          {deletingId === item.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Trash2 className="h-3 w-3 mr-1" />}
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -295,78 +188,47 @@ const CatalogItems = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
-      {/* Add / Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-gray-200/60 bg-white shadow-2xl animate-scale-in">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-md shadow-indigo-500/20">
-                  <Package className="h-4 w-4 text-white" />
-                </div>
-                <h2 className="text-lg font-bold text-gray-900">{editingItem ? "Edit Item" : "Add New Item"}</h2>
-              </div>
-              <button onClick={closeModal} className="rounded-xl p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600">
-                <X className="h-5 w-5" />
-              </button>
+      {/* Add/Edit Modal */}
+      <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) closeModal(); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? "Edit Item" : "Add New Item"}</DialogTitle>
+            <DialogDescription>{editingItem ? "Update the item details below" : "Fill in the item details to add it to your catalog"}</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+            {error && isModalOpen && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Item Name</Label>
+              <Input id="name" name="name" required placeholder="e.g. Coffee Beans" value={formData.name} onChange={handleInputChange} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="unitOfMeasure">Unit of Measure</Label>
+              <Input id="unitOfMeasure" name="unitOfMeasure" required placeholder="e.g. KG, MT, TRIPS" value={formData.unitOfMeasure} onChange={handleInputChange} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="defaultUnitPrice">Default Unit Price (RWF)</Label>
+              <Input id="defaultUnitPrice" name="defaultUnitPrice" type="number" required min="0" step="any" placeholder="e.g. 1500" value={formData.defaultUnitPrice} onChange={handleInputChange} />
             </div>
 
-            <form onSubmit={handleSubmit} className="px-6 py-5">
-              {error && isModalOpen && (
-                <div className="mb-4 rounded-xl border border-red-200/60 bg-red-50 p-3 text-sm font-medium text-red-700">{error}</div>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="mb-1.5 block text-sm font-semibold text-gray-700">Item Name</label>
-                  <input
-                    id="name" name="name" type="text" required value={formData.name} onChange={handleInputChange}
-                    placeholder="e.g. Coffee Beans, Transport Service"
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm shadow-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="unitOfMeasure" className="mb-1.5 block text-sm font-semibold text-gray-700">Unit of Measure</label>
-                  <input
-                    id="unitOfMeasure" name="unitOfMeasure" type="text" required value={formData.unitOfMeasure} onChange={handleInputChange}
-                    placeholder="e.g. KG, MT, TRIPS, LITERS"
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm shadow-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="defaultUnitPrice" className="mb-1.5 block text-sm font-semibold text-gray-700">Default Unit Price (RWF)</label>
-                  <input
-                    id="defaultUnitPrice" name="defaultUnitPrice" type="number" required min="0" step="any" value={formData.defaultUnitPrice} onChange={handleInputChange}
-                    placeholder="e.g. 1500"
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm shadow-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
-                <button
-                  type="button" onClick={closeModal}
-                  className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 hover:shadow-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit" disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-indigo-600 hover:shadow-xl disabled:opacity-50"
-                >
-                  {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {submitting ? (editingItem ? "Updating…" : "Creating…") : (editingItem ? "Update Item" : "Create Item")}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button type="button" variant="outline" onClick={closeModal}>Cancel</Button>
+              <Button type="submit" disabled={submitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {submitting ? (editingItem ? "Updating…" : "Creating…") : (editingItem ? "Update Item" : "Create Item")}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 export default CatalogItems;
-

@@ -1,16 +1,19 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
 const DashboardLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50">
-      <Sidebar />
+    <div className="flex min-h-screen bg-background">
+      <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
-      <div className="flex min-h-screen flex-1 flex-col md:ml-72">
-        <Header />
+      <div className="flex min-h-screen flex-1 flex-col md:ml-64">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl animate-fade-in">
             <Outlet />
           </div>

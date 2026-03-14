@@ -18,20 +18,18 @@ const UsersPage = () => {
   return <StaffAndUsers />;
 };
 
-// ─── Styled Placeholder Pages ────────────────────────────────────────────────
-const PlaceholderPage = ({ icon: Icon, title, description, gradient }) => (
+// ─── Simple Placeholder Pages ─────────────────────────────────────
+const PlaceholderPage = ({ icon: Icon, title, description }) => (
   <div className="flex items-center justify-center py-20 animate-fade-in">
     <div className="text-center">
-      <div className={`mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br ${gradient} shadow-xl mb-6`}>
-        <Icon className="h-10 w-10 text-white" />
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 mb-4">
+        <Icon className="h-7 w-7" />
       </div>
-      <h1 className="text-2xl font-extrabold text-gray-900">{title}</h1>
-      <p className="mt-2 text-sm text-gray-400 max-w-sm mx-auto">{description}</p>
-      <div className="mt-5">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-teal-500 to-indigo-500 px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-teal-500/20">
-          ✨ Coming Soon
-        </span>
-      </div>
+      <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+      <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">{description}</p>
+      <span className="mt-4 inline-block rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+        Coming Soon
+      </span>
     </div>
   </div>
 );
@@ -41,7 +39,6 @@ const Activities = () => (
     icon={ClipboardList}
     title="Activities"
     description="Track and manage all cooperative activities, field visits, and operations in one place."
-    gradient="from-indigo-500 to-indigo-600"
   />
 );
 
@@ -50,7 +47,6 @@ const MyActivities = () => (
     icon={Shield}
     title="My Activities"
     description="View your personal activity history, upcoming tasks, and participation records."
-    gradient="from-teal-500 to-teal-600"
   />
 );
 
@@ -59,7 +55,6 @@ const Payments = () => (
     icon={CreditCard}
     title="Payments"
     description="Process and track payments, invoices, and financial transactions for your cooperative."
-    gradient="from-purple-500 to-purple-600"
   />
 );
 
@@ -68,19 +63,23 @@ const Profile = () => (
     icon={UserCircle}
     title="My Profile"
     description="Manage your personal information, preferences, and account settings."
-    gradient="from-blue-500 to-blue-600"
   />
 );
 
 const Unauthorized = () => (
-  <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100/50 px-4">
+  <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
     <div className="text-center animate-scale-in">
-      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-red-500 to-red-600 shadow-xl shadow-red-500/25 mb-6">
-        <Shield className="h-10 w-10 text-white" />
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-600 mb-4">
+        <Shield className="h-7 w-7" />
       </div>
-      <h1 className="text-3xl font-extrabold text-gray-900">Access Denied</h1>
-      <p className="mt-3 text-sm text-gray-400 max-w-sm mx-auto">You do not have permission to access this page. Please contact your administrator if you believe this is an error.</p>
-      <a href="/dashboard" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-indigo-600 hover:shadow-xl hover:-translate-y-0.5">
+      <h1 className="text-xl font-bold text-gray-900">Access Denied</h1>
+      <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
+        You do not have permission to access this page. Please contact your administrator.
+      </p>
+      <a
+        href="/dashboard"
+        className="mt-4 inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+      >
         Go to Dashboard
       </a>
     </div>
