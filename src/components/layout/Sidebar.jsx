@@ -1,6 +1,7 @@
 import {
   Building2,
   ClipboardList,
+  FileText,
   LayoutDashboard,
   Leaf,
   Package,
@@ -38,10 +39,17 @@ const navItems = [
     section: "Management",
   },
   {
+    title: "System Logs",
+    path: "/logs",
+    icon: FileText,
+    allowedRoles: ["SUPER_ADMIN"],
+    section: "Management",
+  },
+  {
     title: "Catalog Items",
     path: "/items",
     icon: Package,
-    allowedRoles: ["COOP_ADMIN", "FIELD_OFFICER", "ACCOUNTANT"],
+    allowedRoles: ["COOP_ADMIN", "ACCOUNTANT"],
     section: "Operations",
   },
   {

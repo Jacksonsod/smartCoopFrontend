@@ -303,7 +303,7 @@ const CooperativeApplication = () => {
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Application received!</h2>
                   <p className="mt-2 max-w-sm text-sm text-gray-500">
-                    Our Super Admin will review your details and contact you shortly.
+                    Your application has been sent successfully. An email and in-app notification were delivered to the Super Admin for review.
                   </p>
 
                   <div className="mt-6 grid w-full max-w-md gap-3 sm:grid-cols-2">

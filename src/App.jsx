@@ -9,13 +9,22 @@ import UserManagement from "./pages/admin/UserManagement";
 import Dashboard from "./pages/admin/Dashboard";
 import CatalogItems from "./pages/admin/CatalogItems";
 import StaffAndUsers from "./pages/admin/StaffAndUsers";
+import SystemLogs from "./pages/admin/SystemLogs";
+import MemberDashboard from "./pages/member/MemberDashboard";
 import { useAuth } from "./context/AuthContext";
 import { ClipboardList, CreditCard, Shield, UserCircle } from "lucide-react";
+import Activities from "./pages/admin/Activities";
 
 const UsersPage = () => {
   const { user } = useAuth();
   if (user?.role === "SUPER_ADMIN") return <UserManagement />;
   return <StaffAndUsers />;
+};
+
+const DashboardEntry = () => {
+  const { user } = useAuth();
+  if (user?.role === "MEMBER") return <MemberDashboard />;
+  return <Dashboard />;
 };
 
 // ─── Simple Placeholder Pages ─────────────────────────────────────
@@ -34,21 +43,6 @@ const PlaceholderPage = ({ icon: Icon, title, description }) => (
   </div>
 );
 
-const Activities = () => (
-  <PlaceholderPage
-    icon={ClipboardList}
-    title="Activities"
-    description="Track and manage all cooperative activities, field visits, and operations in one place."
-  />
-);
-
-const MyActivities = () => (
-  <PlaceholderPage
-    icon={Shield}
-    title="My Activities"
-    description="View your personal activity history, upcoming tasks, and participation records."
-  />
-);
 
 const Payments = () => (
   <PlaceholderPage
@@ -96,7 +90,7 @@ const App = () => {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<DashboardEntry />} />
               <Route
                 path="/cooperatives"
                 element={
@@ -117,8 +111,30 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/activities" element={<Activities />} />
-              <Route path="/my-activities" element={<MyActivities />} />
+              <Route
+                path="/activities"
+                element={
+                  <ProtectedRoute allowedRoles={["COOP_ADMIN", "FIELD_OFFICER"]}>
+                    <Activities />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/logs"
+                element={
+                  <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
+                    <SystemLogs />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-activities"
+                element={
+                  <ProtectedRoute allowedRoles={["MEMBER"]}>
+                    <MemberDashboard />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/payments" element={<Payments />} />
               <Route path="/profile" element={<Profile />} />
             </Route>

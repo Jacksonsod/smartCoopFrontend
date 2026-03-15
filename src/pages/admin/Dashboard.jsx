@@ -1,3 +1,109 @@
+// ═══════════════════════════════════════════════════════════════════
+// ─── FIELD OFFICER DASHBOARD ──────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+import { getCoopActivities } from "@/services/activityService";
+
+const FieldOfficerDashboard = () => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setError(null);
+    (async () => {
+      try {
+        const res = await getCoopActivities();
+        if (!mounted) return;
+        setActivities(Array.isArray(res?.data) ? res.data : Array.isArray(res?.data?.content) ? res.data.content : []);
+      } catch (err) {
+        if (!mounted) return;
+        setError("Could not load activities.");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {greet()}, {user?.username || "Field Officer"}
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Welcome! Here are your recent cooperative activities.
+        </p>
+        <div className="mt-4">
+          <a href="/activities">
+            <button className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">
+              Record Activity
+            </button>
+          </a>
+        </div>
+      </div>
+      <div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex h-20 items-center justify-center gap-2">
+                <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+                <span className="text-sm text-gray-500">Loading activities...</span>
+              </div>
+            ) : error ? (
+              <Alert>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : activities.length === 0 ? (
+              <div className="py-12 text-center text-sm text-gray-500">No activities recorded yet.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full border border-gray-200 rounded-md">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Member Name</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Item/Service</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Quantity</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activities.slice(0, 10).map((activity) => (
+                      <tr key={activity.id} className="border-b last:border-b-0">
+                        <td className="px-4 py-2 text-sm text-gray-700">
+                          {new Date(activity.activityDate || activity.createdAt).toLocaleString("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                        </td>
+                        <td className="px-4 py-2 text-sm text-gray-900">
+                          {activity.memberName || activity.member?.fullName || activity.member?.username || "-"}
+                        </td>
+                        <td className="px-4 py-2 text-sm text-gray-900">
+                          {activity.itemName || activity.item?.name || activity.serviceName || "-"}
+                        </td>
+                        <td className="px-4 py-2 text-sm text-gray-700">
+                          {activity.metricValue}
+                        </td>
+                        <td className="px-4 py-2 text-sm text-gray-700">
+                          {activity.notes || "-"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -574,6 +680,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   if (user?.role === "SUPER_ADMIN") return <SuperAdminDashboard />;
   if (user?.role === "COOP_ADMIN") return <CoopAdminDashboard />;
+  if (user?.role === "FIELD_OFFICER") return <FieldOfficerDashboard />;
   return (
     <div className="flex h-64 items-center justify-center gap-3">
       <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
