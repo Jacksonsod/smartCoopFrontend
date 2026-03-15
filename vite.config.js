@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/v1": {
-        target: "http://localhost:8089",
+        target: "https://smart-coop.onrender.com",
         changeOrigin: true,
         secure: false,
       },
