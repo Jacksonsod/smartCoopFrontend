@@ -41,7 +41,9 @@ const Activities = () => {
     ]).then(([activitiesRes, membersRes, itemsRes]) => {
       if (!mounted) return;
       setActivities(extractList(activitiesRes?.data));
-      setMembers(extractList(membersRes?.data));
+      const membersList = extractList(membersRes?.data);
+      console.log("[Activities] Members fetched:", membersList);
+      setMembers(membersList);
       setCatalogItems(extractList(itemsRes?.data));
       setLoading(false);
     }).catch(() => {
@@ -52,7 +54,7 @@ const Activities = () => {
   }, []);
 
   const filteredMembers = useMemo(() =>
-    members.filter((m) => String(m.role).toUpperCase() === "MEMBER"),
+    members.filter((m) => String(m.role).toLowerCase() === "member"),
     [members]
   );
 
@@ -177,11 +179,15 @@ const Activities = () => {
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                 >
                   <option value="" disabled>Select member</option>
-                  {filteredMembers.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.fullName || member.username || `Member #${member.id}`}
-                    </option>
-                  ))}
+                   {filteredMembers.length === 0 ? (
+                     <option value="" disabled>No members available</option>
+                   ) : (
+                     filteredMembers.map((member) => (
+                       <option key={member.id} value={member.id}>
+                         {member.fullName || member.username || `Member #${member.id}`}
+                       </option>
+                     ))
+                   )}
                 </select>
               </div>
               <div>

@@ -67,6 +67,13 @@ const navItems = [
     section: "Personal",
   },
   {
+    title: "Report Problem",
+    path: "/report-problem",
+    icon: FileText,
+    allowedRoles: ["MEMBER"],
+    section: "Personal",
+  },
+  {
     title: "Payments",
     path: "/payments",
     icon: ReceiptText,

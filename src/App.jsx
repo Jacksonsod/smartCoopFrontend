@@ -14,6 +14,7 @@ import MemberDashboard from "./pages/member/MemberDashboard";
 import { useAuth } from "./context/AuthContext";
 import { ClipboardList, CreditCard, Shield, UserCircle } from "lucide-react";
 import Activities from "./pages/admin/Activities";
+import RaiseProblem from './pages/member/RaiseProblem';
 
 
 const UsersPage = () => {
@@ -133,6 +134,12 @@ const App = () => {
                 element={
                   <ProtectedRoute allowedRoles={["MEMBER"]}>
                     <MemberDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/report-problem" element={
+                  <ProtectedRoute allowedRoles={["MEMBER"]}>
+                    <RaiseProblem />
                   </ProtectedRoute>
                 }
               />
