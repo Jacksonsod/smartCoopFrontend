@@ -15,6 +15,7 @@ import { useAuth } from "./context/AuthContext";
 import { ClipboardList, CreditCard, Shield, UserCircle } from "lucide-react";
 import Activities from "./pages/admin/Activities";
 
+
 const UsersPage = () => {
   const { user } = useAuth();
   if (user?.role === "SUPER_ADMIN") return <UserManagement />;
