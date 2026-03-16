@@ -11,12 +11,13 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { getAllUsers, toggleUserStatus, deleteUser } from "@/services/userService";
+import { getAllUsers, toggleUserStatus, deleteUser, updateUser } from "@/services/userService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/context/AuthContext";
 
 // ─── Helpers ─────────────────────────────────────────────────────
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
@@ -42,6 +43,7 @@ const ALL_ROLES = ["SUPER_ADMIN", "COOP_ADMIN", "ACCOUNTANT", "FIELD_OFFICER", "
 
 // ═══════════════════════════════════════════════════════════════════
 const UserManagement = () => {
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
@@ -51,6 +53,10 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
+
+  const [editUser, setEditUser] = useState(null); // user object for modal
+  const [editForm, setEditForm] = useState({ firstName: '', lastName: '', email: '', phone: '', username: '', role: '', password: '' });
+  const [editLoading, setEditLoading] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true); setError(null);
@@ -87,6 +93,54 @@ const UserManagement = () => {
     finally { setDeletingId(null); }
   };
 
+  // Open edit modal and populate form
+  const handleEditOpen = (user) => {
+    setEditUser(user);
+    setEditForm({
+      firstName: user.firstName || user.profile?.firstName || '',
+      lastName: user.lastName || user.profile?.lastName || '',
+      email: user.email || '',
+      phone: user.phone || user.profile?.phone || '',
+      username: user.username || '',
+      role: user.role || '',
+      password: '', // always blank on open
+    });
+  };
+  // Close edit modal
+  const handleEditClose = () => {
+    setEditUser(null);
+    setEditForm({ firstName: '', lastName: '', email: '', phone: '', username: '', role: '', password: '' });
+    setEditLoading(false);
+  };
+  // Handle edit form change
+  const handleEditChange = (e) => {
+    setEditForm(f => ({ ...f, [e.target.name]: e.target.value }));
+  };
+  // Submit edit
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        email: editForm.email,
+        phone: editForm.phone,
+        username: editForm.username,
+        role: editForm.role,
+        password: editForm.password ? editForm.password : "unchanged",
+      };
+      await updateUser(editUser.id, payload);
+      setSuccessMsg('User updated successfully!');
+      fetchUsers();
+      handleEditClose();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update user.');
+    }
+    setEditLoading(false);
+  };
+
   const filtered = users.filter(u => {
     if (searchTerm) {
       const t = searchTerm.toLowerCase();
@@ -111,7 +165,7 @@ const UserManagement = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">All Platform Users</h1>
-        <p className="text-sm text-gray-500 mt-1">View, manage, and control access for every user. {activeCount} active of {total}.</p>
+        <p className="text-sm text-gray-500 mt-1">Welcome, {user?.firstName || user?.fullName || user?.username || ""}. View, manage, and control access for every user. {activeCount} active of {total}.</p>
       </div>
 
       {/* Alerts */}
@@ -131,27 +185,40 @@ const UserManagement = () => {
       )}
 
       {/* Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-4 items-center mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input placeholder="Search users…" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <Input
+            placeholder="Search users…"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="pl-10 border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          />
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 rounded-md border border-input px-3 py-1.5 text-sm">
-            <Filter className="h-3.5 w-3.5 text-gray-400" />
-            <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)} className="bg-transparent text-sm focus:outline-none cursor-pointer">
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-2 border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500">
+            <Filter className="h-4 w-4 text-gray-400" />
+            <select
+              value={roleFilter}
+              onChange={e => setRoleFilter(e.target.value)}
+              className="bg-transparent text-sm focus:outline-none cursor-pointer px-2"
+            >
               <option value="ALL">All Roles</option>
               {ALL_ROLES.map(r => <option key={r} value={r}>{r.replace(/_/g, " ")}</option>)}
             </select>
           </div>
-          <div className="flex items-center gap-1.5 rounded-md border border-input px-3 py-1.5 text-sm">
-            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-transparent text-sm focus:outline-none cursor-pointer">
+          <div className="flex items-center gap-2 border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500">
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="bg-transparent text-sm focus:outline-none cursor-pointer px-2"
+            >
               <option value="ALL">All Statuses</option>
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
             </select>
           </div>
-          <Button variant="outline" size="icon" onClick={fetchUsers} disabled={loading}>
+          <Button variant="outline" size="icon" onClick={fetchUsers} disabled={loading} className="border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </Button>
         </div>
@@ -234,6 +301,9 @@ const UserManagement = () => {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
+                          <Button size="sm" variant="outline" onClick={() => handleEditOpen(u)} className="text-xs text-blue-700 border-blue-200 hover:bg-blue-50">
+                            Edit
+                          </Button>
                           <Button size="sm" variant="outline" onClick={() => handleToggle(u.id)} disabled={togglingId === u.id}
                             className={`text-xs ${active ? "text-amber-700 border-amber-200 hover:bg-amber-50" : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"}`}>
                             {togglingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Power className="h-3 w-3 mr-1" />}
@@ -253,6 +323,50 @@ const UserManagement = () => {
             </table>
           </div>
         </Card>
+      )}
+
+      {/* Edit User Modal */}
+      {editUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative animate-fade-in">
+            <button onClick={handleEditClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"><X className="h-5 w-5" /></button>
+            <h2 className="text-lg font-semibold mb-4">Edit User</h2>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">First Name</label>
+                <Input name="firstName" value={editForm.firstName} onChange={handleEditChange} required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                <Input name="lastName" value={editForm.lastName} onChange={handleEditChange} required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <Input name="email" type="email" value={editForm.email} onChange={handleEditChange} required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Phone</label>
+                <Input name="phone" value={editForm.phone} onChange={handleEditChange} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Username</label>
+                <Input name="username" value={editForm.username} onChange={handleEditChange} required disabled />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Role</label>
+                <Input name="role" value={editForm.role} onChange={handleEditChange} required disabled />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <Input name="password" type="password" value={editForm.password} onChange={handleEditChange} placeholder="Leave blank to keep unchanged" autoComplete="new-password" />
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button type="button" variant="outline" onClick={handleEditClose}>Cancel</Button>
+                <Button type="submit" disabled={editLoading}>{editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}</Button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

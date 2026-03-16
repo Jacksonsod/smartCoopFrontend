@@ -32,6 +32,13 @@ const navItems = [
     section: "Management",
   },
   {
+    title: "Pending Cooperatives",
+    path: "/pending-cooperatives",
+    icon: ClipboardList,
+    allowedRoles: ["SUPER_ADMIN"],
+    section: "Management",
+  },
+  {
     title: "Staff & Users",
     path: "/users",
     icon: Users,
@@ -57,6 +64,13 @@ const navItems = [
     path: "/activities",
     icon: ClipboardList,
     allowedRoles: ["COOP_ADMIN", "FIELD_OFFICER", "ACCOUNTANT"],
+    section: "Operations",
+  },
+  {
+    title: "Helpdesk",
+    path: "/helpdesk",
+    icon: FileText,
+    allowedRoles: ["COOP_ADMIN"],
     section: "Operations",
   },
   {

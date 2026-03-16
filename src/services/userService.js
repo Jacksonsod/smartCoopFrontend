@@ -1,3 +1,5 @@
+// Update user details (firstName, lastName, email, phone)
+export const updateUser = (id, data) => api.put(`/users/${id}`, data);
 import api from "./api";
 
 export const registerCoopAdmin = (data) => {

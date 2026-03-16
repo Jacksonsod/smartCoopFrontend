@@ -37,7 +37,7 @@ const COOPERATIVE_TYPES = ["AGRICULTURE", "FINANCIAL", "SERVICE", "TRANSPORT", "
 const initialFormState = {
   name: "", tinNumber: "", rcaRegistrationNumber: "", category: "", type: "",
   province: "", district: "", sector: "",
-  representativeName: "", representativePhone: "",
+  representativeName: "", representativePhone: "", representativeEmail: "",
 };
 const resetAdminForm = () => ({
   username: "", email: "", phone: "", password: "",
@@ -426,6 +426,7 @@ const CooperativeManagement = () => {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Field id="representativeName" label="Name" placeholder="e.g. Jean Bosco" value={formData.representativeName} onChange={handleInputChange} />
                 <Field id="representativePhone" label="Phone" placeholder="e.g. 0788123456" type="tel" value={formData.representativePhone} onChange={handleInputChange} />
+                <Field id="representativeEmail" label="Representative Email" type="email" placeholder="e.g. bosco@coop.rw" value={formData.representativeEmail} onChange={handleInputChange} required={true} />
               </div>
             </div>
             <Separator />

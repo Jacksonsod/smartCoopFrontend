@@ -9,19 +9,15 @@ const publicApi = axios.create({
   },
 });
 
-export const getAllCooperatives = () => {
-  return api.get(COOPERATIVES_BASE);
-};
+export const getAllCooperatives = async () => await api.get(COOPERATIVES_BASE);
 
 export const registerCooperative = (data) => {
   return api.post(COOPERATIVES_BASE, data);
 };
 
-export const activateCooperative = (id) => {
-  return api.put(`${COOPERATIVES_BASE}/${id}/activate`);
-};
+export const activateCooperative = async (id) => await api.put(`${COOPERATIVES_BASE}/${id}/activate`);
+export const deactivateCooperative = async (id) => await api.put(`${COOPERATIVES_BASE}/${id}/deactivate`);
 
 export const submitCooperativeApplication = (data) => {
   return publicApi.post("/public/cooperatives/apply", data);
 };
-

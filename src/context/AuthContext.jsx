@@ -47,11 +47,13 @@ const getUserFromToken = (token) => {
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
 
     if (!storedToken) {
+      setIsLoading(false);
       return;
     }
 
@@ -63,6 +65,8 @@ export const AuthProvider = ({ children }) => {
     } else {
       localStorage.removeItem("token");
     }
+
+    setIsLoading(false);
   }, []);
 
   const login = (newToken) => {
@@ -92,8 +96,9 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated,
       login,
       logout,
+      isLoading,
     }),
-    [token, user, isAuthenticated]
+    [token, user, isAuthenticated, isLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

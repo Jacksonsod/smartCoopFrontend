@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { getMyNotifications, getUnreadCount, markAsRead } from "@/services/notificationService";
+import EditProfileModal from "./EditProfileModal";
 
 const formatRole = (role = "") =>
   role.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -64,6 +65,8 @@ const Header = ({ onMenuClick }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const handleLogout = () => {
@@ -190,6 +193,7 @@ const Header = ({ onMenuClick }) => {
 
       {/* Right */}
       <div className="flex items-center gap-2">
+        {/* Notification Bell */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen((prev) => !prev)}
@@ -235,29 +239,49 @@ const Header = ({ onMenuClick }) => {
           )}
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 outline-none transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-emerald-500/30">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-emerald-600 text-xs font-semibold text-white">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden text-left sm:block">
-                <p className="text-sm font-medium text-gray-900">{user?.username || "User"}</p>
-                <p className="text-[11px] text-gray-400">{formatRole(user?.role || "")}</p>
+        {/* User Profile Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setProfileDropdownOpen((prev) => !prev)}
+            className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 outline-none transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-emerald-500/30"
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-emerald-600 text-xs font-semibold text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="hidden text-left sm:block">
+              <p className="text-sm font-medium text-gray-900">{user?.firstName || user?.username || "Admin"}</p>
+              <p className="text-[11px] text-gray-400">{formatRole(user?.role || "")}</p>
+            </div>
+          </button>
+          {profileDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 z-50">
+              <div className="text-sm text-gray-700 font-bold px-4 py-2 cursor-default">
+                {user?.firstName || user?.username || "User"}
+                <span className="block text-xs font-normal text-gray-500">{formatRole(user?.role || "")}</span>
               </div>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel className="text-xs text-gray-500">My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <button
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                onClick={() => { setEditProfileOpen(true); setProfileDropdownOpen(false); }}
+              >
+                <svg className="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5l-4 1 1-4L16.5 3.5z" /></svg>
+                Edit Profile
+              </button>
+              <button
+                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-600"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </button>
+            </div>
+          )}
+          {/* Edit Profile Modal */}
+          {editProfileOpen && (
+            <EditProfileModal open={editProfileOpen} onClose={() => setEditProfileOpen(false)} />
+          )}
+        </div>
       </div>
     </header>
   );

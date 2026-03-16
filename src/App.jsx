@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
@@ -12,9 +13,14 @@ import StaffAndUsers from "./pages/admin/StaffAndUsers";
 import SystemLogs from "./pages/admin/SystemLogs";
 import MemberDashboard from "./pages/member/MemberDashboard";
 import { useAuth } from "./context/AuthContext";
-import { ClipboardList, CreditCard, Shield, UserCircle } from "lucide-react";
+import { CreditCard, Shield, UserCircle } from "lucide-react";
 import Activities from "./pages/admin/Activities";
 import RaiseProblem from './pages/member/RaiseProblem';
+import AdminHelpdesk from './pages/admin/AdminHelpdesk';
+import PendingCooperatives from "./pages/superadmin/PendingCooperatives";
+import AccountantDashboard from "./pages/accountant/Dashboard";
+import ActivitiesLedger from "./pages/accountant/ActivitiesLedger";
+import PaymentsManagement from "./pages/accountant/PaymentsManagement";
 
 
 const UsersPage = () => {
@@ -84,74 +90,120 @@ const Unauthorized = () => (
 
 const App = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/apply" element={<CooperativeApplication />} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/apply" element={<CooperativeApplication />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<DashboardEntry />} />
-              <Route
-                path="/cooperatives"
-                element={
-                  <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
-                    <CooperativeManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/users" element={
-                  <ProtectedRoute allowedRoles={["SUPER_ADMIN", "COOP_ADMIN"]}>
-                    <UsersPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/items" element={
-                  <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>
-                    <CatalogItems />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/activities"
-                element={
-                  <ProtectedRoute allowedRoles={["COOP_ADMIN", "FIELD_OFFICER"]}>
-                    <Activities />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/logs"
-                element={
-                  <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
-                    <SystemLogs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/my-activities"
-                element={
-                  <ProtectedRoute allowedRoles={["MEMBER"]}>
-                    <MemberDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/report-problem" element={
-                  <ProtectedRoute allowedRoles={["MEMBER"]}>
-                    <RaiseProblem />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/payments" element={<Payments />} />
-              <Route path="/profile" element={<Profile />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<DashboardEntry />} />
+                <Route
+                  path="/cooperatives"
+                  element={
+                    <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
+                      <CooperativeManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/pending-cooperatives"
+                  element={
+                    <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
+                      <PendingCooperatives />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/users" element={
+                    <ProtectedRoute allowedRoles={["SUPER_ADMIN", "COOP_ADMIN"]}>
+                      <UsersPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/items" element={
+                    <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>
+                      <CatalogItems />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/activities"
+                  element={
+                    <ProtectedRoute allowedRoles={["COOP_ADMIN", "FIELD_OFFICER"]}>
+                      <Activities />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/logs"
+                  element={
+                    <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
+                      <SystemLogs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/my-activities"
+                  element={
+                    <ProtectedRoute allowedRoles={["MEMBER"]}>
+                      <MemberDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/report-problem" element={
+                    <ProtectedRoute allowedRoles={["MEMBER"]}>
+                      <RaiseProblem />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/payments" element={<Payments />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/helpdesk" element={
+                    <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>
+                      <AdminHelpdesk />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/accountant/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={["ACCOUNTANT", "ROLE_ACCOUNTANT"]}>
+                      <DashboardLayout>
+                        <AccountantDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/accountant/ledger"
+                  element={
+                    <ProtectedRoute allowedRoles={["ACCOUNTANT", "ROLE_ACCOUNTANT"]}>
+                      <DashboardLayout>
+                        <ActivitiesLedger />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/accountant/payments"
+                  element={
+                    <ProtectedRoute allowedRoles={["ACCOUNTANT", "ROLE_ACCOUNTANT"]}>
+                      <DashboardLayout>
+                        <PaymentsManagement />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
             </Route>
-          </Route>
-          <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

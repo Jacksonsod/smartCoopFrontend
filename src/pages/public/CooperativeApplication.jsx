@@ -9,6 +9,7 @@ import {
   FileBadge2,
   Leaf,
   Loader2,
+  Mail,
   MapPin,
   Phone,
   Send,
@@ -43,6 +44,7 @@ const initialFormState = {
   district: "",
   sector: "",
   representativeName: "",
+  representativeEmail: "",
   representativePhone: "",
 };
 
@@ -272,7 +274,10 @@ const CooperativeApplication = () => {
                       </div>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <Field id="representativeName" label="Representative name" icon={UserRound} value={formData.representativeName} onChange={handleChange} placeholder="e.g. Jean Bosco" />
-                        <Field id="representativePhone" label="Representative phone" icon={Phone} type="tel" value={formData.representativePhone} onChange={handleChange} placeholder="e.g. 0788123456" />
+                        <Field id="representativeEmail" label="Representative email" icon={Mail} type="email" value={formData.representativeEmail} onChange={handleChange} placeholder="e.g. jean@example.com" />
+                        <div className="sm:col-span-2">
+                          <Field id="representativePhone" label="Representative phone" icon={Phone} type="tel" value={formData.representativePhone} onChange={handleChange} placeholder="e.g. 0788123456" />
+                        </div>
                       </div>
                     </div>
 
