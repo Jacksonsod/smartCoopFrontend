@@ -21,6 +21,7 @@ import PendingCooperatives from "./pages/superadmin/PendingCooperatives";
 import AccountantDashboard from "./pages/accountant/Dashboard";
 import ActivitiesLedger from "./pages/accountant/ActivitiesLedger";
 import PaymentsManagement from "./pages/accountant/PaymentsManagement";
+import Payments from "./pages/accountant/Payments";
 
 
 const UsersPage = () => {
@@ -52,7 +53,7 @@ const PlaceholderPage = ({ icon: Icon, title, description }) => (
 );
 
 
-const Payments = () => (
+const PaymentsPage = () => (
   <PlaceholderPage
     icon={CreditCard}
     title="Payments"
@@ -131,7 +132,7 @@ const App = () => {
                 <Route
                   path="/activities"
                   element={
-                    <ProtectedRoute allowedRoles={["COOP_ADMIN", "FIELD_OFFICER"]}>
+                    <ProtectedRoute allowedRoles={["COOP_ADMIN", "FIELD_OFFICER", "ACCOUNTANT"]}>
                       <Activities />
                     </ProtectedRoute>
                   }

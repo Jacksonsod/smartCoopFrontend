@@ -55,9 +55,12 @@ const formatDate = (value) => {
 const getStatusBadgeClass = (status) => {
   const normalized = String(status || "PENDING").toUpperCase();
   if (normalized === "PAID") {
-    return "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-100";
+    return "bg-green-50 text-green-700 hover:bg-green-50 border-green-100";
   }
-  return "bg-amber-50 text-amber-700 hover:bg-amber-50 border-amber-100";
+  if (normalized === "UNPROCESSED") {
+    return "bg-orange-50 text-orange-700 hover:bg-orange-50 border-orange-100";
+  }
+  return "bg-gray-100 text-gray-700 hover:bg-gray-100 border-gray-200";
 };
 
 const extractActivities = (payload) => {

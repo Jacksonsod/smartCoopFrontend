@@ -3,6 +3,7 @@ import { getAllActivities } from "../../services/activityService";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
 
 const ActivitiesLedger = () => {
   const [activities, setActivities] = useState([]);
@@ -60,6 +61,21 @@ const ActivitiesLedger = () => {
                 <Badge className={a.status === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
                   {a.status}
                 </Badge>
+                {user?.role === "ACCOUNTANT" && a.status === "UNPROCESSED" && (
+                  <button
+                    className="ml-2 px-3 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+                    onClick={async () => {
+                      try {
+                        await api.patch(`/activities/${a.id}/pay`);
+                        getAllActivities().then(({ data }) => setActivities(data));
+                      } catch (err) {
+                        alert("Failed to mark as paid.");
+                      }
+                    }}
+                  >
+                    Process Payment
+                  </button>
+                )}
               </td>
             </tr>
           ))}

@@ -3,6 +3,8 @@ import { getAllPayments } from "../../services/paymentService";
 import { getAllActivities } from "../../services/activityService";
 import { Badge } from "../../components/ui/badge";
 import { useAuth } from "../../context/AuthContext";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Loader2 } from "lucide-react";
 
 const AccountantDashboard = () => {
   const [payments, setPayments] = useState([]);
@@ -68,7 +70,7 @@ const AccountantDashboard = () => {
           </div>
 
           {/* Recent Payments Table */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-8">
             <div className="font-semibold mb-2">Recent Payments</div>
             <table className="min-w-full">
               <thead>
@@ -101,6 +103,54 @@ const AccountantDashboard = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Recent Activities Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Activities</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex h-20 items-center justify-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+                  <span className="text-sm text-gray-500">Loading activities...</span>
+                </div>
+              ) : activities.length === 0 ? (
+                <div className="py-12 text-center text-sm text-gray-500">No activities found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border border-gray-200 rounded-md">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Type</th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Amount</th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activities.slice(0, 10).map((activity) => (
+                        <tr key={activity.id} className="border-b last:border-b-0">
+                          <td className="px-4 py-2 text-sm text-gray-700">
+                            {new Date(activity.createdAt).toLocaleString("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                          </td>
+                          <td className="px-4 py-2 text-sm text-gray-900">
+                            {activity.type || "-"}
+                          </td>
+                          <td className="px-4 py-2 text-sm text-gray-900">
+                            {activity.amount || 0}
+                          </td>
+                          <td className="px-4 py-2 text-sm text-gray-900">
+                            {activity.notes || "-"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </>
       )}
     </div>
