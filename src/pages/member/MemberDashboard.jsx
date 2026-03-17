@@ -11,6 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getMyActivities } from "@/services/activityService";
+import api from "@/services/api";
+
+const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 
 const parseNumeric = (value) => {
   const parsed = Number(value);
@@ -97,6 +100,7 @@ const StatCard = ({ title, value, icon: Icon, accentClass = "text-emerald-600 bg
 
 const MemberDashboard = () => {
   const [activities, setActivities] = useState([]);
+  const [coopName, setCoopName] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -105,7 +109,9 @@ const MemberDashboard = () => {
     const fetchActivities = async () => {
       setLoading(true);
       try {
-        const response = await getMyActivities();
+        const [response] = await Promise.all([
+          getMyActivities()
+        ]);
         if (mounted) {
           setActivities(extractActivities(response?.data));
         }
@@ -142,8 +148,10 @@ const MemberDashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Cooperative Activity & Earnings</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {greet()}, {coopName || user?.username || "Member"}
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
           Track your deliveries, service records, and payment progress in one place.
         </p>
       </div>

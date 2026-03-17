@@ -34,9 +34,9 @@ const getUserFromToken = (token) => {
     console.log("Normalized User Role:", extractedRole);
 
     return {
-      username: decodedToken.username,
+      username: decodedToken.username || decodedToken.sub,
       role: extractedRole,
-      cooperativeId: decodedToken.cooperativeId,
+      cooperativeId: decodedToken.cooperativeId || decodedToken.tenantId,
     };
   } catch (error) {
     console.error("Failed to decode token:", error);

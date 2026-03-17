@@ -26,7 +26,11 @@ const RaiseIssue = () => {
     setLoading(true);
     setError("");
     try {
-      await axios.post("/api/v1/issues", form);
+      await axios.post("/api/v1/issues", {
+        ...form,
+        category: "QUALITY_CONTROL",
+        assignedRole: "QUALITY_OFFICER"
+      });
       setSuccess(true);
       setForm(initialState);
     } catch (err) {
@@ -55,6 +59,9 @@ const RaiseIssue = () => {
                   <AlertCircle className="h-4 w-4" /> {error}
                 </div>
               )}
+              <p className="text-xs text-emerald-600 bg-emerald-50 p-2 rounded border border-emerald-100">
+                Note: Your issue will be sent directly to the Cooperative Quality Officer.
+              </p>
               <Button type="submit" className="bg-emerald-600 text-white" disabled={loading}>
                 {loading ? t("support.submitting") : t("support.submit")}
               </Button>

@@ -2,12 +2,14 @@
 // ─── FIELD OFFICER DASHBOARD ──────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════
 import { getCoopActivities } from "@/services/activityService";
+import api from "@/services/api";
 
 const FieldOfficerDashboard = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activities, setActivities] = useState([]);
+  const [coopName, setCoopName] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -15,7 +17,9 @@ const FieldOfficerDashboard = () => {
     setError(null);
     (async () => {
       try {
-        const res = await getCoopActivities();
+        const [res] = await Promise.all([
+          getCoopActivities()
+        ]);
         if (!mounted) return;
         setActivities(Array.isArray(res?.data) ? res.data : Array.isArray(res?.data?.content) ? res.data.content : []);
       } catch (err) {
@@ -34,6 +38,7 @@ const FieldOfficerDashboard = () => {
         <h1 className="text-2xl font-bold text-gray-900">
           {greet()}, {user?.username || "Field Officer"}
         </h1>
+        {coopName && <p className="text-lg font-medium text-emerald-700 mt-1">Welcome to {coopName}</p>}
         <p className="text-sm text-gray-500 mt-1">
           Welcome! Here are your recent cooperative activities.
         </p>
@@ -231,16 +236,20 @@ const SuperAdminDashboard = () => {
   const [coops, setCoops] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [items, setItems] = useState([]);
+  const [profileName, setProfileName] = useState("");
 
   useEffect(() => {
     (async () => {
       setLoading(true); setError(null);
-      let c = [], u = [], it = [];
+      let c = [], u = [];
       try { c = extractList((await getAllCooperatives()).data); } catch (e) { console.error(e); }
       try { u = extractList((await getAllUsers()).data); } catch (e) { console.error(e); }
-      try { it = extractList((await getAllItems()).data); } catch (e) { /* 403 ok */ }
+      try {
+        const profRes = await api.get('/profile/me');
+        if (profRes?.data?.fullName) setProfileName(profRes.data.fullName);
+      } catch (e) { /* silent fail */ }
       if (!c.length && !u.length) setError("Could not load data. Please refresh.");
-      setCoops(c); setAllUsers(u); setItems(it); setLoading(false);
+      setCoops(c); setAllUsers(u); setLoading(false);
     })();
   }, []);
 
@@ -280,7 +289,7 @@ const SuperAdminDashboard = () => {
       {/* ── Welcome ───────────────────────────────────────────── */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          {greet()}, {user?.username || "Admin"}
+          {greet()}, {profileName || user?.fullName || user?.firstName || user?.username || "Admin"}
         </h1>
         <p className="text-sm text-gray-500 mt-1">
           Here's an overview of your cooperative ecosystem.
@@ -492,6 +501,7 @@ const CoopAdminDashboard = () => {
   const { user } = useAuth();
   const [staff, setStaff] = useState([]);
   const [items, setItems] = useState([]);
+  const [coopName, setCoopName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -537,6 +547,7 @@ const CoopAdminDashboard = () => {
         <h1 className="text-2xl font-bold text-gray-900">
           {greet()}, {user?.username || "Admin"}
         </h1>
+        {coopName && <p className="text-lg font-medium text-emerald-700 mt-1">Welcome to {coopName}</p>}
         <p className="text-sm text-gray-500 mt-1">Your cooperative's team and operations at a glance.</p>
       </div>
 
@@ -683,6 +694,7 @@ const AccountantDashboard = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [coopName, setCoopName] = useState("");
   const [stats, setStats] = useState({
     pendingCount: 0,
     pendingAmount: 0,
@@ -731,6 +743,7 @@ const AccountantDashboard = () => {
         <h1 className="text-2xl font-bold text-gray-900">
           {greet()}, {user?.username || "Accountant"}
         </h1>
+        {coopName && <p className="text-lg font-medium text-emerald-700 mt-1">Welcome to {coopName}</p>}
         <p className="text-sm text-gray-500 mt-1">Your payments and activities overview.</p>
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

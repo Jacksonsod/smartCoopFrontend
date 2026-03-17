@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { getMyNotifications, getUnreadCount, markAsRead } from "@/services/notificationService";
+import api from "@/services/api";
 import EditProfileModal from "./EditProfileModal";
 
 const formatRole = (role = "") =>
@@ -62,6 +63,7 @@ const Header = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [dbUser, setDbUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -75,7 +77,10 @@ const Header = ({ onMenuClick }) => {
   };
 
   const pageTitle = pageTitles[location.pathname] || "Dashboard";
-  const initials = (user?.username || "U").charAt(0).toUpperCase();
+  
+  const displayUser = dbUser || user;
+  const initials = (displayUser?.fullName || displayUser?.firstName || displayUser?.username || "U").charAt(0).toUpperCase();
+  
   const notificationItems = useMemo(
     () =>
       notifications.map((notification, index) => ({
@@ -94,12 +99,17 @@ const Header = ({ onMenuClick }) => {
 
     const fetchNotificationData = async () => {
       try {
-        const [notificationsResponse, unreadResponse] = await Promise.all([
+        const [notificationsResponse, unreadResponse, userResponse] = await Promise.all([
           getMyNotifications(),
           getUnreadCount(),
+          api.get("/profile/me").catch(() => null)
         ]);
 
         if (!mounted) return;
+
+        if (userResponse?.data) {
+          setDbUser(userResponse.data);
+        }
 
         const list = extractNotifications(notificationsResponse?.data);
         const countFromApi = Number(unreadResponse?.data);
@@ -251,15 +261,15 @@ const Header = ({ onMenuClick }) => {
               </AvatarFallback>
             </Avatar>
             <div className="hidden text-left sm:block">
-              <p className="text-sm font-medium text-gray-900">{user?.firstName || user?.username || "Admin"}</p>
-              <p className="text-[11px] text-gray-400">{formatRole(user?.role || "")}</p>
+              <p className="text-sm font-medium text-gray-900">{displayUser?.fullName || displayUser?.firstName || displayUser?.username || "User"}</p>
+              <p className="text-[11px] text-gray-400">{displayUser?.email || formatRole(user?.role || "")}</p>
             </div>
           </button>
           {profileDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 z-50">
               <div className="text-sm text-gray-700 font-bold px-4 py-2 cursor-default">
-                {user?.firstName || user?.username || "User"}
-                <span className="block text-xs font-normal text-gray-500">{formatRole(user?.role || "")}</span>
+                {displayUser?.fullName || displayUser?.firstName || displayUser?.username || "User"}
+                <span className="block text-xs font-normal text-gray-500">{displayUser?.email || formatRole(user?.role || "")}</span>
               </div>
               <button
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
