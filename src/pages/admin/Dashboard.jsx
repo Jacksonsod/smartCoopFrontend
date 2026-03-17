@@ -674,6 +674,121 @@ const CoopAdminDashboard = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════
+// ─── ACCOUNTANT DASHBOARD ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+import { getAllActivities } from "@/services/activityService";
+import { getAllPayments } from "@/services/paymentService";
+
+const AccountantDashboard = () => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    pendingCount: 0,
+    pendingAmount: 0,
+    completedAmount: 0,
+    activityCount: 0,
+    recentPayments: []
+  });
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setError(null);
+    const fetchAccountantData = async () => {
+      try {
+        const [paymentsRes, activitiesRes] = await Promise.all([
+          getAllPayments().catch(() => ({ data: [] })),
+          getAllActivities().catch(() => ({ data: [] }))
+        ]);
+        const payments = paymentsRes?.data || paymentsRes || [];
+        const activities = activitiesRes?.data || activitiesRes || [];
+        const pending = payments.filter(p => p.status === 'PENDING');
+        const completed = payments.filter(p => p.status === 'COMPLETED');
+        if (!mounted) return;
+        setStats({
+          pendingCount: pending.length,
+          pendingAmount: pending.reduce((sum, p) => sum + (p.amount || 0), 0),
+          completedAmount: completed.reduce((sum, p) => sum + (p.amount || 0), 0),
+          activityCount: activities.length,
+          recentPayments: pending.slice(0, 5)
+        });
+      } catch (error) {
+        if (!mounted) return;
+        console.error("Dashboard fetch error:", error);
+        toast.error("Failed to load some dashboard data");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchAccountantData();
+    return () => { mounted = false; };
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {greet()}, {user?.username || "Accountant"}
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">Your payments and activities overview.</p>
+      </div>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <MetricCard icon={Package} label="Pending Payments" value={stats.pendingCount} accent={P.emerald} loading={loading} />
+        <MetricCard icon={Zap} label="Completed Payments" value={stats.completedAmount} accent={P.blue} loading={loading} />
+        <MetricCard icon={Users} label="Activities" value={stats.activityCount} accent={P.purple} loading={loading} />
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Payments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex h-20 items-center justify-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+              <span className="text-sm text-gray-500">Loading payments...</span>
+            </div>
+          ) : error ? (
+            <Alert>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : !stats || !stats.recentPayments || stats.recentPayments.length === 0 ? (
+            <div className="py-12 text-center text-sm text-gray-500">No recent payments found.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full border border-gray-200 rounded-md">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Amount</th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.recentPayments.map((payment) => (
+                    <tr key={payment.id} className="border-b last:border-b-0">
+                      <td className="px-4 py-2 text-sm text-gray-700">
+                        {new Date(payment.createdAt).toLocaleString("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td className="px-4 py-2 text-sm text-gray-900">
+                        {payment.amount || 0}
+                      </td>
+                      <td className="px-4 py-2 text-sm text-gray-900">
+                        {payment.status || "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════
 // ─── MAIN EXPORT ─────────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════
 const Dashboard = () => {
@@ -681,6 +796,7 @@ const Dashboard = () => {
   if (user?.role === "SUPER_ADMIN") return <SuperAdminDashboard />;
   if (user?.role === "COOP_ADMIN") return <CoopAdminDashboard />;
   if (user?.role === "FIELD_OFFICER") return <FieldOfficerDashboard />;
+  if (user?.role === "ACCOUNTANT") return <AccountantDashboard />;
   return (
     <div className="flex h-64 items-center justify-center gap-3">
       <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
