@@ -13,15 +13,19 @@ import StaffAndUsers from "./pages/admin/StaffAndUsers";
 import SystemLogs from "./pages/admin/SystemLogs";
 import MemberDashboard from "./pages/member/MemberDashboard";
 import { useAuth } from "./context/AuthContext";
-import { CreditCard, Shield, UserCircle } from "lucide-react";
+import { Shield } from "lucide-react";
 import Activities from "./pages/admin/Activities";
-import RaiseProblem from './pages/member/RaiseProblem';
-import AdminHelpdesk from './pages/admin/AdminHelpdesk';
+import RaiseProblem from "./pages/member/RaiseProblem";
+import AdminHelpdesk from "./pages/admin/AdminHelpdesk";
 import PendingCooperatives from "./pages/superadmin/PendingCooperatives";
 import AccountantDashboard from "./pages/accountant/Dashboard";
 import ActivitiesLedger from "./pages/accountant/ActivitiesLedger";
 import PaymentsManagement from "./pages/accountant/PaymentsManagement";
 import Payments from "./pages/accountant/Payments";
+import CoopAdminDashboard from "./pages/coopadmin/CoopAdminDashboard";
+import QualityInspectorDashboard from "./pages/inspector/QualityInspectorDashboard";
+import FieldOfficerDashboard from "./pages/fieldofficer/FieldOfficerDashboard";
+import Profile from "./pages/Profile";
 
 
 const UsersPage = () => {
@@ -33,41 +37,12 @@ const UsersPage = () => {
 const DashboardEntry = () => {
   const { user } = useAuth();
   if (user?.role === "MEMBER") return <MemberDashboard />;
+  if (user?.role === "COOP_ADMIN") return <CoopAdminDashboard />;
+  if (user?.role === "ACCOUNTANT") return <AccountantDashboard />;
+  if (user?.role === "QUALITY_INSPECTOR") return <QualityInspectorDashboard />;
+  if (user?.role === "FIELD_OFFICER") return <FieldOfficerDashboard />;
   return <Dashboard />;
 };
-
-// ─── Simple Placeholder Pages ─────────────────────────────────────
-const PlaceholderPage = ({ icon: Icon, title, description }) => (
-  <div className="flex items-center justify-center py-20 animate-fade-in">
-    <div className="text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 mb-4">
-        <Icon className="h-7 w-7" />
-      </div>
-      <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-      <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">{description}</p>
-      <span className="mt-4 inline-block rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-        Coming Soon
-      </span>
-    </div>
-  </div>
-);
-
-
-const PaymentsPage = () => (
-  <PlaceholderPage
-    icon={CreditCard}
-    title="Payments"
-    description="Process and track payments, invoices, and financial transactions for your cooperative."
-  />
-);
-
-const Profile = () => (
-  <PlaceholderPage
-    icon={UserCircle}
-    title="My Profile"
-    description="Manage your personal information, preferences, and account settings."
-  />
-);
 
 const Unauthorized = () => (
   <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
@@ -118,13 +93,13 @@ const App = () => {
                   }
                 />
                 <Route path="/users" element={
-                    <ProtectedRoute allowedRoles={["SUPER_ADMIN", "COOP_ADMIN"]}>
+                    <ProtectedRoute allowedRoles={["SUPER_ADMIN", "COOP_ADMIN", "FIELD_OFFICER"]}>
                       <UsersPage />
                     </ProtectedRoute>
                   }
                 />
                 <Route path="/items" element={
-                    <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>
+                    <ProtectedRoute allowedRoles={["COOP_ADMIN", "ACCOUNTANT"]}>
                       <CatalogItems />
                     </ProtectedRoute>
                   }
@@ -132,7 +107,7 @@ const App = () => {
                 <Route
                   path="/activities"
                   element={
-                    <ProtectedRoute allowedRoles={["COOP_ADMIN", "FIELD_OFFICER", "ACCOUNTANT"]}>
+                    <ProtectedRoute allowedRoles={["COOP_ADMIN", "FIELD_OFFICER", "ACCOUNTANT", "QUALITY_INSPECTOR"]}>
                       <Activities />
                     </ProtectedRoute>
                   }
@@ -159,41 +134,28 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/payments" element={<Payments />} />
+                <Route path="/payments" element={
+                    <ProtectedRoute allowedRoles={["ACCOUNTANT", "COOP_ADMIN"]}>
+                      <Payments />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/payments-manage" element={
+                    <ProtectedRoute allowedRoles={["ACCOUNTANT"]}>
+                      <PaymentsManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/ledger" element={
+                    <ProtectedRoute allowedRoles={["ACCOUNTANT"]}>
+                      <ActivitiesLedger />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/helpdesk" element={
                     <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>
                       <AdminHelpdesk />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/accountant/dashboard"
-                  element={
-                    <ProtectedRoute allowedRoles={["ACCOUNTANT", "ROLE_ACCOUNTANT"]}>
-                      <DashboardLayout>
-                        <AccountantDashboard />
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/accountant/ledger"
-                  element={
-                    <ProtectedRoute allowedRoles={["ACCOUNTANT", "ROLE_ACCOUNTANT"]}>
-                      <DashboardLayout>
-                        <ActivitiesLedger />
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/accountant/payments"
-                  element={
-                    <ProtectedRoute allowedRoles={["ACCOUNTANT", "ROLE_ACCOUNTANT"]}>
-                      <DashboardLayout>
-                        <PaymentsManagement />
-                      </DashboardLayout>
                     </ProtectedRoute>
                   }
                 />

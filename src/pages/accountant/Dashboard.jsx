@@ -1,10 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { getAllPayments } from "../../services/paymentService";
-import { getAllActivities } from "../../services/activityService";
-import { Badge } from "../../components/ui/badge";
-import { useAuth } from "../../context/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Banknote,
+  CalendarDays,
+  CreditCard,
+  Loader2,
+  TrendingUp,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
+import { getAllPayments } from "@/services/paymentService";
+import { getAllActivities } from "@/services/activityService";
+
+const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
+
+const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
+
+const StatCard = ({ title, value, icon: Icon, color = "emerald" }) => {
+  const cls = {
+    emerald: "text-emerald-600 bg-emerald-50",
+    amber: "text-amber-600 bg-amber-50",
+    blue: "text-blue-600 bg-blue-50",
+  }[color] || "text-emerald-600 bg-emerald-50";
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{title}</p>
+            <p className="mt-2 text-2xl font-semibold text-gray-900">{value}</p>
+          </div>
+          <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${cls}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const AccountantDashboard = () => {
   const [payments, setPayments] = useState([]);
@@ -13,149 +46,131 @@ const AccountantDashboard = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    console.log("Current User:", user);
-    const fetchData = async () => {
+    (async () => {
       setLoading(true);
       try {
-        const [paymentsRes, activitiesRes] = await Promise.all([
-          getAllPayments(),
-          getAllActivities(),
-        ]);
-        setPayments(paymentsRes.data || []);
-        setActivities(activitiesRes.data || []);
-      } catch (err) {
-        // Optionally show error toast
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [user]);
+        const [pRes, aRes] = await Promise.all([getAllPayments(), getAllActivities()]);
+        setPayments(extractList(pRes?.data));
+        setActivities(extractList(aRes?.data));
+      } catch { /* fail silently */ }
+      finally { setLoading(false); }
+    })();
+  }, []);
 
-  // Stats
   const totalPayments = payments.length;
-  const totalRevenue = payments
-    .filter((p) => p.status === "COMPLETED")
-    .reduce((sum, p) => sum + (p.amount || 0), 0);
-  const pendingPayouts = payments.filter((p) => p.status === "PENDING").length;
+  const totalRevenue = payments.filter(p => p.status === "COMPLETED").reduce((s, p) => s + (p.amount || 0), 0);
+  const pendingPayouts = payments.filter(p => p.status === "PENDING").length;
   const recentPayments = payments.slice(0, 5);
+  const recentActivities = activities.slice(0, 10);
+
+  const formatDate = (d) => {
+    if (!d) return "-";
+    const date = new Date(d);
+    return isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "short", day: "2-digit" }).format(date);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
+        <p className="text-sm text-gray-400">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Accountant Dashboard</h2>
-      {loading ? (
-        <div className="flex justify-center items-center h-40">
-          <svg className="animate-spin h-6 w-6 text-green-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-          </svg>
-          Loading dashboard...
-        </div>
-      ) : (
-        <>
-          {/* Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
-              <div className="text-3xl font-bold text-green-700">{totalPayments}</div>
-              <div className="text-gray-500 mt-2">Total Payments</div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
-              <div className="text-3xl font-bold text-yellow-600">{pendingPayouts}</div>
-              <div className="text-gray-500 mt-2">Pending Payouts</div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
-              <div className="text-3xl font-bold text-emerald-700">{totalRevenue.toLocaleString()} RWF</div>
-              <div className="text-gray-500 mt-2">Total Revenue</div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Accountant Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">Financial overview and recent payment activity</p>
+      </div>
 
-          {/* Recent Payments Table */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-8">
-            <div className="font-semibold mb-2">Recent Payments</div>
-            <table className="min-w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Date</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Member</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Amount</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Method</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentPayments.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="text-center py-6 text-gray-400">No payments found.</td>
+      {/* Stats */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <StatCard title="Total Payments" value={totalPayments} icon={CreditCard} color="blue" />
+        <StatCard title="Pending Payouts" value={pendingPayouts} icon={CalendarDays} color="amber" />
+        <StatCard title="Total Revenue" value={formatCurrency(totalRevenue)} icon={TrendingUp} color="emerald" />
+      </div>
+
+      {/* Recent Payments */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Banknote className="h-4 w-4 text-emerald-600" /> Recent Payments
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {recentPayments.length === 0 ? (
+            <div className="py-10 text-center text-sm text-gray-400">No payments found</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b">
+                    {["Date", "Member", "Amount", "Method", "Status"].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">{h}</th>
+                    ))}
                   </tr>
-                ) : (
-                  recentPayments.map((p) => (
-                    <tr key={p.id} className="border-t">
-                      <td className="px-3 py-2">{p.date ? new Date(p.date).toLocaleDateString() : "-"}</td>
-                      <td className="px-3 py-2">{p.memberName || "-"}</td>
-                      <td className="px-3 py-2">{p.amount?.toLocaleString()} RWF</td>
-                      <td className="px-3 py-2">{p.method}</td>
-                      <td className="px-3 py-2">
-                        <Badge className={p.status === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>{p.status}</Badge>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {recentPayments.map(p => (
+                    <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{formatDate(p.date || p.createdAt)}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">{p.memberName || "-"}</td>
+                      <td className="px-4 py-3 text-sm font-mono text-gray-700 whitespace-nowrap">{formatCurrency(p.amount)}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{p.method || "-"}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <Badge className={p.status === "COMPLETED" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"} variant="secondary">
+                          {p.status}
+                        </Badge>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-          {/* Recent Activities Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex h-20 items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
-                  <span className="text-sm text-gray-500">Loading activities...</span>
-                </div>
-              ) : activities.length === 0 ? (
-                <div className="py-12 text-center text-sm text-gray-500">No activities found.</div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border border-gray-200 rounded-md">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Type</th>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Amount</th>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {activities.slice(0, 10).map((activity) => (
-                        <tr key={activity.id} className="border-b last:border-b-0">
-                          <td className="px-4 py-2 text-sm text-gray-700">
-                            {new Date(activity.createdAt).toLocaleString("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                          </td>
-                          <td className="px-4 py-2 text-sm text-gray-900">
-                            {activity.type || "-"}
-                          </td>
-                          <td className="px-4 py-2 text-sm text-gray-900">
-                            {activity.amount || 0}
-                          </td>
-                          <td className="px-4 py-2 text-sm text-gray-900">
-                            {activity.notes || "-"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </>
-      )}
+      {/* Recent Activities */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Recent Activities</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {recentActivities.length === 0 ? (
+            <div className="py-10 text-center text-sm text-gray-400">No activities found</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b">
+                    {["Date", "Type", "Amount", "Notes"].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {recentActivities.map(a => (
+                    <tr key={a.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                        {formatDate(a.createdAt || a.activityDate)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">{a.type || a.itemName || "-"}</td>
+                      <td className="px-4 py-3 text-sm font-mono text-gray-700 whitespace-nowrap">{a.amount || a.metricValue || 0}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">{a.notes || "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
 export default AccountantDashboard;
-
