@@ -32,6 +32,27 @@ const FieldOfficerDashboard = () => {
     return () => { mounted = false; };
   }, []);
 
+  const stats = useMemo(() => {
+    const today = new Date().toDateString();
+    let todayCount = 0;
+    let totalVol = 0;
+    const members = new Set();
+    
+    activities.forEach(a => {
+      if (new Date(a.activityDate || a.createdAt).toDateString() === today) todayCount++;
+      totalVol += Number(a.metricValue) || 0;
+      const memName = a.memberName || a.member?.fullName || a.member?.username;
+      if (memName) members.add(memName);
+    });
+
+    return {
+      total: activities.length,
+      today: todayCount,
+      volume: totalVol,
+      members: members.size
+    };
+  }, [activities]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -50,6 +71,15 @@ const FieldOfficerDashboard = () => {
           </a>
         </div>
       </div>
+
+      {/* Metrics */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <MetricCard icon={Activity} label="Total Activities" value={stats.total} accent={P.emerald} loading={loading} />
+        <MetricCard icon={Calendar} label="Today's Activities" value={stats.today} accent={P.blue} loading={loading} />
+        <MetricCard icon={Package} label="Total Volume" value={stats.volume.toLocaleString()} accent={P.amber} loading={loading} />
+        <MetricCard icon={Users} label="Unique Members" value={stats.members} accent={P.purple} loading={loading} />
+      </div>
+
       <div>
         <Card>
           <CardHeader>
@@ -111,8 +141,10 @@ const FieldOfficerDashboard = () => {
 };
 import { useEffect, useMemo, useState } from "react";
 import {
+  Activity,
   ArrowRight,
   Building2,
+  Calendar,
   ChevronRight,
   Clock,
   Layers,
