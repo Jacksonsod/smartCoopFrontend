@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 3000;
 // Serve the static files from the Vite build folder
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Handle React Router navigation (sends all requests to index.html)
-app.get('/*', (req, res) => {
+// Handle React Router navigation (Bypass strict routing)
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
