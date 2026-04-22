@@ -44,6 +44,23 @@ smartcoop/
 
 All configuration is driven by the `.env` file — no credentials or ports are hardcoded in source files. Review and edit the `.env` file before building if needed.
 
+Frontend backend URL options:
+
+```bash
+VITE_SERVER=https://smart-coop-production-62c6.up.railway.app/api/v1
+VITE_SERVER_PRIMARY=https://smart-coop-production-62c6.up.railway.app/api/v1
+VITE_SERVER_SECONDARY=https://smart-coop-7ad393dd9aeb.herokuapp.com/api/v1
+```
+
+- `VITE_SERVER` is the currently active API base URL.
+- `VITE_SERVER_SECONDARY` is a standby backend URL that can also be selected.
+- Optional runtime switch in browser console:
+
+```js
+localStorage.setItem("backendUrl", "https://smart-coop-7ad393dd9aeb.herokuapp.com/api/v1");
+window.location.reload();
+```
+
 Minimum email-related variables:
 
 ```bash

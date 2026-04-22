@@ -1,8 +1,30 @@
 import axios from "axios";
 
+const normalizeBaseUrl = (url) => {
+    if (!url || typeof url !== "string") return null;
+    const trimmed = url.trim().replace(/\/+$/, "");
+    if (!trimmed) return null;
+    return trimmed.endsWith("/api/v1") ? trimmed : `${trimmed}/api/v1`;
+};
+
+const getStoredBackend = () => {
+    if (typeof window === "undefined") return null;
+    return normalizeBaseUrl(localStorage.getItem("backendUrl"));
+};
+
+const availableBackends = [
+    getStoredBackend(),
+    normalizeBaseUrl(import.meta.env.VITE_SERVER),
+    normalizeBaseUrl(import.meta.env.VITE_SERVER_PRIMARY),
+    normalizeBaseUrl(import.meta.env.VITE_SERVER_SECONDARY),
+    "http://localhost:8080/api/v1",
+].filter(Boolean);
+
+const baseURL = availableBackends[0];
+
 const api = axios.create({
-    // Use the Railway environment variable, or fallback to localhost for dev
-    baseURL: import.meta.env.VITE_SERVER || "http://localhost:8080/api/v1",
+    // Supports a selected backend URL, then falls back to configured primary/secondary endpoints.
+    baseURL,
     timeout: 30000,
     headers: {
         "Content-Type": "application/json",
@@ -54,3 +76,13 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const getAvailableBackends = () => [...new Set(availableBackends)];
+
+export const setBackendUrl = (url) => {
+    if (typeof window === "undefined") return;
+    const normalized = normalizeBaseUrl(url);
+    if (!normalized) return;
+    localStorage.setItem("backendUrl", normalized);
+    window.location.reload();
+};
