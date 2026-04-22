@@ -26,6 +26,7 @@ import CoopAdminDashboard from "./pages/coopadmin/CoopAdminDashboard";
 import QualityInspectorDashboard from "./pages/inspector/QualityInspectorDashboard";
 import FieldOfficerDashboard from "./pages/fieldofficer/FieldOfficerDashboard";
 import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
 
 
 const UsersPage = () => {
@@ -71,6 +72,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/apply" element={<CooperativeApplication />} />
 
             <Route element={<ProtectedRoute />}>

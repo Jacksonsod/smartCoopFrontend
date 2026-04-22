@@ -10,7 +10,6 @@ import {
   RefreshCw,
   Search,
   Trash2,
-  UserPlus,
   Users,
   X,
 } from "lucide-react";
@@ -41,7 +40,7 @@ const resolveActive = (u) => {
 };
 
 const STAFF_ROLES = ["MEMBER", "FIELD_OFFICER", "ACCOUNTANT", "QUALITY_INSPECTOR"];
-const initialForm = { username: "", email: "", phone: "", password: "", role: "" };
+const initialForm = { username: "", email: "", phone: "", role: "" };
 
 const roleColors = {
   COOP_ADMIN: "bg-blue-50 text-blue-700",
@@ -82,8 +81,8 @@ const StaffAndUsers = () => {
   const handleSubmit = async (e) => {
     e.preventDefault(); setSubmitting(true); setError(null); setSuccessMsg(null);
     try {
-      await createCoopStaff({ username: formData.username.trim(), email: formData.email.trim(), phone: formData.phone.trim(), password: formData.password, role: formData.role });
-      closeModal(); setSuccessMsg("User created!"); await fetchStaff(); setTimeout(() => setSuccessMsg(null), 3000);
+      await createCoopStaff({ username: formData.username.trim(), email: formData.email.trim(), phone: formData.phone.trim(), role: formData.role });
+      closeModal(); setSuccessMsg("User created successfully. A temporary password has been emailed to them."); await fetchStaff(); setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err) { setError(err.response?.data?.message || "Failed to create user."); }
     finally { setSubmitting(false); }
   };
@@ -306,10 +305,6 @@ const StaffAndUsers = () => {
             <div className="space-y-1.5">
               <Label htmlFor="phone">Phone</Label>
               <Input id="phone" name="phone" type="tel" required placeholder="e.g. 0788123456" value={formData.phone} onChange={handleInput} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required placeholder="Secure password" value={formData.password} onChange={handleInput} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="role">Role</Label>

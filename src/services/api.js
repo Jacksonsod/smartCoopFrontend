@@ -17,7 +17,7 @@ const availableBackends = [
     normalizeBaseUrl(import.meta.env.VITE_SERVER),
     normalizeBaseUrl(import.meta.env.VITE_SERVER_PRIMARY),
     normalizeBaseUrl(import.meta.env.VITE_SERVER_SECONDARY),
-    "http://localhost:8080/api/v1",
+    "http://localhost:8089/api/v1",
 ].filter(Boolean);
 
 const baseURL = availableBackends[0];
