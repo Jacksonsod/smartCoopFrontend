@@ -23,13 +23,12 @@ const availableBackends = [
 const baseURL = availableBackends[0];
 
 const api = axios.create({
-    // Supports a selected backend URL, then falls back to configured primary/secondary endpoints.
     baseURL,
     timeout: 30000,
     headers: {
         "Content-Type": "application/json",
-    },
-    withCredentials: true, // Required for the CORS configuration we set on the backend
+    }
+    // No withCredentials here anymore!
 });
 
 const isTokenExpired = (token) => {
