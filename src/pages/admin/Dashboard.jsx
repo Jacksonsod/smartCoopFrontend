@@ -748,7 +748,7 @@ const AccountantDashboard = () => {
         const payments = paymentsRes?.data || paymentsRes || [];
         const activities = activitiesRes?.data || activitiesRes || [];
         const pending = payments.filter(p => p.status === 'PENDING');
-        const completed = payments.filter(p => p.status === 'COMPLETED');
+        const completed = payments.filter(p => p.status === 'PAID');
         if (!mounted) return;
         setStats({
           pendingCount: pending.length,

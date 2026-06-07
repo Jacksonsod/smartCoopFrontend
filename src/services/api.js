@@ -1,26 +1,7 @@
 import axios from "axios";
 
-const normalizeBaseUrl = (url) => {
-    if (!url || typeof url !== "string") return null;
-    const trimmed = url.trim().replace(/\/+$/, "");
-    if (!trimmed) return null;
-    return trimmed.endsWith("/api/v1") ? trimmed : `${trimmed}/api/v1`;
-};
-
-const getStoredBackend = () => {
-    if (typeof window === "undefined") return null;
-    return normalizeBaseUrl(localStorage.getItem("backendUrl"));
-};
-
-const availableBackends = [
-    getStoredBackend(),
-    normalizeBaseUrl(import.meta.env.VITE_SERVER),
-    normalizeBaseUrl(import.meta.env.VITE_SERVER_PRIMARY),
-    normalizeBaseUrl(import.meta.env.VITE_SERVER_SECONDARY),
-    "http://localhost:8089/api/v1",
-].filter(Boolean);
-
-const baseURL = availableBackends[0];
+// Ensure Vite proxy mapping works: prefer explicit VITE_SERVER then fall back to proxy path
+const baseURL = import.meta.env.VITE_SERVER || 'http://localhost:8089/api/v1';
 
 const api = axios.create({
     baseURL,
@@ -28,7 +9,6 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     }
-    // No withCredentials here anymore!
 });
 
 const isTokenExpired = (token) => {
@@ -76,13 +56,21 @@ api.interceptors.response.use(
 
 export default api;
 
-export const getAvailableBackends = () => [...new Set(availableBackends)];
+export const getAvailableBackends = () => [baseURL];
 
 export const setBackendUrl = (url) => {
     if (typeof window === "undefined") return;
-    const normalized = normalizeBaseUrl(url);
-    if (!normalized) return;
-    localStorage.setItem("backendUrl", normalized);
-    window.location.reload();
+    try { localStorage.setItem("backendUrl", String(url)); window.location.reload(); } catch (e) { /* noop */ }
 };
+
+// ─── Phase 1: Sector & Report Endpoints ─────────────────────────
+export const getSectorUnits = async (sectorType) => {
+    return api.get(`/sectors/${sectorType}/units`);
+};
+
+export const getReportSummary = async () => {
+    return api.get('/reports/summary');
+};
+
+export const applyForCooperative = (data) => api.post('/public/cooperatives/apply', data);
 //good

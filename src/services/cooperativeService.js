@@ -4,7 +4,7 @@ import api from "./api";
 const COOPERATIVES_BASE = "/admin/cooperatives";
 const publicApi = axios.create({
   // Using the exact same variable as your api.js!
-  baseURL: import.meta.env.VITE_SERVER || "https://smart-coop-production.up.railway.app/api/v1",
+  baseURL: import.meta.env.VITE_SERVER,
   headers: {
     "Content-Type": "application/json",
   },

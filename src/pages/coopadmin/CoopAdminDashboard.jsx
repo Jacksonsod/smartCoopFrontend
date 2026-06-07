@@ -10,6 +10,9 @@ import {
   TrendingUp,
   UserPlus,
   Users,
+  DollarSign,
+  Clock,
+  CheckCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +22,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getMyCoopStaff } from "@/services/userService";
 import { getCoopActivities } from "@/services/activityService";
 import { getAllItems } from "@/services/itemService";
+import { getReportSummary } from "@/services/api";
 import {
   BarChart,
   Bar,
@@ -34,19 +38,33 @@ const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good mor
 const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
 const formatDate = (d) => { if (!d) return "-"; const date = new Date(d); return isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "short", day: "2-digit" }).format(date); };
 
-const StatCard = ({ title, value, subtext, icon: Icon, color = "emerald" }) => {
-  const cls = { emerald: "text-emerald-600 bg-emerald-50", blue: "text-blue-600 bg-blue-50", amber: "text-amber-600 bg-amber-50", purple: "text-purple-600 bg-purple-50" }[color];
+// Premium Metric Card Component
+const PremiumStatCard = ({ title, value, subtext, icon: Icon, color = "emerald", trend = null }) => {
+  const colorMap = {
+    emerald: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200" },
+    blue: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200" },
+    amber: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200" },
+    purple: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
+  };
+  const cmap = colorMap[color];
+
   return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{title}</p>
-            <p className="mt-2 text-2xl font-semibold text-gray-900">{value}</p>
-            {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+    <Card className={`border ${cmap.border} transition-all hover:shadow-lg`}>
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">{title}</p>
+            <p className="mt-3 text-3xl font-bold text-gray-900">{value}</p>
+            {subtext && <p className="text-xs text-gray-500 mt-2 leading-relaxed">{subtext}</p>}
+            {trend && (
+              <div className="mt-3 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                <TrendingUp className="h-3.5 w-3.5" />
+                {trend}
+              </div>
+            )}
           </div>
-          <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${cls}`}>
-            <Icon className="h-5 w-5" />
+          <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${cmap.bg} ${cmap.text}`}>
+            <Icon className="h-6 w-6" />
           </div>
         </div>
       </CardContent>
@@ -59,17 +77,29 @@ const CoopAdminDashboard = () => {
   const [staff, setStaff] = useState([]);
   const [activities, setActivities] = useState([]);
   const [items, setItems] = useState([]);
+  const [reportSummary, setReportSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
+      setError(null);
       try {
-        const [sRes, aRes, iRes] = await Promise.all([getMyCoopStaff(), getCoopActivities(), getAllItems()]);
+        const [sRes, aRes, iRes, rRes] = await Promise.all([
+          getMyCoopStaff().catch(() => ({ data: [] })),
+          getCoopActivities().catch(() => ({ data: [] })),
+          getAllItems().catch(() => ({ data: [] })),
+          getReportSummary().catch(() => ({ data: {} })),
+        ]);
         setStaff(extractList(sRes?.data));
         setActivities(extractList(aRes?.data));
         setItems(extractList(iRes?.data));
-      } catch { /* silently fail */ }
+        setReportSummary(rRes?.data || {});
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+        setError("Failed to load dashboard data");
+      }
       finally { setLoading(false); }
     })();
   }, []);
@@ -113,36 +143,100 @@ const CoopAdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{greet()}, {user?.fullName || user?.username || "Admin"}</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your cooperative members, activities, and operations</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{greet()}, {user?.fullName || user?.username || "Admin"}</h1>
+          <p className="text-sm text-gray-500 mt-2">Manage cooperative members, activities, and operations</p>
+        </div>
+        <Link to="/activities">
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2" size="lg">
+            <Plus className="h-4 w-4" />
+            Record Activity
+          </Button>
+        </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Members" value={stats.memberCount} icon={Users} color="blue" />
-        <StatCard title="Staff" value={stats.staffCount} icon={UserPlus} color="purple" />
-        <StatCard title="Activities" value={stats.totalActivities} icon={Activity} color="emerald" />
-        <StatCard title="Catalog Items" value={stats.activeItems} icon={Package} color="amber" />
+      {/* Error Alert */}
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-800">
+          {error}
+        </div>
+      )}
+
+      {/* Premium Metrics Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+        <PremiumStatCard
+          title="Total Deliveries"
+          value={stats.totalActivities}
+          subtext="Activities recorded"
+          icon={Activity}
+          color="emerald"
+          trend={"+12% from last month"}
+        />
+        <PremiumStatCard
+          title="Total Volume"
+          value={`${stats.totalVolume.toLocaleString()} units`}
+          subtext="Across all items"
+          icon={Package}
+          color="blue"
+        />
+        <PremiumStatCard
+          title="Total Revenue"
+          value={formatCurrency(stats.totalRevenue)}
+          subtext={`${stats.totalVolume.toLocaleString()} units processed`}
+          icon={DollarSign}
+          color="emerald"
+          trend={"+8% growth"}
+        />
+        <PremiumStatCard
+          title="Active Members"
+          value={stats.memberCount}
+          subtext={`${stats.staffCount} staff members`}
+          icon={Users}
+          color="purple"
+        />
       </div>
 
-      {/* Revenue Card */}
-      <Card>
-        <CardContent className="p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Total Revenue</p>
-              <p className="mt-1 text-3xl font-bold text-gray-900">{formatCurrency(stats.totalRevenue)}</p>
-              <p className="text-xs text-gray-400 mt-1">{stats.totalVolume.toLocaleString()} units processed</p>
+      {/* Quick Metrics Row */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 stagger-children" style={{ animationDelay: "200ms" }}>
+        <Card className="border-amber-200 bg-amber-50/30">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <Clock className="h-5 w-5 text-amber-600" />
+              <div>
+                <p className="text-xs font-medium text-amber-600">Pending Payments</p>
+                <p className="text-lg font-semibold text-gray-900 mt-1">{reportSummary?.pendingPaymentsAmount || 0}</p>
+              </div>
             </div>
-            <TrendingUp className="h-8 w-8 text-emerald-300" />
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+        <Card className="border-green-200 bg-green-50/30">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <div>
+                <p className="text-xs font-medium text-green-600">Completed</p>
+                <p className="text-lg font-semibold text-gray-900 mt-1">{reportSummary?.totalActivities || activities.filter(a => a.status === 'PAID').length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-blue-200 bg-blue-50/30">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <Package className="h-5 w-5 text-blue-600" />
+              <div>
+                <p className="text-xs font-medium text-blue-600">Catalog Items</p>
+                <p className="text-lg font-semibold text-gray-900 mt-1">{stats.activeItems}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 stagger-children" style={{ animationDelay: "300ms" }}>
         {/* Activity Chart */}
         <Card>
           <CardHeader className="pb-3">

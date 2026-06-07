@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { FileText, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FileDown } from "lucide-react";
+import { downloadAuditLogExcel } from "@/services/documentService";
 import {
   Table,
   TableBody,
@@ -101,6 +104,19 @@ const SystemLogs = () => {
     };
   }, []);
 
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportExcel = async () => {
+    setExporting(true);
+    try {
+      await downloadAuditLogExcel();
+    } catch (err) {
+      alert(err.message || "Failed to export audit log.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const rows = useMemo(
     () =>
       logs.map((log, index) => {
@@ -119,11 +135,24 @@ const SystemLogs = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">System Audit Logs</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          End-to-end traceability of actions performed across the platform.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">System Audit Logs</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            End-to-end traceability of actions performed across the platform.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={handleExportExcel}
+          disabled={exporting || loading}
+          className="gap-2"
+        >
+          {exporting
+            ? <Loader2 className="h-4 w-4 animate-spin" />
+            : <FileDown className="h-4 w-4" />}
+          Export Audit Log
+        </Button>
       </div>
 
       <Card className="border border-gray-200 shadow-sm">

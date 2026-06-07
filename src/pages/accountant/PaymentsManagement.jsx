@@ -4,7 +4,9 @@ import {
   Loader2,
   RefreshCw,
 } from "lucide-react";
-import { getAllPayments, updatePaymentStatus } from "@/services/paymentService";
+import { FileDown } from "lucide-react";
+import { getAllPayments, markPaymentAsPaid } from "@/services/paymentService";
+import { downloadPaymentSummaryExcel } from "@/services/documentService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,7 @@ const PaymentsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const fetchPayments = async () => {
     setLoading(true);
@@ -29,12 +32,23 @@ const PaymentsManagement = () => {
     finally { setLoading(false); }
   };
 
+  const handleExportExcel = async () => {
+    setExporting(true);
+    try {
+      await downloadPaymentSummaryExcel();
+    } catch (err) {
+      alert(err.message || "Failed to export payments.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   useEffect(() => { fetchPayments(); }, []);
 
   const handleMarkAsPaid = async (id) => {
     setProcessingId(id);
     try {
-      await updatePaymentStatus(id, "COMPLETED");
+      await markPaymentAsPaid(id);
       setSuccessMsg("Payment marked as completed!"); setTimeout(() => setSuccessMsg(""), 4000);
       fetchPayments();
     } catch { /* silently handle */ }
@@ -46,11 +60,27 @@ const PaymentsManagement = () => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Payments Management</h1>
-          <p className="text-sm text-gray-500 mt-1">View and process all cooperative payments</p>
+          <p className="text-sm text-gray-500 mt-1">
+            View and process all cooperative payments
+          </p>
         </div>
-        <Button variant="outline" onClick={fetchPayments} disabled={loading}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleExportExcel}
+            disabled={exporting || loading}
+            className="gap-2"
+          >
+            {exporting
+              ? <Loader2 className="h-4 w-4 animate-spin" />
+              : <FileDown className="h-4 w-4" />}
+            Export Excel
+          </Button>
+          <Button variant="outline" onClick={fetchPayments} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {successMsg && (
@@ -88,7 +118,7 @@ const PaymentsManagement = () => {
                     <td className="px-4 py-3 text-sm font-mono text-gray-700 whitespace-nowrap">{formatCurrency(p.amount)}</td>
                     <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{p.method || "-"}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={p.status === "COMPLETED" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"} variant="secondary">
+                      <Badge className={p.status === "PAID" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"} variant="secondary">
                         {p.status}
                       </Badge>
                     </td>

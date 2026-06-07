@@ -32,7 +32,7 @@ const Activities = () => {
   const [catalogItems, setCatalogItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form, setForm] = useState({ memberId: "", itemId: "", metricValue: "", notes: "" });
+  const [form, setForm] = useState({ memberId: "", itemId: "", metricValue: "", notes: "", activityDate: new Date().toISOString().slice(0, 10) });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -65,7 +65,7 @@ const Activities = () => {
   const handleFormChange = (e) => { const { name, value } = e.target; setForm(p => ({ ...p, [name]: value })); };
 
   const openModal = () => {
-    setForm({ memberId: "", itemId: "", metricValue: "", notes: "" });
+    setForm({ memberId: "", itemId: "", metricValue: "", notes: "", activityDate: new Date().toISOString().slice(0, 10) });
     setError("");
     setIsModalOpen(true);
   };
@@ -86,7 +86,8 @@ const Activities = () => {
         memberId: Number(form.memberId),
         itemId: Number(form.itemId),
         metricValue: Number(form.metricValue),
-        notes: form.notes
+        notes: form.notes,
+        activityDate: form.activityDate
       });
 
       closeModal();
@@ -243,6 +244,16 @@ const Activities = () => {
               <div className="space-y-1.5">
                 <Label htmlFor="metricValue">Quantity / Volume</Label>
                 <Input id="metricValue" name="metricValue" type="number" min="0" step="any" value={form.metricValue} onChange={handleFormChange} required placeholder="Enter quantity" />
+              </div>
+              <div>
+                <Label>Activity Date</Label>
+                <input
+                  type="date"
+                  name="activityDate"
+                  value={form.activityDate}
+                  onChange={handleFormChange}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="notes">Notes</Label>

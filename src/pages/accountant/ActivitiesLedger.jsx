@@ -5,7 +5,12 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
+import { FileDown, FileText } from "lucide-react";
 import { getAllActivities } from "@/services/activityService";
+import {
+  downloadActivityReportPdf,
+  downloadInvoicePdf,
+} from "@/services/documentService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +31,8 @@ const ActivitiesLedger = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState(null);
   const { user } = useAuth();
 
   const fetchActivities = async () => {
@@ -54,17 +61,55 @@ const ActivitiesLedger = () => {
     finally { setProcessingId(null); }
   };
 
+  const handleDownloadReport = async () => {
+    setDownloading(true);
+    try {
+      await downloadActivityReportPdf();
+    } catch (err) {
+      alert(err.message || "Failed to download report.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDownloadInvoice = async (activityId) => {
+    setDownloadingInvoiceId(activityId);
+    try {
+      await downloadInvoicePdf(activityId);
+    } catch (err) {
+      alert(err.message || "Failed to download invoice.");
+    } finally {
+      setDownloadingInvoiceId(null);
+    }
+  };
+
   return (
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Activities Ledger</h1>
-            <p className="text-sm text-gray-500 mt-1">View all cooperative activities and process payments</p>
+            <p className="text-sm text-gray-500 mt-1">
+              View all cooperative activities and process payments
+            </p>
           </div>
-          <Button variant="outline" onClick={fetchActivities} disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleDownloadReport}
+              disabled={downloading || loading}
+              className="gap-2"
+            >
+              {downloading
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <FileDown className="h-4 w-4" />}
+              Download PDF
+            </Button>
+            <Button variant="outline" onClick={fetchActivities} disabled={loading}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Search */}
@@ -143,6 +188,21 @@ const ActivitiesLedger = () => {
                                   {processingId === a.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                                   Make Payment
                                 </Button>
+                            )}
+
+                            {currentStatus === "PAID" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDownloadInvoice(a.id)}
+                                disabled={downloadingInvoiceId === a.id}
+                                className="text-xs h-8 px-2 gap-1"
+                              >
+                                {downloadingInvoiceId === a.id
+                                  ? <Loader2 className="h-3 w-3 animate-spin" />
+                                  : <FileText className="h-3 w-3" />}
+                                Invoice
+                              </Button>
                             )}
 
                           </td>
