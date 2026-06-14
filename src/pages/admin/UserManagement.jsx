@@ -246,71 +246,71 @@ const UserManagement = () => {
 
       {/* No match */}
       {!loading && users.length > 0 && filtered.length === 0 && (
-        <Card className="py-16 text-center">
-          <Search className="mx-auto h-10 w-10 text-gray-300 mb-3" />
-          <p className="text-sm font-medium text-gray-500">No users match your filters</p>
+        <Card className="py-16 text-center bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800">
+          <Search className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-700 mb-3" />
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No users match your filters</p>
         </Card>
       )}
 
-      {/* Table */}
+      {/* Desktop view Table */}
       {!loading && filtered.length > 0 && (
-        <Card>
+        <Card className="hidden md:block overflow-hidden border border-gray-150 dark:border-gray-800 shadow-xs rounded-xl bg-white dark:bg-gray-900">
           <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+              <thead className="bg-gray-50/75 dark:bg-gray-950/50">
+                <tr>
                   {["User", "Role", "Cooperative", "Status", "Actions"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">{h}</th>
+                    <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map(u => {
                   const name = u.fullName || u.profile?.fullName || u.username || "User";
                   const initial = name.charAt(0).toUpperCase();
                   const active = resolveActive(u);
                   return (
-                    <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap">
+                    <tr key={u.id} className="hover:bg-emerald-50/10 dark:hover:bg-emerald-950/10 transition-colors duration-150">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-semibold">
+                          <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-semibold shadow-sm">
                             {initial}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
+                            <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{name}</p>
                             {u.email && (
-                              <p className="flex items-center gap-1 text-xs text-gray-400 truncate">
+                              <p className="flex items-center gap-1 text-[11px] text-gray-450 dark:text-gray-400 truncate">
                                 <Mail className="h-3 w-3" />{u.email}
                               </p>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge className={roleColors[u.role?.toUpperCase()] || roleColors.MEMBER} variant="secondary">
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <Badge className={`${roleColors[u.role?.toUpperCase()] || roleColors.MEMBER} font-semibold border-none shadow-none text-[10px] px-2 py-0.5`} variant="secondary">
                           {u.role?.replace(/_/g, " ") || "—"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                      <td className="px-5 py-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {u.cooperativeName || u.cooperative?.name || "—"}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge className={active ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"} variant="secondary">
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <Badge className={`${active ? "bg-emerald-50 dark:bg-emerald-955/20 text-emerald-700 dark:text-emerald-400 border-none" : "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border-none"} font-semibold shadow-none text-[10px] px-2 py-0.5`} variant="secondary">
                           {active ? "Active" : "Inactive"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
-                          <Button size="sm" variant="outline" onClick={() => handleEditOpen(u)} className="text-xs text-blue-700 border-blue-200 hover:bg-blue-50">
+                          <Button size="sm" variant="outline" onClick={() => handleEditOpen(u)} className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-blue-200 dark:border-blue-900/50 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors shadow-none">
                             Edit
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => handleToggle(u.id)} disabled={togglingId === u.id}
-                            className={`text-xs ${active ? "text-amber-700 border-amber-200 hover:bg-amber-50" : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"}`}>
+                            className={`text-[10px] font-semibold h-8 px-2.5 rounded-lg border shadow-none transition-colors ${active ? "text-amber-700 border-amber-200 dark:border-amber-900/50 hover:bg-amber-50 dark:hover:bg-amber-955/20" : "text-emerald-700 border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-955/20"}`}>
                             {togglingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Power className="h-3 w-3 mr-1" />}
                             {active ? "Deactivate" : "Activate"}
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => handleDelete(u.id)} disabled={deletingId === u.id}
-                            className="text-xs text-red-600 border-red-200 hover:bg-red-50">
+                            className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-955/20 shadow-none transition-colors">
                             {deletingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Trash2 className="h-3 w-3 mr-1" />}
                             Delete
                           </Button>
@@ -325,44 +325,112 @@ const UserManagement = () => {
         </Card>
       )}
 
+      {/* Mobile Card List */}
+      {!loading && filtered.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 md:hidden">
+          {filtered.map(u => {
+            const name = u.fullName || u.profile?.fullName || u.username || "User";
+            const initial = name.charAt(0).toUpperCase();
+            const active = resolveActive(u);
+            return (
+              <div key={u.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-150 dark:border-gray-800 p-4 shadow-xs space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-semibold shadow-xs">
+                      {initial}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{name}</p>
+                      {u.email && (
+                        <p className="flex items-center gap-1 text-[11px] text-gray-455 dark:text-gray-400 truncate max-w-[170px]">
+                          <Mail className="h-3 w-3" />{u.email}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <Badge className={`${roleColors[u.role?.toUpperCase()] || roleColors.MEMBER} font-semibold border-none shadow-none text-[9px] px-2 py-0.5`} variant="secondary">
+                    {u.role?.replace(/_/g, " ") || "—"}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs border-y border-gray-50 dark:border-gray-800 py-2.5">
+                  <div>
+                    <span className="text-gray-455 block text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500">Cooperative</span>
+                    <span className="text-gray-800 dark:text-gray-205 font-medium truncate block max-w-[130px]">
+                      {u.cooperativeName || u.cooperative?.name || "—"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-455 block text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500">Status</span>
+                    <Badge className={`${active ? "bg-emerald-50 dark:bg-emerald-955/20 text-emerald-700 dark:text-emerald-400" : "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400"} font-semibold border-none shadow-none text-[9px] px-2 py-0.5`} variant="secondary">
+                      {active ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-1">
+                  <Button size="sm" variant="outline" onClick={() => handleEditOpen(u)} className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-blue-200 dark:border-blue-900/50 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors shadow-none">
+                    Edit
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleToggle(u.id)} disabled={togglingId === u.id}
+                    className={`text-[10px] font-semibold h-8 px-2.5 rounded-lg border shadow-none transition-colors ${active ? "text-amber-700 border-amber-200 dark:border-amber-900/50 hover:bg-amber-50 dark:hover:bg-amber-955/20" : "text-emerald-700 border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-955/20"}`}>
+                    {togglingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Power className="h-3 w-3 mr-1" />}
+                    {active ? "Deactivate" : "Activate"}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleDelete(u.id)} disabled={deletingId === u.id}
+                    className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-955/20 shadow-none transition-colors">
+                    {deletingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Trash2 className="h-3 w-3 mr-1" />}
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* Edit User Modal */}
       {editUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative animate-fade-in">
-            <button onClick={handleEditClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"><X className="h-5 w-5" /></button>
-            <h2 className="text-lg font-semibold mb-4">Edit User</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg w-full max-w-md p-6 relative border border-gray-100 dark:border-gray-800 animate-scale-in">
+            <button onClick={handleEditClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-650 dark:hover:text-gray-250 transition-colors">
+              <X className="h-4 w-4" />
+            </button>
+            <h2 className="text-base font-bold text-gray-950 dark:text-white mb-4">Edit User</h2>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">First Name</label>
-                <Input name="firstName" value={editForm.firstName} onChange={handleEditChange} required />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">First Name</label>
+                <Input name="firstName" value={editForm.firstName} onChange={handleEditChange} required className="dark:bg-gray-950" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Last Name</label>
-                <Input name="lastName" value={editForm.lastName} onChange={handleEditChange} required />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">Last Name</label>
+                <Input name="lastName" value={editForm.lastName} onChange={handleEditChange} required className="dark:bg-gray-950" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <Input name="email" type="email" value={editForm.email} onChange={handleEditChange} required />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">Email</label>
+                <Input name="email" type="email" value={editForm.email} onChange={handleEditChange} required className="dark:bg-gray-950" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Phone</label>
-                <Input name="phone" value={editForm.phone} onChange={handleEditChange} />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">Phone</label>
+                <Input name="phone" value={editForm.phone} onChange={handleEditChange} className="dark:bg-gray-950" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Username</label>
-                <Input name="username" value={editForm.username} onChange={handleEditChange} required disabled />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">Username</label>
+                <Input name="username" value={editForm.username} onChange={handleEditChange} required disabled className="dark:bg-gray-950" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Role</label>
-                <Input name="role" value={editForm.role} onChange={handleEditChange} required disabled />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">Role</label>
+                <Input name="role" value={editForm.role} onChange={handleEditChange} required disabled className="dark:bg-gray-950" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Password</label>
-                <Input name="password" type="password" value={editForm.password} onChange={handleEditChange} placeholder="Leave blank to keep unchanged" autoComplete="new-password" />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">Password</label>
+                <Input name="password" type="password" value={editForm.password} onChange={handleEditChange} placeholder="Leave blank to keep unchanged" autoComplete="new-password" className="dark:bg-gray-950" />
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button type="button" variant="outline" onClick={handleEditClose}>Cancel</Button>
-                <Button type="submit" disabled={editLoading}>{editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}</Button>
+              <div className="flex justify-end gap-2 mt-5">
+                <Button type="button" variant="outline" onClick={handleEditClose} className="dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300">Cancel</Button>
+                <Button type="submit" disabled={editLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+                  {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Changes'}
+                </Button>
               </div>
             </form>
           </div>

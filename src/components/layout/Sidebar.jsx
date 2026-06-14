@@ -80,7 +80,7 @@ const navItems = [
     title: "Pending Payments",
     path: "/payments",
     icon: CreditCard,
-    allowedRoles: ["ACCOUNTANT", "COOP_ADMIN"],
+    allowedRoles: ["COOP_ADMIN"],
     section: "Finance",
   },
   {
@@ -96,13 +96,6 @@ const navItems = [
     icon: BookOpen,
     allowedRoles: ["ACCOUNTANT"],
     section: "Finance",
-  },
-  {
-    title: "My Activities",
-    path: "/my-activities",
-    icon: Shield,
-    allowedRoles: ["MEMBER"],
-    section: "Personal",
   },
   {
     title: "Report Problem",
@@ -139,25 +132,26 @@ const SidebarContent = ({ onLinkClick }) => {
   });
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-sidebar">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white">
+      <div className="flex h-16 items-center gap-3 px-5 border-b border-sidebar-border">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-500/10">
           <Leaf className="h-5 w-5" />
         </div>
-        <h1 className="text-lg font-bold text-gray-900 tracking-tight">Smart-Coop</h1>
+        <div>
+          <h1 className="text-sm font-bold text-sidebar-foreground tracking-tight leading-none">Smart-Coop</h1>
+          <span className="text-[10px] text-sidebar-foreground/60 font-medium mt-0.5 block">Cooperative Portal</span>
+        </div>
       </div>
 
-      <Separator />
-
       {/* Navigation */}
-      <nav className="mt-4 flex-1 space-y-5 px-3 overflow-y-auto">
+      <nav className="mt-5 flex-1 space-y-6 px-3.5 overflow-y-auto">
         {sections.map((section) => (
-          <div key={section.label}>
-            <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+          <div key={section.label} className="space-y-2">
+            <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-sidebar-foreground/45">
               {section.label}
             </p>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {section.items.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -167,10 +161,10 @@ const SidebarContent = ({ onLinkClick }) => {
                     onClick={onLinkClick}
                     className={({ isActive }) =>
                       [
-                        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                        "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-200",
                         isActive
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                          ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/15 scale-[1.02]"
+                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                       ].join(" ")
                     }
                   >
@@ -178,8 +172,8 @@ const SidebarContent = ({ onLinkClick }) => {
                       <>
                         <Icon
                           className={[
-                            "h-[18px] w-[18px]",
-                            isActive ? "text-emerald-600" : "text-gray-400 group-hover:text-gray-500",
+                            "h-[16px] w-[16px] transition-colors duration-200",
+                            isActive ? "text-white" : "text-sidebar-foreground/50 group-hover:text-sidebar-accent-foreground",
                           ].join(" ")}
                         />
                         <span>{item.title}</span>
@@ -200,16 +194,16 @@ const Sidebar = ({ open, onOpenChange }) => {
   return (
     <>
       {/* Desktop */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-gray-200 bg-white md:block">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-sidebar-border bg-sidebar md:block">
         <SidebarContent />
       </aside>
 
       {/* Mobile */}
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className="w-64 border-r border-gray-200 bg-white p-0 [&>button]:hidden">
+        <SheetContent side="left" className="w-64 border-r border-sidebar-border bg-sidebar p-0 [&>button]:hidden">
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute right-3 top-3 z-50 flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="absolute right-3 top-3 z-50 flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
             <X className="h-4 w-4" />
           </button>

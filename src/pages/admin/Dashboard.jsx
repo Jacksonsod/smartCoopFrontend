@@ -73,7 +73,7 @@ const FieldOfficerDashboard = () => {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard icon={Activity} label="Total Activities" value={stats.total} accent={P.emerald} loading={loading} />
         <MetricCard icon={Calendar} label="Today's Activities" value={stats.today} accent={P.blue} loading={loading} />
         <MetricCard icon={Package} label="Total Volume" value={stats.volume.toLocaleString()} accent={P.amber} loading={loading} />
@@ -98,33 +98,35 @@ const FieldOfficerDashboard = () => {
             ) : activities.length === 0 ? (
               <div className="py-12 text-center text-sm text-gray-500">No activities recorded yet.</div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-200 rounded-md">
-                  <thead className="bg-gray-50">
+              <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                  <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Member Name</th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Item/Service</th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Quantity</th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
+                      <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Date</th>
+                      <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Member Name</th>
+                      <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Item/Service</th>
+                      <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Quantity</th>
+                      <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Notes</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                     {activities.slice(0, 10).map((activity) => (
-                      <tr key={activity.id} className="border-b last:border-b-0">
-                        <td className="px-4 py-2 text-sm text-gray-700">
+                      <tr key={activity.id} className="hover:bg-emerald-50/15 dark:hover:bg-emerald-950/10 transition-colors duration-150">
+                        <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {new Date(activity.activityDate || activity.createdAt).toLocaleString("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-900">
+                        <td className="px-5 py-3.5 text-xs font-semibold text-gray-900 dark:text-white whitespace-nowrap">
                           {activity.memberName || activity.member?.fullName || activity.member?.username || "-"}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-900">
-                          {activity.itemName || activity.item?.name || activity.serviceName || "-"}
+                        <td className="px-5 py-3.5 text-xs whitespace-nowrap">
+                          <span className="inline-flex items-center rounded-md bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-400 ring-1 ring-inset ring-emerald-600/10 dark:ring-emerald-500/20">
+                            {activity.itemName || activity.item?.name || activity.serviceName || "-"}
+                          </span>
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-700">
+                        <td className="px-5 py-3.5 text-xs font-mono font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
                           {activity.metricValue}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-700">
+                        <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">
                           {activity.notes || "-"}
                         </td>
                       </tr>
@@ -216,30 +218,39 @@ const StackedBar = ({ segments = [], total = 1 }) => (
 const ChartTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg bg-white px-3 py-2 text-gray-900 shadow-lg border border-gray-200">
-      <p className="text-[11px] text-gray-400 font-medium">{label}</p>
-      {payload.map((p, i) => (
-        <p key={i} className="text-sm font-semibold" style={{ color: p.color }}>{p.name}: {p.value}</p>
-      ))}
+    <div className="rounded-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-3.5 py-2 text-gray-900 dark:text-white shadow-xl border border-gray-100 dark:border-gray-800 animate-fade-in z-50">
+      <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mb-1.5">{label}</p>
+      <div className="space-y-1">
+        {payload.map((p, i) => (
+          <p key={i} className="text-xs font-semibold flex items-center gap-1.5" style={{ color: p.color }}>
+            <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+            {p.name}: <span className="text-gray-950 dark:text-white font-bold">{p.value}</span>
+          </p>
+        ))}
+      </div>
     </div>
   );
 };
 
 // ─── Metric Card ─────────────────────────────────────────────────
 const MetricCard = ({ icon: Icon, label, value, accent, loading }) => (
-  <Card>
-    <CardContent className="p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: `${accent}15` }}>
-          <Icon className="h-4 w-4" style={{ color: accent }} />
+  <Card className="overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group bg-card">
+    <CardContent className="p-5 relative">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{label}</span>
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: `${accent}12`, color: accent }}>
+          <Icon className="h-4.5 w-4.5" />
         </div>
-        <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">{label}</span>
       </div>
       {loading ? (
-        <div className="h-7 w-14 animate-pulse rounded bg-gray-100" />
+        <div className="h-8 w-20 animate-pulse rounded bg-gray-100/80 dark:bg-gray-800/80" />
       ) : (
-        <span className="text-2xl font-bold text-gray-900">{value}</span>
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-extrabold text-gray-950 dark:text-white tracking-tight">{value}</span>
+        </div>
       )}
+      {/* Decorative colored glow on the side */}
+      <div className="absolute right-0 top-0 bottom-0 w-[3px] transition-all duration-300" style={{ backgroundColor: accent }} />
     </CardContent>
   </Card>
 );
@@ -335,7 +346,7 @@ const SuperAdminDashboard = () => {
       )}
 
       {/* ── Metrics ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard icon={Building2} label="Cooperatives" value={coops.length} accent={P.emerald} loading={loading} />
         <MetricCard icon={Zap} label="Active Coops" value={activeCoops} accent={P.blue} loading={loading} />
         <MetricCard icon={Users} label="Total Users" value={allUsers.length} accent={P.purple} loading={loading} />
@@ -356,20 +367,22 @@ const SuperAdminDashboard = () => {
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Cooperatives</span>
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-blue-500" /> Users</span>
               </div>
-              <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={growthData} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gCoops" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={P.emerald} stopOpacity={0.15} /><stop offset="100%" stopColor={P.emerald} stopOpacity={0} /></linearGradient>
-                    <linearGradient id="gUsers" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={P.blue} stopOpacity={0.15} /><stop offset="100%" stopColor={P.blue} stopOpacity={0} /></linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Area type="monotone" dataKey="coops" name="Cooperatives" stroke={P.emerald} strokeWidth={2} fill="url(#gCoops)" dot={{ r: 3, fill: "#fff", stroke: P.emerald, strokeWidth: 2 }} />
-                  <Area type="monotone" dataKey="users" name="Users" stroke={P.blue} strokeWidth={2} fill="url(#gUsers)" dot={{ r: 3, fill: "#fff", stroke: P.blue, strokeWidth: 2 }} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <div className="h-[240px] w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={growthData} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="gCoops" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={P.emerald} stopOpacity={0.15} /><stop offset="100%" stopColor={P.emerald} stopOpacity={0} /></linearGradient>
+                      <linearGradient id="gUsers" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={P.blue} stopOpacity={0.15} /><stop offset="100%" stopColor={P.blue} stopOpacity={0} /></linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip content={<ChartTooltip />} />
+                    <Area type="monotone" dataKey="coops" name="Cooperatives" stroke={P.emerald} strokeWidth={2} fill="url(#gCoops)" dot={{ r: 3, fill: "#fff", stroke: P.emerald, strokeWidth: 2 }} />
+                    <Area type="monotone" dataKey="users" name="Users" stroke={P.blue} strokeWidth={2} fill="url(#gUsers)" dot={{ r: 3, fill: "#fff", stroke: P.blue, strokeWidth: 2 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
 
@@ -434,18 +447,20 @@ const SuperAdminDashboard = () => {
               <p className="text-xs text-gray-400">Cooperatives grouped by type</p>
             </CardHeader>
             <CardContent>
-              {byCat.length > 0 ? (
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={byCat} margin={{ top: 8, right: 0, left: -20, bottom: 0 }} barCategoryGap="25%">
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                    <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                    <Tooltip content={<ChartTooltip />} />
-                    <Bar dataKey="count" name="Cooperatives" radius={[6, 6, 2, 2]} maxBarSize={32}>
-                      {byCat.map((_, i) => <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />)}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+               {byCat.length > 0 ? (
+                <div className="h-[200px] w-full relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={byCat} margin={{ top: 8, right: 0, left: -20, bottom: 0 }} barCategoryGap="25%">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                      <Tooltip content={<ChartTooltip />} />
+                      <Bar dataKey="count" name="Cooperatives" radius={[6, 6, 2, 2]} maxBarSize={32}>
+                        {byCat.map((_, i) => <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />)}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
                 <div className="flex h-[200px] items-center justify-center text-xs text-gray-400">No categories yet</div>
               )}
@@ -602,18 +617,20 @@ const CoopAdminDashboard = () => {
               <p className="text-xs text-gray-400">Team size over recent months</p>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={staffGrowth} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gStaff" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={P.emerald} stopOpacity={0.15} /><stop offset="100%" stopColor={P.emerald} stopOpacity={0} /></linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Area type="monotone" dataKey="staff" name="Staff" stroke={P.emerald} strokeWidth={2} fill="url(#gStaff)" dot={{ r: 3, fill: "#fff", stroke: P.emerald, strokeWidth: 2 }} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <div className="h-[220px] w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={staffGrowth} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="gStaff" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={P.emerald} stopOpacity={0.15} /><stop offset="100%" stopColor={P.emerald} stopOpacity={0} /></linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<ChartTooltip />} />
+                    <Area type="monotone" dataKey="staff" name="Staff" stroke={P.emerald} strokeWidth={2} fill="url(#gStaff)" dot={{ r: 3, fill: "#fff", stroke: P.emerald, strokeWidth: 2 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
 
@@ -778,7 +795,7 @@ const AccountantDashboard = () => {
         {coopName && <p className="text-lg font-medium text-emerald-700 mt-1">Welcome to {coopName}</p>}
         <p className="text-sm text-gray-500 mt-1">Your payments and activities overview.</p>
       </div>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <MetricCard icon={Package} label="Pending Payments" value={stats.pendingCount} accent={P.emerald} loading={loading} />
         <MetricCard icon={Zap} label="Completed Payments" value={stats.completedAmount} accent={P.blue} loading={loading} />
         <MetricCard icon={Users} label="Activities" value={stats.activityCount} accent={P.purple} loading={loading} />
@@ -798,28 +815,30 @@ const AccountantDashboard = () => {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : !stats || !stats.recentPayments || stats.recentPayments.length === 0 ? (
-            <div className="py-12 text-center text-sm text-gray-500">No recent payments found.</div>
+            <div className="py-12 text-center text-sm text-gray-500 dark:text-gray-400">No recent payments found.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full border border-gray-200 rounded-md">
-                <thead className="bg-gray-50">
+            <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+              <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Amount</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Status</th>
+                    <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Date</th>
+                    <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Amount</th>
+                    <th className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">Status</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                   {stats.recentPayments.map((payment) => (
-                    <tr key={payment.id} className="border-b last:border-b-0">
-                      <td className="px-4 py-2 text-sm text-gray-700">
+                    <tr key={payment.id} className="hover:bg-emerald-50/15 dark:hover:bg-emerald-950/10 transition-colors duration-150">
+                      <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {new Date(payment.createdAt).toLocaleString("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
                       </td>
-                      <td className="px-4 py-2 text-sm text-gray-900">
+                      <td className="px-5 py-3.5 text-xs font-semibold text-gray-900 dark:text-white whitespace-nowrap">
                         {payment.amount || 0}
                       </td>
-                      <td className="px-4 py-2 text-sm text-gray-900">
-                        {payment.status || "-"}
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <span className="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-955/20 px-2 py-1 text-xs font-medium text-amber-800 dark:text-amber-400 ring-1 ring-inset ring-amber-600/10 dark:ring-amber-500/20">
+                          {payment.status || "-"}
+                        </span>
                       </td>
                     </tr>
                   ))}

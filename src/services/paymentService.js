@@ -1,8 +1,20 @@
 // src/services/paymentService.js
 import api from "./api";
 
-export const getAllPayments = async () =>
-  await api.get("/payments/pending");
+/**
+ * Fetch all payments that are currently in PENDING status.
+ * GET /api/v1/payments/pending
+ */
+export const getPendingPayments = async () =>
+  api.get("/payments/pending");
 
-export const markPaymentAsPaid = async (id, reference = "web-portal") =>
-  await api.patch(`/payments/${id}/pay?reference=${reference}`);
+/**
+ * Mark a payment as paid, triggering a MoMo payout via Africa's Talking.
+ * PATCH /api/v1/payments/{paymentId}/pay?reference={reference}
+ */
+export const markPaymentAsPaid = async (paymentId, reference = "web-portal") =>
+  api.patch(`/payments/${paymentId}/pay?reference=${reference}`);
+
+// ── Legacy alias kept for backward compatibility with other pages ──────────
+/** @deprecated Use getPendingPayments() instead */
+export const getAllPayments = getPendingPayments;

@@ -24,10 +24,10 @@ const extractList = (payload) => {
 
 const getMethodClass = (method) => {
   const normalized = String(method || "").toUpperCase();
-  if (normalized === "POST") return "bg-emerald-50 text-emerald-700 border-emerald-100";
-  if (normalized === "PUT") return "bg-blue-50 text-blue-700 border-blue-100";
-  if (normalized === "DELETE") return "bg-red-50 text-red-700 border-red-100";
-  return "bg-slate-50 text-slate-700 border-slate-200";
+  if (normalized === "POST") return "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30";
+  if (normalized === "PUT") return "bg-blue-50 dark:bg-blue-955/20 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-900/30";
+  if (normalized === "DELETE") return "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-100 dark:border-red-900/30";
+  return "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-705";
 };
 
 const getMethod = (log) => {
@@ -137,8 +137,8 @@ const SystemLogs = () => {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">System Audit Logs</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Audit Logs</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             End-to-end traceability of actions performed across the platform.
           </p>
         </div>
@@ -146,7 +146,7 @@ const SystemLogs = () => {
           variant="outline"
           onClick={handleExportExcel}
           disabled={exporting || loading}
-          className="gap-2"
+          className="gap-2 dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300"
         >
           {exporting
             ? <Loader2 className="h-4 w-4 animate-spin" />
@@ -155,21 +155,21 @@ const SystemLogs = () => {
         </Button>
       </div>
 
-      <Card className="border border-gray-200 shadow-sm">
+      <Card className="border border-gray-200 dark:border-gray-800 shadow-sm bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
+          <CardTitle className="flex items-center gap-2 text-base text-gray-900 dark:text-white">
             <FileText className="h-4 w-4 text-emerald-600" />
             Action Trace
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex h-40 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white">
+            <div className="flex h-40 items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
               <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
-              <span className="text-sm text-gray-500">Loading audit logs...</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Loading audit logs...</span>
             </div>
           ) : rows.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+            <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-850 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
               No audit logs available yet.
             </div>
           ) : (
@@ -186,15 +186,15 @@ const SystemLogs = () => {
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell className="text-gray-600">{row.timestamp}</TableCell>
-                    <TableCell className="font-medium text-gray-900">{row.user}</TableCell>
-                    <TableCell className="text-gray-600">{row.role}</TableCell>
+                    <TableCell className="text-gray-600 dark:text-gray-400">{row.timestamp}</TableCell>
+                    <TableCell className="font-medium text-gray-900 dark:text-white">{row.user}</TableCell>
+                    <TableCell className="text-gray-600 dark:text-gray-400">{row.role}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={getMethodClass(row.method)}>
                         {row.method}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-gray-700">{row.endpoint}</TableCell>
+                    <TableCell className="font-mono text-xs text-gray-700 dark:text-gray-350">{row.endpoint}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

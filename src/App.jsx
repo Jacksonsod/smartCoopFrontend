@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Login from "./pages/Login";
+import LandingPage from "./pages/LandingPage";
 import CooperativeApplication from "./pages/public/CooperativeApplication";
 import CooperativeManagement from "./pages/admin/CooperativeManagement";
 import UserManagement from "./pages/admin/UserManagement";
@@ -27,6 +28,7 @@ import QualityInspectorDashboard from "./pages/inspector/QualityInspectorDashboa
 import FieldOfficerDashboard from "./pages/fieldofficer/FieldOfficerDashboard";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
+import ThemeToggle from "./components/layout/ThemeToggle";
 
 
 const UsersPage = () => {
@@ -71,6 +73,7 @@ const App = () => {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/apply" element={<CooperativeApplication />} />
@@ -164,8 +167,9 @@ const App = () => {
               </Route>
             </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <ThemeToggle />
         </BrowserRouter>
       </AuthProvider>
     </ErrorBoundary>

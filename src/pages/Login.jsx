@@ -89,7 +89,7 @@ const Login = () => {
   };
 
   return (
-    <main className="flex min-h-screen bg-gray-50">
+    <main className="flex min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-250">
       {/* ─── Left Panel: Premium Background + Branding ─────────────────── */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-700">
         {/* Background Image (Placeholder) */}
@@ -103,7 +103,7 @@ const Login = () => {
           }}
         />
 
-        {/* Dark overlay */}
+         {/* Dark overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/60 via-teal-900/40 to-emerald-900/50 backdrop-blur-xs" />
 
         {/* Animated background elements */}
@@ -117,21 +117,21 @@ const Login = () => {
       </div>
 
       {/* ─── Right Panel: Login Form ────────────────────────────────── */}
-      <div className="flex w-full items-center justify-center px-4 sm:px-6 py-10 lg:w-1/2 lg:px-8">
+      <div className="flex w-full items-center justify-center px-4 sm:px-6 py-10 lg:w-1/2 lg:px-8 dark:bg-gray-950 transition-colors duration-250">
         <div className="w-full max-w-md animate-scale-in">
           {/* Mobile Logo */}
           <div className="mb-8 lg:hidden text-center">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 mb-4">
               <Leaf className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Smart-Coop</h1>
-            <p className="text-sm text-gray-500 mt-1">Cooperative Resource Platform</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Smart-Coop</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Cooperative Resource Platform</p>
           </div>
 
           {/* Form Header */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-            <p className="text-sm text-gray-600 mt-1">Sign in to access your cooperative dashboard</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Sign in to access your cooperative dashboard</p>
           </div>
 
           {/* Error Alert */}
@@ -146,11 +146,11 @@ const Login = () => {
           <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Username/Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="identifier" className="font-medium text-sm">
+              <Label htmlFor="identifier" className="font-medium text-sm text-gray-700 dark:text-gray-300">
                 Username or Email
               </Label>
               <div className="relative">
-                <UserRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <UserRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
                 <Input
                   id="identifier"
                   name="identifier"
@@ -158,7 +158,7 @@ const Login = () => {
                   value={formData.identifier}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className="pl-10 h-11 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+                  className="pl-10 h-11 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
                   autoComplete="username"
                   required
                   disabled={isSubmitting}
@@ -169,7 +169,7 @@ const Login = () => {
             {/* Password Field */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="font-medium text-sm">
+                <Label htmlFor="password" className="font-medium text-sm text-gray-700 dark:text-gray-300">
                   Password
                 </Label>
                 <Link
@@ -180,7 +180,7 @@ const Login = () => {
                 </Link>
               </div>
               <div className="relative">
-                <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
                 <Input
                   id="password"
                   name="password"
@@ -188,7 +188,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter your password"
-                  className="pl-10 h-11 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+                  className="pl-10 h-11 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
                   autoComplete="current-password"
                   required
                   disabled={isSubmitting}
@@ -215,20 +215,20 @@ const Login = () => {
 
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium">OR</span>
-            <div className="h-px flex-1 bg-gray-200" />
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+            <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">OR</span>
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
           </div>
 
           {/* Footer Links */}
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
               Don&apos;t have an account?{" "}
               <Link to="/apply" className="font-semibold text-emerald-600 hover:text-emerald-700">
                 Register your cooperative
               </Link>
             </p>
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
               &copy; {new Date().getFullYear()} Smart-Coop. All rights reserved.
             </p>
           </div>

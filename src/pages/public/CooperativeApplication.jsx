@@ -155,12 +155,12 @@ const CooperativeApplication = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 py-10 sm:px-6 lg:px-8 transition-colors duration-250">
       <div className="mx-auto max-w-5xl">
         {/* Back link */}
         <Link
           to="/login"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 mb-6"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to login
@@ -173,10 +173,10 @@ const CooperativeApplication = () => {
               <Leaf className="h-4 w-4" />
               Guest Application
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
               Register your cooperative
             </h1>
-            <p className="mt-3 text-sm text-gray-500 leading-relaxed">
+            <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
               Submit your cooperative details as a guest. Our team will review the application,
               validate the registration information, and contact your representative shortly.
             </p>
@@ -184,12 +184,12 @@ const CooperativeApplication = () => {
             <div className="mt-6 space-y-3">
               {benefitItems.map(({ icon: Icon, title, description }) => (
                 <div key={title} className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 mt-0.5">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mt-0.5 animate-scale-in">
                     <Icon className="h-4 w-4" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
-                    <p className="text-sm text-gray-500">{description}</p>
+                    <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{title}</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
                   </div>
                 </div>
               ))}
@@ -198,7 +198,7 @@ const CooperativeApplication = () => {
             <Card className="mt-6">
               <CardContent className="p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Before you submit</p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                     Ensure your RCA registration number and TIN match your official records.
@@ -219,8 +219,8 @@ const CooperativeApplication = () => {
                 <>
                   <div className="mb-6">
                     <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Cooperative application</p>
-                    <h2 className="mt-1 text-lg font-bold text-gray-900">Submit your organization details</h2>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <h2 className="mt-1 text-lg font-bold text-gray-900 dark:text-white">Submit your organization details</h2>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                       Complete the form below and we&apos;ll send your application for review.
                     </p>
                   </div>
@@ -284,7 +284,7 @@ const CooperativeApplication = () => {
                     <Separator />
 
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="max-w-md text-xs text-gray-400">
+                      <p className="max-w-md text-xs text-gray-400 dark:text-gray-500">
                         By submitting, you confirm the information is accurate and can be reviewed by Smart-Coop administrators.
                       </p>
                       <Button
@@ -303,11 +303,11 @@ const CooperativeApplication = () => {
                 </>
               ) : (
                 <div className="flex min-h-[500px] flex-col items-center justify-center text-center animate-fade-in">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 mb-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-4">
                     <CheckCircle2 className="h-8 w-8" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900">Application received!</h2>
-                  <p className="mt-2 max-w-sm text-sm text-gray-500">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">Application received!</h2>
+                  <p className="mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400">
                     Your application has been sent successfully. An email and in-app notification were delivered to the Super Admin for review.
                   </p>
 
@@ -315,13 +315,13 @@ const CooperativeApplication = () => {
                     <Card>
                       <CardContent className="p-4">
                         <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">What happens next</p>
-                        <p className="mt-1 text-sm text-gray-600">Your records will be reviewed for completeness and eligibility.</p>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Your records will be reviewed for completeness and eligibility.</p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Follow-up</p>
-                        <p className="mt-1 text-sm text-gray-600">The representative will be contacted using the phone number provided.</p>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">The representative will be contacted using the phone number provided.</p>
                       </CardContent>
                     </Card>
                   </div>

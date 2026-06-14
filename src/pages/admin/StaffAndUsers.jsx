@@ -211,61 +211,61 @@ const StaffAndUsers = () => {
         </Card>
       )}
 
-      {/* Table */}
+      {/* Desktop view Table */}
       {!loading && filtered.length > 0 && (
-        <Card>
+        <Card className="hidden md:block overflow-hidden border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs rounded-xl">
           <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+              <thead className="bg-gray-50/75 dark:bg-gray-950/50">
+                <tr>
                   {["User", "Contact", "Role", "Status", "Actions"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">{h}</th>
+                    <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map(u => {
                   const name = u.fullName || u.profile?.fullName || u.username || "User";
                   const initial = name.charAt(0).toUpperCase();
                   const active = resolveActive(u);
                   return (
-                    <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap">
+                    <tr key={u.id} className="hover:bg-emerald-50/10 dark:hover:bg-emerald-950/10 transition-colors duration-150">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-semibold">
+                          <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-semibold shadow-sm">
                             {initial}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
-                            <p className="text-xs text-gray-400 truncate">@{u.username}</p>
+                            <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{name}</p>
+                            <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500">@{u.username}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <div className="space-y-0.5">
-                          {u.email && <p className="flex items-center gap-1 text-xs text-gray-500"><Mail className="h-3 w-3 text-gray-300" />{u.email}</p>}
-                          {u.phone && <p className="flex items-center gap-1 text-xs text-gray-500"><Phone className="h-3 w-3 text-gray-300" />{u.phone}</p>}
+                          {u.email && <p className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-400"><Mail className="h-3 w-3 text-gray-400 dark:text-gray-500" />{u.email}</p>}
+                          {u.phone && <p className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-400"><Phone className="h-3 w-3 text-gray-400 dark:text-gray-500" />{u.phone}</p>}
                         </div>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge className={roleColors[u.role?.toUpperCase()] || roleColors.MEMBER} variant="secondary">
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <Badge className={`${roleColors[u.role?.toUpperCase()] || roleColors.MEMBER} font-semibold border-none shadow-none text-[10px] px-2 py-0.5`} variant="secondary">
                           {u.role?.replace(/_/g, " ") || "—"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge className={active ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"} variant="secondary">
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <Badge className={`${active ? "bg-emerald-50 dark:bg-emerald-955/20 text-emerald-700 dark:text-emerald-400 border-none" : "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border-none"} font-semibold shadow-none text-[10px] px-2 py-0.5`} variant="secondary">
                           {active ? "Active" : "Inactive"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
                           <Button size="sm" variant="outline" onClick={() => handleToggle(u.id)} disabled={togglingId === u.id}
-                            className={`text-xs ${active ? "text-amber-700 border-amber-200 hover:bg-amber-50" : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"}`}>
+                            className={`text-[10px] font-semibold h-8 px-2.5 rounded-lg border shadow-none transition-colors ${active ? "text-amber-700 border-amber-200 dark:border-amber-900/50 hover:bg-amber-50 dark:hover:bg-amber-955/20" : "text-emerald-700 border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-955/20"}`}>
                             {togglingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Power className="h-3 w-3 mr-1" />}
                             {active ? "Deactivate" : "Activate"}
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => handleDelete(u.id)} disabled={deletingId === u.id}
-                            className="text-xs text-red-600 border-red-200 hover:bg-red-50">
+                            className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-red-200 dark:border-red-900/50 text-red-650 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-955/20 shadow-none transition-colors">
                             {deletingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Trash2 className="h-3 w-3 mr-1" />}
                             Delete
                           </Button>
@@ -278,6 +278,69 @@ const StaffAndUsers = () => {
             </table>
           </div>
         </Card>
+      )}
+
+      {/* Mobile Card List */}
+      {!loading && filtered.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 md:hidden">
+          {filtered.map(u => {
+            const name = u.fullName || u.profile?.fullName || u.username || "User";
+            const initial = name.charAt(0).toUpperCase();
+            const active = resolveActive(u);
+            return (
+              <div key={u.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-150 dark:border-gray-800 p-4 shadow-xs space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-semibold shadow-xs">
+                      {initial}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{name}</p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">@{u.username}</p>
+                    </div>
+                  </div>
+                  <Badge className={`${roleColors[u.role?.toUpperCase()] || roleColors.MEMBER} font-semibold border-none shadow-none text-[9px] px-2 py-0.5`} variant="secondary">
+                    {u.role?.replace(/_/g, " ") || "—"}
+                  </Badge>
+                </div>
+
+                <div className="space-y-1.5 text-xs border-y border-gray-50 dark:border-gray-800 py-2.5">
+                  {u.email && (
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                      <Mail className="h-3.5 w-3.5 text-gray-400 dark:text-gray-550" />
+                      <span className="truncate">{u.email}</span>
+                    </div>
+                  )}
+                  {u.phone && (
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                      <Phone className="h-3.5 w-3.5 text-gray-400 dark:text-gray-550" />
+                      <span>{u.phone}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center pt-1">
+                  <Badge className={`${active ? "bg-emerald-50 dark:bg-emerald-955/20 text-emerald-700 dark:text-emerald-400" : "bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400"} font-semibold border-none shadow-none text-[9px] px-2 py-0.5`} variant="secondary">
+                    {active ? "Active" : "Inactive"}
+                  </Badge>
+
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => handleToggle(u.id)} disabled={togglingId === u.id}
+                      className={`text-[10px] font-semibold h-8 px-2.5 rounded-lg border shadow-none transition-colors ${active ? "text-amber-700 border-amber-200 dark:border-amber-900/50 hover:bg-amber-50 dark:hover:bg-amber-955/20" : "text-emerald-700 border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-955/20"}`}>
+                      {togglingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Power className="h-3 w-3 mr-1" />}
+                      {active ? "Deactivate" : "Activate"}
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleDelete(u.id)} disabled={deletingId === u.id}
+                      className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-red-200 dark:border-red-900/50 text-red-650 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-955/20 shadow-none transition-colors">
+                      {deletingId === u.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Trash2 className="h-3 w-3 mr-1" />}
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {/* Add User Modal */}

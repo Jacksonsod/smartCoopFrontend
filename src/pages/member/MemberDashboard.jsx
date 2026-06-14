@@ -49,13 +49,13 @@ const formatDate = (value) => {
 
 const extractList = (p) => (Array.isArray(p) ? p : Array.isArray(p?.content) ? p.content : Array.isArray(p?.data) ? p.data : []);
 
-const StatCard = ({ title, value, icon: Icon, accentClass = "text-emerald-600 bg-emerald-50" }) => (
-  <Card className="border border-gray-200 shadow-sm">
+const StatCard = ({ title, value, icon: Icon, accentClass = "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20" }) => (
+  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900">
     <CardContent className="p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{title}</p>
-          <p className="mt-2 text-2xl font-semibold text-gray-900">{value}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</p>
+          <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{value}</p>
         </div>
         <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${accentClass}`}>
           <Icon className="h-5 w-5" />
@@ -96,18 +96,18 @@ const MemberDashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           {greet()}, {user?.fullName || user?.username || "Member"}
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Track your deliveries, service records, and payment progress.
         </p>
       </div>
 
       {loading ? (
-        <div className="flex h-48 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white">
-          <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
-          <span className="text-sm text-gray-500">Loading your activities...</span>
+        <div className="flex h-48 items-center justify-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <Loader2 className="h-5 w-5 animate-spin text-emerald-600 dark:text-emerald-400" />
+          <span className="text-sm text-gray-500 dark:text-gray-400">Loading your activities...</span>
         </div>
       ) : (
         <>
@@ -118,27 +118,27 @@ const MemberDashboard = () => {
               title="Revenue (RWF)"
               value={formatCurrency(stats.totalRevenue)}
               icon={Banknote}
-              accentClass="text-green-700 bg-green-50"
+              accentClass="text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/20"
             />
           </div>
 
-          <Card className="border border-gray-200 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">My Activities</CardTitle>
+          <Card className="border border-gray-200 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900">
+            <CardHeader className="pb-3 border-b dark:border-gray-800">
+              <CardTitle className="text-base text-gray-900 dark:text-white">My Activities</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {activities.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-gray-300 py-10 text-center text-sm text-gray-500">
+                <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                   No activities assigned to you yet.
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Item / Service</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Revenue (RWF)</TableHead>
+                    <TableRow className="dark:border-gray-800">
+                      <TableHead className="dark:text-gray-450">Date</TableHead>
+                      <TableHead className="dark:text-gray-450">Item / Service</TableHead>
+                      <TableHead className="dark:text-gray-450">Quantity</TableHead>
+                      <TableHead className="dark:text-gray-450">Revenue (RWF)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -150,11 +150,11 @@ const MemberDashboard = () => {
                       const revenue = getActivityRevenue(activity);
 
                       return (
-                        <TableRow key={activity?.id || `${itemName}-${index}`}>
-                          <TableCell className="text-gray-600">{formatDate(activityDate)}</TableCell>
-                          <TableCell className="font-medium text-gray-900">{itemName}</TableCell>
-                          <TableCell className="text-gray-600">{`${quantity.toLocaleString()} ${unit}`.trim()}</TableCell>
-                          <TableCell className="font-medium text-gray-900">{formatCurrency(revenue)}</TableCell>
+                        <TableRow key={activity?.id || `${itemName}-${index}`} className="dark:border-gray-800 hover:bg-emerald-50/10 dark:hover:bg-emerald-950/10">
+                          <TableCell className="text-gray-600 dark:text-gray-400">{formatDate(activityDate)}</TableCell>
+                          <TableCell className="font-medium text-gray-900 dark:text-white">{itemName}</TableCell>
+                          <TableCell className="text-gray-600 dark:text-gray-450">{`${quantity.toLocaleString()} ${unit}`.trim()}</TableCell>
+                          <TableCell className="font-medium text-gray-900 dark:text-white">{formatCurrency(revenue)}</TableCell>
                         </TableRow>
                       );
                     })}

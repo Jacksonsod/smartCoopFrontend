@@ -256,10 +256,10 @@ const CooperativeManagement = () => {
 
       {/* No match */}
       {!loading && cooperatives.length > 0 && filtered.length === 0 && (
-        <Card className="py-16 text-center">
+        <Card className="py-16 text-center bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800">
           <CardContent>
-            <Search className="mx-auto h-10 w-10 text-gray-300 mb-3" />
-            <p className="text-sm font-medium text-gray-500">No cooperatives match your filters</p>
+            <Search className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-700 mb-3" />
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No cooperatives match your filters</p>
           </CardContent>
         </Card>
       )}
@@ -271,10 +271,10 @@ const CooperativeManagement = () => {
             const isActive = coop.status?.toUpperCase() === "ACTIVE";
             const isInactive = coop.status?.toUpperCase() === "INACTIVE";
             return (
-              <Card key={coop.id} className="hover:shadow-md transition-shadow">
+              <Card key={coop.id} className="hover:shadow-md transition-shadow bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
                 <CardContent className="p-5 flex flex-col h-full">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400">
                       <Building2 className="h-4 w-4" />
                     </div>
                     <Badge className={statusConfig[coop.status?.toUpperCase()] || "bg-gray-50 text-gray-600"} variant="secondary">
@@ -282,8 +282,8 @@ const CooperativeManagement = () => {
                     </Badge>
                   </div>
 
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1 truncate">{coop.name}</h3>
-                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 truncate">{coop.name}</h3>
+                  <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mb-2">
                     <span className="font-mono">{coop.tinNumber || "—"}</span>
                     <span>·</span>
                     <Badge className={categoryConfig[coop.category?.toUpperCase()] || "bg-gray-50 text-gray-600"} variant="secondary">
@@ -292,7 +292,7 @@ const CooperativeManagement = () => {
                   </div>
 
                   {(coop.province || coop.district) && (
-                    <div className="flex items-center gap-1 text-xs text-gray-400 mb-3">
+                    <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-550 mb-3">
                       <MapPin className="h-3 w-3 shrink-0" />
                       <span className="truncate">{[coop.sector, coop.district, coop.province].filter(Boolean).join(", ")}</span>
                     </div>
@@ -312,7 +312,7 @@ const CooperativeManagement = () => {
                     )}
                     {isActive && (
                       <>
-                        <Badge className="bg-emerald-50 text-emerald-700" variant="secondary">
+                        <Badge className="bg-emerald-50 dark:bg-emerald-955/20 text-emerald-700 dark:text-emerald-400 border-none shadow-none" variant="secondary">
                           <CheckCircle2 className="h-3 w-3 mr-1" /> Active
                         </Badge>
                         <Button size="sm" onClick={() => handleOpenAdminModal(coop.id)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs">
@@ -330,51 +330,53 @@ const CooperativeManagement = () => {
 
       {/* Table View */}
       {!loading && filtered.length > 0 && viewMode === "table" && (
-        <Card>
+        <Card className="overflow-hidden border border-gray-150 dark:border-gray-800 shadow-xs rounded-xl bg-white dark:bg-gray-900">
           <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+              <thead className="bg-gray-50/75 dark:bg-gray-950/50">
+                <tr>
                   {["Cooperative", "TIN", "Category", "Location", "Status", "Actions"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">{h}</th>
+                    <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map(coop => {
                   const isActive = coop.status?.toUpperCase() === "ACTIVE";
                   const isInactive = coop.status?.toUpperCase() === "INACTIVE";
                   return (
-                    <tr key={coop.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
-                            <Building2 className="h-3.5 w-3.5" />
+                    <tr key={coop.id} className="hover:bg-emerald-50/10 dark:hover:bg-emerald-950/10 transition-colors duration-150">
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 shadow-xs">
+                            <Building2 className="h-4 w-4" />
                           </div>
-                          <span className="text-sm font-medium text-gray-900">{coop.name}</span>
+                          <span className="text-xs font-semibold text-gray-900 dark:text-white">{coop.name}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-500 font-mono whitespace-nowrap">{coop.tinNumber}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge className={categoryConfig[coop.category?.toUpperCase()] || "bg-gray-50 text-gray-600"} variant="secondary">
+                      <td className="px-5 py-4 text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-nowrap">{coop.tinNumber}</td>
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <Badge className={`${categoryConfig[coop.category?.toUpperCase()] || "bg-gray-50 text-gray-600"} font-semibold border-none shadow-none text-[10px] px-2 py-0.5`} variant="secondary">
                           {coop.category?.replace(/_/g, " ") || "—"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">{[coop.district, coop.province].filter(Boolean).join(", ") || "—"}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge className={statusConfig[coop.status?.toUpperCase()] || "bg-gray-50 text-gray-600"} variant="secondary">{coop.status}</Badge>
+                      <td className="px-5 py-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{[coop.district, coop.province].filter(Boolean).join(", ") || "—"}</td>
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <Badge className={`${statusConfig[coop.status?.toUpperCase()] || "bg-gray-50 text-gray-600"} font-semibold border-none shadow-none text-[10px] px-2 py-0.5`} variant="secondary">
+                          {coop.status}
+                        </Badge>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
                           {isInactive && (
                             <Button size="sm" variant="outline" onClick={() => handleActivate(coop.id)} disabled={activatingId === coop.id}
-                              className="text-xs text-emerald-700 border-emerald-200 hover:bg-emerald-50">
+                              className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 shadow-none transition-colors">
                               {activatingId === coop.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <CheckCircle2 className="h-3 w-3 mr-1" />} Activate
                             </Button>
                           )}
                           {isActive && (
                             <Button size="sm" variant="outline" onClick={() => handleOpenAdminModal(coop.id)}
-                              className="text-xs text-emerald-700 border-emerald-200 hover:bg-emerald-50">
+                              className="text-[10px] font-semibold h-8 px-2.5 rounded-lg border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 shadow-none transition-colors">
                               <UserPlus className="h-3 w-3 mr-1" /> Assign Admin
                             </Button>
                           )}

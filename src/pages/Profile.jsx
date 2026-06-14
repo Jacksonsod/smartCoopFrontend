@@ -103,70 +103,254 @@ const Profile = () => {
     );
   }
 
+  const isLegacy = localStorage.getItem("designMode") === "legacy";
+
+  if (isLegacy) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">View and update your personal information</p>
+          </div>
+          {!editing && (
+            <Button variant="outline" className="dark:border-gray-800 dark:hover:bg-gray-900" onClick={() => setEditing(true)}>
+              <Edit3 className="mr-2 h-4 w-4" /> Edit
+            </Button>
+          )}
+        </div>
+
+        {/* Alerts */}
+        {success && (
+          <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-205 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 animate-slide-down">
+            <CheckCircle2 className="h-4 w-4" />
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
+        {error && (
+          <Alert variant="destructive" className="animate-slide-down">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Account Info (read-only) */}
+        <Card className="dark:bg-gray-900 dark:border-gray-800">
+          <CardHeader className="pb-3 border-b dark:border-gray-800">
+            <CardTitle className="flex items-center gap-2 text-base text-gray-900 dark:text-white">
+              <Shield className="h-4 w-4 text-emerald-600" /> Account
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="flex items-center gap-3 text-sm">
+                <User className="h-4 w-4 text-gray-400" />
+                <div>
+                  <p className="text-gray-400 text-xs">Username</p>
+                  <p className="text-gray-900 dark:text-white font-medium">{user?.username || "-"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Mail className="h-4 w-4 text-gray-400" />
+                <div>
+                  <p className="text-gray-400 text-xs">Email</p>
+                  <p className="text-gray-900 dark:text-white font-medium">{user?.email || "-"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Phone className="h-4 w-4 text-gray-400" />
+                <div>
+                  <p className="text-gray-400 text-xs">Phone</p>
+                  <p className="text-gray-900 dark:text-white font-medium">{user?.phone || "-"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Shield className="h-4 w-4 text-gray-400" />
+                <div>
+                  <p className="text-gray-400 text-xs">Role</p>
+                  <Badge className="bg-emerald-50 dark:bg-emerald-950/35 text-emerald-700 dark:text-emerald-400 dark:border-emerald-900/50" variant="secondary">{user?.role || "-"}</Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Details */}
+        <Card className="dark:bg-gray-900 dark:border-gray-800">
+          <CardHeader className="pb-3 border-b dark:border-gray-800">
+            <CardTitle className="flex items-center gap-2 text-base text-gray-900 dark:text-white">
+              <UserCircle className="h-4 w-4 text-emerald-600" /> Personal Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            {editing ? (
+              <form onSubmit={handleSave} className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fullName" className="text-gray-700 dark:text-gray-300">Full Name</Label>
+                    <Input id="fullName" name="fullName" value={form.fullName} onChange={handleChange} placeholder="Enter full name" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="nationalId" className="text-gray-700 dark:text-gray-300">National ID</Label>
+                    <Input id="nationalId" name="nationalId" value={form.nationalId} onChange={handleChange} placeholder="e.g., 1199880012345678" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="dateOfBirth" className="text-gray-700 dark:text-gray-300">Date of Birth</Label>
+                    <Input id="dateOfBirth" name="dateOfBirth" type="date" value={form.dateOfBirth} onChange={handleChange} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="gender" className="text-gray-700 dark:text-gray-300">Gender</Label>
+                    <select id="gender" name="gender" value={form.gender} onChange={handleChange}
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent dark:bg-gray-950 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-gray-900 dark:text-white">
+                      <option value="" className="dark:bg-gray-950">Select gender</option>
+                      <option value="Male" className="dark:bg-gray-950">Male</option>
+                      <option value="Female" className="dark:bg-gray-950">Female</option>
+                      <option value="Other" className="dark:bg-gray-950">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="address" className="text-gray-700 dark:text-gray-300">Address</Label>
+                  <Input id="address" name="address" value={form.address} onChange={handleChange} placeholder="KG 123 St, Kigali" />
+                </div>
+                <div className="flex justify-end gap-3 pt-4 border-t dark:border-gray-800">
+                  <Button type="button" variant="outline" className="dark:border-gray-800 dark:hover:bg-gray-900" onClick={handleCancel}>
+                    <X className="mr-2 h-4 w-4" /> Cancel
+                  </Button>
+                  <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={saving}>
+                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Save className="mr-2 h-4 w-4" /> Save
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="flex items-center gap-3 text-sm">
+                  <User className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <p className="text-gray-400 text-xs">Full Name</p>
+                    <p className="text-gray-900 dark:text-white font-medium">{profile?.fullName || "-"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Shield className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <p className="text-gray-400 text-xs">National ID</p>
+                    <p className="text-gray-900 dark:text-white font-medium">{profile?.nationalId || "-"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <CalendarDays className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <p className="text-gray-400 text-xs">Date of Birth</p>
+                    <p className="text-gray-900 dark:text-white font-medium">{profile?.dateOfBirth || "-"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <User className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <p className="text-gray-400 text-xs">Gender</p>
+                    <p className="text-gray-900 dark:text-white font-medium">{profile?.gender || "-"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-sm sm:col-span-2">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <p className="text-gray-400 text-xs">Address</p>
+                    <p className="text-gray-900 dark:text-white font-medium">{profile?.address || "-"}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ─── Modernized Render ─────────────────────────────────────────────────────
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-sm text-gray-500 mt-1">View and update your personal information</p>
+          <h1 className="text-2xl font-extrabold text-gray-950 dark:text-white tracking-tight">My Profile</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">View and update your personal information</p>
         </div>
         {!editing && (
-          <Button variant="outline" onClick={() => setEditing(true)}>
-            <Edit3 className="mr-2 h-4 w-4" /> Edit
+          <Button
+            variant="outline"
+            onClick={() => setEditing(true)}
+            className="rounded-xl border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 font-bold text-xs h-9 px-3.5 gap-1.5 dark:text-gray-300 dark:hover:text-white"
+          >
+            <Edit3 className="h-4 w-4 text-gray-500 dark:text-gray-450" /> Edit Profile
           </Button>
         )}
       </div>
 
       {/* Alerts */}
       {success && (
-        <Alert className="bg-emerald-50 border-emerald-200 text-emerald-700 animate-slide-down">
-          <CheckCircle2 className="h-4 w-4" />
-          <AlertDescription>{success}</AlertDescription>
+        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-250 dark:border-emerald-900 text-emerald-700 dark:text-emerald-450 animate-slide-down rounded-xl shadow-xs">
+          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+          <AlertDescription className="font-semibold text-xs">{success}</AlertDescription>
         </Alert>
       )}
       {error && (
-        <Alert variant="destructive" className="animate-slide-down">
+        <Alert variant="destructive" className="animate-slide-down rounded-xl shadow-xs">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="font-semibold text-xs">{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Account Info (read-only) */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Shield className="h-4 w-4 text-emerald-600" /> Account
+      <Card className="border border-gray-150 dark:border-gray-800 rounded-2xl shadow-xs bg-white dark:bg-gray-900">
+        <CardHeader className="pb-3 border-b border-gray-50 dark:border-gray-800">
+          <CardTitle className="flex items-center gap-2 text-sm font-bold text-gray-950 dark:text-white">
+            <Shield className="h-4 w-4 text-emerald-600" /> Account Security Info
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex items-center gap-3 text-sm">
-              <User className="h-4 w-4 text-gray-400" />
+        <CardContent className="pt-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div className="flex items-center gap-3.5 text-xs">
+              <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                <User className="h-4.5 w-4.5" />
+              </div>
               <div>
-                <p className="text-gray-400 text-xs">Username</p>
-                <p className="text-gray-900 font-medium">{user?.username || "-"}</p>
+                <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Username</p>
+                <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5">{user?.username || "—"}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-sm">
-              <Mail className="h-4 w-4 text-gray-400" />
+            <div className="flex items-center gap-3.5 text-xs">
+              <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                <Mail className="h-4.5 w-4.5" />
+              </div>
               <div>
-                <p className="text-gray-400 text-xs">Email</p>
-                <p className="text-gray-900 font-medium">{user?.email || "-"}</p>
+                <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Email Address</p>
+                <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5">{user?.email || "—"}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-sm">
-              <Phone className="h-4 w-4 text-gray-400" />
+            <div className="flex items-center gap-3.5 text-xs">
+              <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                <Phone className="h-4.5 w-4.5" />
+              </div>
               <div>
-                <p className="text-gray-400 text-xs">Phone</p>
-                <p className="text-gray-900 font-medium">{user?.phone || "-"}</p>
+                <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Phone Number</p>
+                <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5 font-mono">{user?.phone || "—"}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-sm">
-              <Shield className="h-4 w-4 text-gray-400" />
+            <div className="flex items-center gap-3.5 text-xs">
+              <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                <Shield className="h-4.5 w-4.5" />
+              </div>
               <div>
-                <p className="text-gray-400 text-xs">Role</p>
-                <Badge className="bg-emerald-50 text-emerald-700" variant="secondary">{user?.role || "-"}</Badge>
+                <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">System Role</p>
+                <Badge
+                  className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-450 border-emerald-250 dark:border-emerald-900/50 mt-1 font-bold text-[9px] px-2"
+                  variant="outline"
+                >
+                  {user?.role?.replace(/^ROLE_/, "") || "—"}
+                </Badge>
               </div>
             </div>
           </div>
@@ -174,88 +358,144 @@ const Profile = () => {
       </Card>
 
       {/* Profile Details */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <UserCircle className="h-4 w-4 text-emerald-600" /> Personal Information
+      <Card className="border border-gray-150 dark:border-gray-800 rounded-2xl shadow-xs bg-white dark:bg-gray-900">
+        <CardHeader className="pb-3 border-b border-gray-50 dark:border-gray-800">
+          <CardTitle className="flex items-center gap-2 text-sm font-bold text-gray-950 dark:text-white">
+            <UserCircle className="h-4 w-4 text-emerald-600" /> Personal Profile Details
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-5">
           {editing ? (
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input id="fullName" name="fullName" value={form.fullName} onChange={handleChange} placeholder="Enter full name" />
+                  <Label htmlFor="fullName" className="text-xs font-semibold text-gray-800 dark:text-gray-300">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    name="fullName"
+                    value={form.fullName}
+                    onChange={handleChange}
+                    placeholder="Enter full name"
+                    className="rounded-xl border-gray-250 focus-visible:ring-emerald-500/25 text-xs h-9.5"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="nationalId">National ID</Label>
-                  <Input id="nationalId" name="nationalId" value={form.nationalId} onChange={handleChange} placeholder="e.g., 1199880012345678" />
+                  <Label htmlFor="nationalId" className="text-xs font-semibold text-gray-800 dark:text-gray-300">National ID</Label>
+                  <Input
+                    id="nationalId"
+                    name="nationalId"
+                    value={form.nationalId}
+                    onChange={handleChange}
+                    placeholder="e.g., 1199880012345678"
+                    className="rounded-xl border-gray-250 dark:border-gray-800 focus-visible:ring-emerald-500/25 text-xs h-9.5"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                  <Input id="dateOfBirth" name="dateOfBirth" type="date" value={form.dateOfBirth} onChange={handleChange} />
+                  <Label htmlFor="dateOfBirth" className="text-xs font-semibold text-gray-800 dark:text-gray-300">Date of Birth</Label>
+                  <Input
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    type="date"
+                    value={form.dateOfBirth}
+                    onChange={handleChange}
+                    className="rounded-xl border-gray-250 dark:border-gray-800 focus-visible:ring-emerald-500/25 text-xs h-9.5"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="gender">Gender</Label>
-                  <select id="gender" name="gender" value={form.gender} onChange={handleChange}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                    <option value="">Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                  <Label htmlFor="gender" className="text-xs font-semibold text-gray-800 dark:text-gray-300">Gender</Label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={form.gender}
+                    onChange={handleChange}
+                    className="flex h-9.5 w-full rounded-xl border border-gray-250 dark:border-gray-800 bg-transparent dark:bg-gray-950 px-3 py-1 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/25 focus-visible:border-emerald-500 text-gray-900 dark:text-white"
+                  >
+                    <option value="" className="dark:bg-gray-950">Select gender</option>
+                    <option value="Male" className="dark:bg-gray-950">Male</option>
+                    <option value="Female" className="dark:bg-gray-950">Female</option>
+                    <option value="Other" className="dark:bg-gray-950">Other</option>
                   </select>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" name="address" value={form.address} onChange={handleChange} placeholder="KG 123 St, Kigali" />
+                <Label htmlFor="address" className="text-xs font-semibold text-gray-800 dark:text-gray-300">Physical Address</Label>
+                <Input
+                  id="address"
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  placeholder="KG 123 St, Kigali"
+                  className="rounded-xl border-gray-250 dark:border-gray-800 focus-visible:ring-emerald-500/25 text-xs h-9.5"
+                />
               </div>
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button type="button" variant="outline" onClick={handleCancel}>
-                  <X className="mr-2 h-4 w-4" /> Cancel
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-gray-50 dark:border-gray-800">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  className="rounded-xl border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 text-xs font-bold h-9 dark:text-gray-300 dark:hover:text-white"
+                >
+                  <X className="mr-1.5 h-4 w-4 text-gray-500 dark:text-gray-450" /> Cancel
                 </Button>
-                <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={saving}>
-                  {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  <Save className="mr-2 h-4 w-4" /> Save
+                <Button
+                  type="submit"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs text-xs font-bold gap-1.5 h-9"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  Save Profile
                 </Button>
               </div>
             </form>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="flex items-center gap-3 text-sm">
-                <User className="h-4 w-4 text-gray-400" />
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div className="flex items-center gap-3.5 text-xs">
+                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                  <User className="h-4.5 w-4.5" />
+                </div>
                 <div>
-                  <p className="text-gray-400 text-xs">Full Name</p>
-                  <p className="text-gray-900 font-medium">{profile?.fullName || "-"}</p>
+                  <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Full Name</p>
+                  <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5">{profile?.fullName || "—"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Shield className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center gap-3.5 text-xs">
+                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                  <Shield className="h-4.5 w-4.5" />
+                </div>
                 <div>
-                  <p className="text-gray-400 text-xs">National ID</p>
-                  <p className="text-gray-900 font-medium">{profile?.nationalId || "-"}</p>
+                  <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">National ID</p>
+                  <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5 font-mono">{profile?.nationalId || "—"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <CalendarDays className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center gap-3.5 text-xs">
+                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                  <CalendarDays className="h-4.5 w-4.5" />
+                </div>
                 <div>
-                  <p className="text-gray-400 text-xs">Date of Birth</p>
-                  <p className="text-gray-900 font-medium">{profile?.dateOfBirth || "-"}</p>
+                  <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Date of Birth</p>
+                  <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5">{profile?.dateOfBirth || "—"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <User className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center gap-3.5 text-xs">
+                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                  <User className="h-4.5 w-4.5" />
+                </div>
                 <div>
-                  <p className="text-gray-400 text-xs">Gender</p>
-                  <p className="text-gray-900 font-medium">{profile?.gender || "-"}</p>
+                  <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Gender</p>
+                  <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5">{profile?.gender || "—"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-sm sm:col-span-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center gap-3.5 text-xs sm:col-span-2">
+                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-450">
+                  <MapPin className="h-4.5 w-4.5" />
+                </div>
                 <div>
-                  <p className="text-gray-400 text-xs">Address</p>
-                  <p className="text-gray-900 font-medium">{profile?.address || "-"}</p>
+                  <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Physical Address</p>
+                  <p className="text-gray-900 dark:text-gray-100 font-semibold mt-0.5">{profile?.address || "—"}</p>
                 </div>
               </div>
             </div>

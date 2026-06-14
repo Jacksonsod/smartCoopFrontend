@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@variant dark (&:where(.dark, .dark *));
 
 /* ─── Theme Variables (Clean Light + Green) ────────────────────── */
 :root {
@@ -40,8 +40,56 @@
   --sidebar-ring: oklch(0.55 0.17 155 / 40%);
 }
 
+.dark {
+  --background: oklch(0.14 0.01 240);
+  --foreground: oklch(0.98 0.002 240);
+  --card: oklch(0.17 0.01 240);
+  --card-foreground: oklch(0.98 0.002 240);
+  --popover: oklch(0.17 0.01 240);
+  --popover-foreground: oklch(0.98 0.002 240);
+  --primary: oklch(0.68 0.16 155);
+  --primary-foreground: oklch(0.14 0.01 240);
+  --secondary: oklch(0.22 0.02 155);
+  --secondary-foreground: oklch(0.88 0.04 155);
+  --muted: oklch(0.19 0.01 240);
+  --muted-foreground: oklch(0.62 0.01 240);
+  --accent: oklch(0.22 0.02 155);
+  --accent-foreground: oklch(0.88 0.04 155);
+  --border: oklch(0.24 0.01 240);
+  --input: oklch(0.24 0.01 240);
+  --ring: oklch(0.68 0.16 155);
+  --sidebar: oklch(0.15 0.01 240);
+  --sidebar-foreground: oklch(0.92 0.005 240);
+  --sidebar-primary: oklch(0.68 0.16 155);
+  --sidebar-primary-foreground: oklch(0.14 0.01 240);
+  --sidebar-accent: oklch(0.22 0.02 155);
+  --sidebar-accent-foreground: oklch(0.88 0.04 155);
+  --sidebar-border: oklch(0.22 0.01 240);
+}
+
 @theme inline {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Custom Missing Colors for Fallbacks */
+  --color-gray-150: oklch(0.947 0.004 264.542);
+  --color-gray-250: oklch(0.900 0.008 260.000);
+  --color-gray-305: oklch(0.850 0.012 258.000);
+  --color-gray-350: oklch(0.790 0.016 260.000);
+  --color-gray-450: oklch(0.630 0.026 259.000);
+  --color-gray-550: oklch(0.500 0.030 256.848);
+  --color-gray-650: oklch(0.410 0.032 256.848);
+  --color-gray-750: oklch(0.320 0.033 256.848);
+  --color-gray-850: oklch(0.240 0.032 256.848);
+
+  --color-emerald-250: oklch(0.92 0.04 155);
+  --color-emerald-450: oklch(0.65 0.15 155);
+
+  --color-amber-250: oklch(0.92 0.04 85);
+  --color-amber-450: oklch(0.65 0.15 85);
+
+  --color-red-305: oklch(0.85 0.04 30);
+  --color-red-450: oklch(0.65 0.15 30);
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -157,4 +205,95 @@ button, a {
   transition-property: color, background-color, border-color, box-shadow, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+/* ─── Global Dark Mode Helper Overrides ───────────────────────── */
+.dark {
+  /* Text colors */
+  & .text-gray-950, & .text-gray-900, & h1.text-gray-900, & h2.text-gray-900, & h3.text-gray-900, & p.text-gray-900, & span.text-gray-900, & div.text-gray-900 {
+    color: var(--foreground) !important;
+  }
+  & .text-gray-800, & h3.text-gray-800, & p.text-gray-800, & span.text-gray-800, & div.text-gray-800 {
+    color: oklch(0.92 0.005 240) !important;
+  }
+  & .text-gray-700, & p.text-gray-700, & span.text-gray-700, & div.text-gray-700 {
+    color: oklch(0.88 0.008 240) !important;
+  }
+  & .text-gray-650, & .text-gray-600 {
+    color: oklch(0.82 0.01 240) !important;
+  }
+  & .text-gray-550, & .text-gray-500 {
+    color: oklch(0.72 0.015 240) !important;
+  }
+  & .text-gray-455, & .text-gray-450, & .text-gray-400 {
+    color: oklch(0.62 0.01 240) !important;
+  }
+  & .text-gray-350, & .text-gray-305, & .text-gray-250, & .text-gray-205, & .text-gray-150 {
+    color: oklch(0.85 0.01 240) !important;
+  }
+
+  /* Backgrounds */
+  & .bg-white {
+    background-color: var(--card) !important;
+  }
+  & .bg-gray-50 {
+    background-color: var(--background) !important;
+  }
+  & .bg-gray-100 {
+    background-color: oklch(0.18 0.01 240) !important;
+  }
+  & .bg-gray-50\/75 {
+    background-color: oklch(0.15 0.01 240 / 75%) !important;
+  }
+  & .bg-white\/80 {
+    background-color: oklch(0.14 0.01 240 / 80%) !important;
+  }
+
+  /* Borders & Dividers */
+  & .border-gray-50, & .border-gray-100, & .border-gray-150, & .border-gray-200, & .border-gray-250, & .border-gray-300 {
+    border-color: var(--border) !important;
+  }
+  & .divide-gray-50 > * + *, & .divide-gray-100 > * + *, & .divide-gray-200 > * + * {
+    border-color: var(--border) !important;
+  }
+
+  /* Form controls */
+  & input, & select, & textarea {
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+    border-color: var(--border) !important;
+  }
+  & input::placeholder, & textarea::placeholder {
+    color: var(--muted-foreground) !important;
+  }
+  & select option {
+    background-color: var(--card) !important;
+    color: var(--foreground) !important;
+  }
+
+  /* Badge colors for roles */
+  & .bg-purple-50 {
+    background-color: oklch(0.22 0.04 300 / 35%) !important;
+    color: oklch(0.85 0.08 300) !important;
+  }
+  & .bg-blue-50 {
+    background-color: oklch(0.22 0.04 250 / 35%) !important;
+    color: oklch(0.85 0.08 250) !important;
+  }
+  & .bg-cyan-50 {
+    background-color: oklch(0.22 0.04 200 / 35%) !important;
+    color: oklch(0.85 0.08 200) !important;
+  }
+  & .bg-amber-50 {
+    background-color: oklch(0.22 0.04 80 / 35%) !important;
+    color: oklch(0.85 0.08 80) !important;
+  }
+  & .bg-rose-50 {
+    background-color: oklch(0.22 0.04 20 / 35%) !important;
+    color: oklch(0.85 0.08 20) !important;
+  }
+  & .bg-gray-100 {
+    background-color: oklch(0.22 0.01 240 / 35%) !important;
+    color: oklch(0.80 0.01 240) !important;
+  }
 }

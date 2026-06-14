@@ -69,7 +69,9 @@ const Header = ({ onMenuClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [designMode, setDesignMode] = useState(() => localStorage.getItem("designMode") || "modern");
   const dropdownRef = useRef(null);
+  const profileDropdownRef = useRef(null);
 
   const handleLogout = () => {
     logout();
@@ -139,16 +141,19 @@ const Header = ({ onMenuClick }) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
     };
 
-    if (isDropdownOpen) {
+    if (isDropdownOpen || profileDropdownOpen) {
       document.addEventListener("mousedown", handleOutsideClick);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, profileDropdownOpen]);
 
   const handleNotificationClick = async (notification) => {
     const wasUnread = !notification?.isRead;
@@ -180,67 +185,104 @@ const Header = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md px-4 sm:px-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
       {/* Left */}
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={onMenuClick}
-          className="h-9 w-9 md:hidden"
+          className="h-9 w-9 md:hidden hover:bg-gray-100 dark:hover:bg-gray-850 text-gray-600 dark:text-gray-400"
           aria-label="Toggle sidebar"
         >
           <Menu className="h-5 w-5" />
         </Button>
 
         <div>
-          <h2 className="text-base font-semibold text-gray-900">{pageTitle}</h2>
-          <p className="text-[11px] text-gray-400 hidden sm:block">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">{pageTitle}</h2>
+          <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 hidden sm:block">
             {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
           </p>
         </div>
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
+        {/* Design Mode Toggle */}
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 rounded-lg p-0.5 border border-gray-200 dark:border-gray-800 mr-1 shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+          <button
+            onClick={() => {
+              localStorage.setItem("designMode", "modern");
+              setDesignMode("modern");
+              window.location.reload();
+            }}
+            className={`px-2 py-1 text-[9px] font-bold rounded-md transition-all duration-150 ${
+              designMode === "modern"
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
+            }`}
+          >
+            Modern
+          </button>
+          <button
+            onClick={() => {
+              localStorage.setItem("designMode", "legacy");
+              setDesignMode("legacy");
+              window.location.reload();
+            }}
+            className={`px-2 py-1 text-[9px] font-bold rounded-md transition-all duration-150 ${
+              designMode === "legacy"
+                ? "bg-amber-600 text-white shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
+            }`}
+          >
+            Original
+          </button>
+        </div>
+
         {/* Notification Bell */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen((prev) => !prev)}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700 focus-visible:ring-2 focus-visible:ring-emerald-500/30"
+            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 transition-all hover:bg-gray-100/85 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-white focus-visible:ring-2 focus-visible:ring-emerald-500/30"
             aria-label="Open notifications"
           >
-            <Bell className="h-4.5 w-4.5" />
+            <Bell className="h-[18px] w-[18px]" />
             {unreadCount > 0 && (
-              <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-red-500 px-1 text-center text-[10px] font-semibold leading-4 text-white">
+              <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-emerald-600 px-1 text-center text-[9px] font-bold leading-4 text-white animate-pulse">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg">
-              <div className="border-b border-gray-100 px-4 py-3">
-                <p className="text-sm font-semibold text-gray-900">Notifications</p>
-                <p className="text-xs text-gray-500">{unreadCount} unread</p>
+            <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl animate-slide-down z-50">
+              <div className="border-b border-gray-100 dark:border-gray-800 px-4 py-3 bg-gray-50/50 dark:bg-gray-900/50">
+                <p className="text-sm font-bold text-gray-900 dark:text-white">Notifications</p>
+                <p className="text-[11px] text-gray-400 dark:text-gray-550 font-medium">{unreadCount} unread messages</p>
               </div>
 
-              <div className="max-h-96 overflow-y-auto">
+              <div className="max-h-96 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-800">
                 {notificationItems.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-sm text-gray-500">No notifications yet.</div>
+                  <div className="px-4 py-8 text-center text-xs text-gray-400 dark:text-gray-550">No notifications yet.</div>
                 ) : (
                   notificationItems.map((notification) => (
                     <button
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
                       className={[
-                        "w-full border-b border-gray-100 px-4 py-3 text-left transition-colors last:border-b-0",
-                        notification.isRead ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100",
+                        "w-full px-4 py-3.5 text-left transition-colors last:border-b-0",
+                        notification.isRead 
+                          ? "bg-white dark:bg-gray-900 hover:bg-gray-50/70 dark:hover:bg-gray-800/70 text-gray-700 dark:text-gray-305" 
+                          : "bg-emerald-50/20 dark:bg-emerald-950/10 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 text-gray-800 dark:text-gray-200",
                       ].join(" ")}
                     >
-                      <p className="text-sm font-semibold text-gray-900">{notification.title}</p>
-                      <p className="mt-1 text-xs text-gray-600">{notification.message}</p>
-                      <p className="mt-2 text-[11px] text-gray-400">{notification.time || "Just now"}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white">{notification.title}</p>
+                        {!notification.isRead && <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 shrink-0 mt-1" />}
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">{notification.message}</p>
+                      <p className="mt-2 text-[10px] text-gray-400 dark:text-gray-500 font-medium">{notification.time || "Just now"}</p>
                     </button>
                   ))
                 )}
@@ -250,41 +292,45 @@ const Header = ({ onMenuClick }) => {
         </div>
 
         {/* User Profile Dropdown */}
-        <div className="relative">
+        <div className="relative" ref={profileDropdownRef}>
           <button
             onClick={() => setProfileDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 outline-none transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-emerald-500/30"
+            className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 outline-none transition-colors hover:bg-gray-100/80 dark:hover:bg-gray-900/80 focus-visible:ring-2 focus-visible:ring-emerald-500/30"
           >
-            <Avatar className="h-8 w-8">
+            <Avatar className="h-8.5 w-8.5 border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
               <AvatarFallback className="bg-emerald-600 text-xs font-semibold text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="hidden text-left sm:block">
-              <p className="text-sm font-medium text-gray-900">{displayUser?.fullName || displayUser?.firstName || displayUser?.username || "User"}</p>
-              <p className="text-[11px] text-gray-400">{displayUser?.email || formatRole(user?.role || "")}</p>
+              <p className="text-xs font-semibold text-gray-950 dark:text-white truncate max-w-[120px]">{displayUser?.fullName || displayUser?.firstName || displayUser?.username || "User"}</p>
+              <span className="inline-flex items-center rounded-md bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400 ring-1 ring-inset ring-emerald-600/10 dark:ring-emerald-500/20 mt-0.5">
+                {formatRole(user?.role || "")}
+              </span>
             </div>
           </button>
           {profileDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200 z-50">
-              <div className="text-sm text-gray-700 font-bold px-4 py-2 cursor-default">
-                {displayUser?.fullName || displayUser?.firstName || displayUser?.username || "User"}
-                <span className="block text-xs font-normal text-gray-500">{displayUser?.email || formatRole(user?.role || "")}</span>
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-xl py-1.5 border border-gray-100 dark:border-gray-800 z-50 animate-slide-down">
+              <div className="text-xs text-gray-950 dark:text-white font-bold px-4 py-2.5 border-b border-gray-50 dark:border-gray-800">
+                <span className="block truncate">{displayUser?.fullName || displayUser?.firstName || displayUser?.username || "User"}</span>
+                <span className="block text-[10px] font-medium text-gray-400 dark:text-gray-500 mt-0.5 truncate">{displayUser?.email || formatRole(user?.role || "")}</span>
               </div>
-              <button
-                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => { setEditProfileOpen(true); setProfileDropdownOpen(false); }}
-              >
-                <svg className="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5l-4 1 1-4L16.5 3.5z" /></svg>
-                Edit Profile
-              </button>
-              <button
-                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-600"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </button>
+              <div className="p-1">
+                <button
+                  className="flex items-center w-full px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  onClick={() => { setEditProfileOpen(true); setProfileDropdownOpen(false); }}
+                >
+                  <svg className="mr-2 h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5l-4 1 1-4L16.5 3.5z" /></svg>
+                  Edit Profile
+                </button>
+                <button
+                  className="flex items-center w-full px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-700 dark:hover:text-red-305 transition-colors"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4 text-red-500 dark:text-red-450" />
+                  Logout
+                </button>
+              </div>
             </div>
           )}
           {/* Edit Profile Modal */}
