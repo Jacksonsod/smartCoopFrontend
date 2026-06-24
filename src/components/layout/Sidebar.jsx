@@ -59,7 +59,7 @@ const navItems = [
     title: "Catalog Items",
     path: "/items",
     icon: Package,
-    allowedRoles: ["COOP_ADMIN", "ACCOUNTANT"],
+    allowedRoles: ["COOP_ADMIN"],
     section: "Operations",
   },
   {

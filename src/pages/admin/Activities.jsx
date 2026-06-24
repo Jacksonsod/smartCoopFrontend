@@ -23,10 +23,12 @@ import {
 import { getCoopActivities, recordActivity } from "@/services/activityService";
 import { getMyCoopStaff } from "@/services/userService";
 import { getAllItems } from "@/services/itemService";
+import { useAuth } from "@/context/AuthContext";
 
 const extractList = (p) => (Array.isArray(p) ? p : Array.isArray(p?.content) ? p.content : Array.isArray(p?.data) ? p.data : []);
 
 const Activities = () => {
+  const { user } = useAuth();
   const [activities, setActivities] = useState([]);
   const [members, setMembers] = useState([]);
   const [catalogItems, setCatalogItems] = useState([]);
@@ -41,10 +43,18 @@ const Activities = () => {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const [aRes, mRes, iRes] = await Promise.all([getCoopActivities(), getMyCoopStaff(), getAllItems()]);
-      setActivities(extractList(aRes?.data));
-      setMembers(extractList(mRes?.data));
-      setCatalogItems(extractList(iRes?.data));
+      const isStaffOrAdmin = user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER";
+      if (isStaffOrAdmin) {
+        const [aRes, mRes, iRes] = await Promise.all([getCoopActivities(), getMyCoopStaff(), getAllItems()]);
+        setActivities(extractList(aRes?.data));
+        setMembers(extractList(mRes?.data));
+        setCatalogItems(extractList(iRes?.data));
+      } else {
+        const aRes = await getCoopActivities();
+        setActivities(extractList(aRes?.data));
+        setMembers([]);
+        setCatalogItems([]);
+      }
     } catch { /* silently fail */ }
     finally { setLoading(false); }
   };
@@ -117,9 +127,11 @@ const Activities = () => {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Activities</h1>
             <p className="text-sm text-gray-500 dark:text-gray-450 mt-1">Record and track member activities, deliveries, and transactions.</p>
           </div>
-          <Button onClick={openModal} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-            <Plus className="mr-2 h-4 w-4" /> Record Activity
-          </Button>
+          {(user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER") && (
+            <Button onClick={openModal} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Plus className="mr-2 h-4 w-4" /> Record Activity
+            </Button>
+          )}
         </div>
 
         {/* Alerts */}
@@ -158,9 +170,11 @@ const Activities = () => {
               <CardContent>
                 <ClipboardList className="mx-auto h-10 w-10 text-gray-350 dark:text-gray-600 mb-3" />
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No activities recorded yet</p>
-                <Button onClick={openModal} className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white">
-                  <Plus className="mr-2 h-4 w-4" /> Record Activity
-                </Button>
+                {(user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER") && (
+                  <Button onClick={openModal} className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Plus className="mr-2 h-4 w-4" /> Record Activity
+                  </Button>
+                )}
               </CardContent>
             </Card>
         )}

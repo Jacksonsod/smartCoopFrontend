@@ -4,6 +4,7 @@ import {
   CreditCard,
   Loader2,
   RefreshCw,
+  Shield,
 } from "lucide-react";
 import api from "@/services/api";
 import { Card } from "@/components/ui/card";
@@ -17,16 +18,23 @@ const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency"
 const Payments = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
   const [processingId, setProcessingId] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
 
   const fetchPending = async () => {
     setLoading(true);
+    setIsUnauthorized(false);
     try {
       const { data } = await api.get("/payments/pending");
       setActivities(extractList(data));
-    } catch { setActivities([]); }
+    } catch (err) {
+      if (err.response?.status === 403) {
+        setIsUnauthorized(true);
+      }
+      setActivities([]);
+    }
     finally { setLoading(false); }
   };
 
@@ -166,6 +174,16 @@ const Payments = () => {
             <Loader2 className="h-7 w-7 animate-spin text-emerald-500 dark:text-emerald-400 mb-3" />
             <p className="text-sm text-gray-500 dark:text-gray-400">Loading pending payments...</p>
           </div>
+        </Card>
+      ) : isUnauthorized ? (
+        <Card className="py-20 text-center border border-red-100 dark:border-red-900/50 rounded-xl shadow-xs bg-white dark:bg-gray-900">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 mb-4 shadow-sm mx-auto">
+            <Shield className="h-7 w-7 text-red-600 dark:text-red-400" />
+          </div>
+          <p className="text-base font-bold text-gray-900 dark:text-white">Access Denied</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">
+            Your account role does not have permission to view or approve pending payments. Please contact your system administrator or log in as an Accountant.
+          </p>
         </Card>
       ) : activities.length === 0 ? (
         <Card className="py-20 text-center border border-gray-100 dark:border-gray-800 rounded-xl shadow-xs bg-white dark:bg-gray-900">

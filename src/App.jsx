@@ -104,7 +104,7 @@ const App = () => {
                   }
                 />
                 <Route path="/items" element={
-                    <ProtectedRoute allowedRoles={["COOP_ADMIN", "ACCOUNTANT"]}>
+                    <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>
                       <CatalogItems />
                     </ProtectedRoute>
                   }
