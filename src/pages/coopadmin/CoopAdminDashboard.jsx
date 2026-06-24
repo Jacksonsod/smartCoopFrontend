@@ -224,7 +224,7 @@ const CoopAdminDashboard = () => {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-450">Completed Payments</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{reportSummary?.totalActivities || activities.filter(a => a.status === 'PAID').length}</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{reportSummary?.totalActivities || activities.filter(a => (a.paymentStatus || a.status) === 'PAID').length}</p>
               </div>
             </div>
           </CardContent>

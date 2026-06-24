@@ -81,8 +81,11 @@ const QualityInspectorDashboard = () => {
     return {
       total: activities.length,
       today: todayActivities.length,
-      // Updated this logic to look for the "PENDING" status
-      pending: activities.filter(a => !a.status || a.status.toUpperCase() === "PENDING").length,
+      // Updated this logic to look for the "PENDING" status in paymentStatus or status
+      pending: activities.filter(a => {
+        const s = (a.paymentStatus || a.status || "PENDING").toUpperCase();
+        return s === "PENDING";
+      }).length,
     };
   }, [activities]);
 
@@ -162,7 +165,7 @@ const QualityInspectorDashboard = () => {
                           <td className="px-5 py-3.5 text-xs font-mono font-medium text-gray-600 dark:text-gray-350 whitespace-nowrap">{a.metricValue || 0}</td>
                           <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
-                            {(!a.status || a.status.toUpperCase() === "PENDING") ? (
+                            {(!a.paymentStatus || a.paymentStatus.toUpperCase() === "PENDING") ? (
                                 <div className="flex items-center gap-2">
                                   <Button
                                       size="sm"
@@ -183,14 +186,14 @@ const QualityInspectorDashboard = () => {
                                 <Badge
                                     variant="secondary"
                                     className={
-                                      a.status === "APPROVED" || a.status === "PAID" 
+                                      a.paymentStatus === "APPROVED" || a.paymentStatus === "PAID" 
                                         ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-250 dark:border-emerald-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/20" 
-                                        : a.status === "REJECTED" 
+                                        : a.paymentStatus === "REJECTED" 
                                           ? "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-250 dark:border-red-900 hover:bg-red-50 dark:hover:bg-red-950/20" 
                                           : "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-250 dark:border-gray-700 hover:bg-gray-50"
                                     }
                                 >
-                                  {a.status}
+                                  {a.paymentStatus}
                                 </Badge>
                             )}
                           </td>
