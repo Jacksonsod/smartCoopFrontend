@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   ClipboardList,
+  FileDown,
   Loader2,
   Plus,
   RefreshCw,
@@ -23,7 +24,12 @@ import {
 import { getCoopActivities, recordActivity } from "@/services/activityService";
 import { getMyCoopStaff } from "@/services/userService";
 import { getAllItems } from "@/services/itemService";
+import { downloadActivityReportPdf } from "@/services/documentService";
 import { useAuth } from "@/context/AuthContext";
+import PageHeader from "@/components/shared/PageHeader";
+import ResponsiveTable from "@/components/shared/ResponsiveTable";
+import EmptyState from "@/components/shared/EmptyState";
+import { toast } from "@/lib/toast";
 
 const extractList = (p) => (Array.isArray(p) ? p : Array.isArray(p?.content) ? p.content : Array.isArray(p?.data) ? p.data : []);
 
@@ -39,6 +45,7 @@ const Activities = () => {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -112,6 +119,18 @@ const Activities = () => {
     }
   };
 
+  const handleExportPdf = async () => {
+    setExportingPdf(true);
+    try {
+      await downloadActivityReportPdf();
+      toast.success("Activity report exported successfully.");
+    } catch (err) {
+      toast.error(err?.message || "Failed to export PDF.");
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   const formatDate = (d) => {
     if (!d) return "-";
     const date = new Date(d);
@@ -122,17 +141,33 @@ const Activities = () => {
   return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Activities</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-450 mt-1">Record and track member activities, deliveries, and transactions.</p>
-          </div>
-          {(user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER") && (
-            <Button onClick={openModal} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-              <Plus className="mr-2 h-4 w-4" /> Record Activity
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Activities"
+          subtitle="Record and track member activities, deliveries, and transactions."
+          actions={
+            <>
+              <Button
+                variant="outline"
+                onClick={handleExportPdf}
+                disabled={exportingPdf || loading}
+                className="gap-2 rounded-xl border-gray-200 hover:bg-gray-50"
+                id="btn-export-activity-pdf"
+              >
+                {exportingPdf ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileDown className="h-4 w-4" />
+                )}
+                Export PDF
+              </Button>
+              {(user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER") && (
+                <Button onClick={openModal} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <Plus className="mr-2 h-4 w-4" /> Record Activity
+                </Button>
+              )}
+            </>
+          }
+        />
 
         {/* Alerts */}
         {successMsg && (
@@ -166,56 +201,54 @@ const Activities = () => {
 
         {/* Empty */}
         {!loading && activities.length === 0 && (
-            <Card className="py-16 text-center border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900">
-              <CardContent>
-                <ClipboardList className="mx-auto h-10 w-10 text-gray-350 dark:text-gray-600 mb-3" />
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No activities recorded yet</p>
-                {(user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER") && (
-                  <Button onClick={openModal} className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white">
-                    <Plus className="mr-2 h-4 w-4" /> Record Activity
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+          <EmptyState
+            icon={ClipboardList}
+            title="No activities recorded yet"
+            subtitle={
+              (user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER")
+                ? "Use the Record Activity button above to log the first activity."
+                : "Activities recorded by field officers will appear here."
+            }
+          />
         )}
 
         {/* Table */}
         {!loading && filtered.length > 0 && (
-            <Card className="border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900">
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-800">
-                    {["Date", "Member", "Item / Service", "Quantity", "Notes"].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
-                    ))}
-                  </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50 dark:divide-gray-800/80">
-                  {filtered.map(a => (
-                      <tr key={a.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition-colors">
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CalendarDays className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" />
-                            {formatDate(a.activityDate || a.createdAt)}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                          {a.memberName || a.memberUsername || a.member?.fullName || a.member?.username || "-"}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <Badge className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30" variant="secondary">
-                            {a.itemName || a.item?.name || a.serviceName || "-"}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-350 whitespace-nowrap">{a.metricValue}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
-                      </tr>
+          <Card className="border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <ResponsiveTable minWidth="700px">
+              <table className="min-w-full">
+                <thead>
+                <tr className="border-b border-gray-100 dark:border-gray-800">
+                  {["Date", "Member", "Item / Service", "Quantity", "Notes"].map(h => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 dark:divide-gray-800/80">
+                {filtered.map(a => (
+                  <tr key={a.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <CalendarDays className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" />
+                        {formatDate(a.activityDate || a.createdAt)}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                      {a.memberName || a.memberUsername || a.member?.fullName || a.member?.username || "-"}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <Badge className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30" variant="secondary">
+                        {a.itemName || a.item?.name || a.serviceName || "-"}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-350 whitespace-nowrap">{a.metricValue}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>
+            </ResponsiveTable>
+          </Card>
         )}
 
         {/* Record Activity Modal */}

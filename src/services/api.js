@@ -43,13 +43,26 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        const status = error.response?.status;
+
+        if (status === 401) {
+            // Server confirmed the session is invalid — not just a client-side expiry check.
+            console.warn('[API 401] Server rejected the token — clearing session and redirecting.');
+            // Lazy import to avoid circular dep at module init time.
+            import('sonner').then(({ toast }) => {
+                toast.error('Your session has expired. Please log in again.');
+            });
+            localStorage.removeItem('token');
+            // Short delay so the toast is visible before navigation.
+            setTimeout(() => { window.location.href = '/login'; }, 1200);
+        } else if (status === 403) {
             console.error(
-                `[API ${error.response.status}] ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
-                "\nAuth header sent:", error.config?.headers?.Authorization ? "YES" : "NO",
-                "\nResponse body:", error.response?.data
+                `[API 403] ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
+                '\nAuth header sent:', error.config?.headers?.Authorization ? 'YES' : 'NO',
+                '\nResponse body:', error.response?.data
             );
         }
+
         return Promise.reject(error);
     }
 );

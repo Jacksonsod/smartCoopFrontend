@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
-import { downloadAuditLogExcel } from "@/services/documentService";
+import { downloadAuditLogExcel, downloadEntityAuditTrailExcel } from "@/services/documentService";
 import {
   Table,
   TableBody,
@@ -14,6 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getAuditLogs } from "@/services/adminService";
+import PageHeader from "@/components/shared/PageHeader";
+import ResponsiveTable from "@/components/shared/ResponsiveTable";
+import EmptyState from "@/components/shared/EmptyState";
+import { toast } from "@/lib/toast";
 
 const extractList = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -110,10 +114,25 @@ const SystemLogs = () => {
     setExporting(true);
     try {
       await downloadAuditLogExcel();
+      toast.success("Audit log exported successfully.");
     } catch (err) {
-      alert(err.message || "Failed to export audit log.");
+      toast.error(err.message || "Failed to export audit log.");
     } finally {
       setExporting(false);
+    }
+  };
+
+  const [exportingTrail, setExportingTrail] = useState(false);
+
+  const handleExportTrailExcel = async () => {
+    setExportingTrail(true);
+    try {
+      await downloadEntityAuditTrailExcel();
+      toast.success("Payment audit trail exported successfully.");
+    } catch (err) {
+      toast.error(err.message || "Failed to export payment audit trail.");
+    } finally {
+      setExportingTrail(false);
     }
   };
 
@@ -135,25 +154,35 @@ const SystemLogs = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Audit Logs</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            End-to-end traceability of actions performed across the platform.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          onClick={handleExportExcel}
-          disabled={exporting || loading}
-          className="gap-2 dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300"
-        >
-          {exporting
-            ? <Loader2 className="h-4 w-4 animate-spin" />
-            : <FileDown className="h-4 w-4" />}
-          Export Audit Log
-        </Button>
-      </div>
+      <PageHeader
+        title="System Audit Logs"
+        subtitle="End-to-end traceability of actions performed across the platform."
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={handleExportExcel}
+              disabled={exporting || loading}
+              className="gap-2 dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300"
+            >
+              {exporting
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <FileDown className="h-4 w-4" />}
+              Export Audit Log
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportTrailExcel}
+              disabled={exportingTrail}
+              className="flex items-center gap-1.5"
+            >
+              {exportingTrail ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+              Export Payment Trail
+            </Button>
+          </>
+        }
+      />
 
       <Card className="border border-gray-200 dark:border-gray-800 shadow-sm bg-card">
         <CardHeader className="pb-3">
@@ -169,36 +198,39 @@ const SystemLogs = () => {
               <span className="text-sm text-gray-500 dark:text-gray-400">Loading audit logs...</span>
             </div>
           ) : rows.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-850 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-              No audit logs available yet.
-            </div>
+            <EmptyState
+              title="No audit logs available yet."
+              subtitle="Actions performed on the platform will appear here."
+            />
           ) : (
-            <Table className="min-w-[980px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Timestamp</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Endpoint</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="text-gray-600 dark:text-gray-400">{row.timestamp}</TableCell>
-                    <TableCell className="font-medium text-gray-900 dark:text-white">{row.user}</TableCell>
-                    <TableCell className="text-gray-600 dark:text-gray-400">{row.role}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={getMethodClass(row.method)}>
-                        {row.method}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-mono text-xs text-gray-700 dark:text-gray-350">{row.endpoint}</TableCell>
+            <ResponsiveTable minWidth="980px">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Timestamp</TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Action</TableHead>
+                    <TableHead>Endpoint</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell className="text-gray-600 dark:text-gray-400">{row.timestamp}</TableCell>
+                      <TableCell className="font-medium text-gray-900 dark:text-white">{row.user}</TableCell>
+                      <TableCell className="text-gray-600 dark:text-gray-400">{row.role}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={getMethodClass(row.method)}>
+                          {row.method}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs text-gray-700 dark:text-gray-350">{row.endpoint}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ResponsiveTable>
           )}
         </CardContent>
       </Card>
@@ -207,4 +239,3 @@ const SystemLogs = () => {
 };
 
 export default SystemLogs;
-

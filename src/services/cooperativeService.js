@@ -12,6 +12,8 @@ const publicApi = axios.create({
 
 export const getAllCooperatives = async () => await api.get(COOPERATIVES_BASE);
 
+export const getCoopSummary = async () => await api.get(`${COOPERATIVES_BASE}/summary`);
+
 export const registerCooperative = (data) => {
   return api.post(COOPERATIVES_BASE, data);
 };
@@ -22,3 +24,4 @@ export const deactivateCooperative = async (id) => await api.put(`${COOPERATIVES
 export const submitCooperativeApplication = (data) => {
   return publicApi.post("/public/cooperatives/apply", data);
 };
+

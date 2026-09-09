@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Banknote, Layers, Package, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import {
   Table,
   TableBody,
@@ -12,6 +11,9 @@ import {
 } from "@/components/ui/table";
 import { getMyActivities } from "@/services/activityService";
 import { useAuth } from "@/context/AuthContext";
+import StatCard from "@/components/shared/StatCard";
+import EmptyState from "@/components/shared/EmptyState";
+import ResponsiveTable from "@/components/shared/ResponsiveTable";
 
 const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 
@@ -48,22 +50,6 @@ const formatDate = (value) => {
 
 
 const extractList = (p) => (Array.isArray(p) ? p : Array.isArray(p?.content) ? p.content : Array.isArray(p?.data) ? p.data : []);
-
-const StatCard = ({ title, value, icon: Icon, accentClass = "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20" }) => (
-  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900">
-    <CardContent className="p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</p>
-          <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{value}</p>
-        </div>
-        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${accentClass}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
 
 const MemberDashboard = () => {
   const [activities, setActivities] = useState([]);
@@ -111,14 +97,14 @@ const MemberDashboard = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <StatCard title="Total Activities" value={stats.totalActivities} icon={Package} />
-            <StatCard title="Total Volume / Units" value={stats.totalVolume.toLocaleString()} icon={Layers} />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <StatCard label="Total Activities" value={stats.totalActivities} icon={Package} color="emerald" />
+            <StatCard label="Total Volume / Units" value={stats.totalVolume.toLocaleString()} icon={Layers} color="blue" />
             <StatCard
-              title="Revenue (RWF)"
+              label="Revenue (RWF)"
               value={formatCurrency(stats.totalRevenue)}
               icon={Banknote}
-              accentClass="text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/20"
+              color="gold"
             />
           </div>
 
@@ -128,11 +114,13 @@ const MemberDashboard = () => {
             </CardHeader>
             <CardContent className="pt-4">
               {activities.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
-                  No activities assigned to you yet.
-                </div>
+                <EmptyState
+                  title="No activities assigned to you yet."
+                  subtitle="Your recorded deliveries and activities will appear here."
+                />
               ) : (
-                <Table>
+                <ResponsiveTable minWidth="540px">
+                  <Table>
                   <TableHeader>
                     <TableRow className="dark:border-gray-800">
                       <TableHead className="dark:text-gray-450">Date</TableHead>
@@ -160,6 +148,7 @@ const MemberDashboard = () => {
                     })}
                   </TableBody>
                 </Table>
+                </ResponsiveTable>
               )}
             </CardContent>
           </Card>

@@ -158,7 +158,8 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { getAllCooperatives } from "@/services/cooperativeService";
+import { getAllCooperatives, getCoopSummary } from "@/services/cooperativeService";
+
 import { getAllUsers, getMyCoopStaff } from "@/services/userService";
 import { getAllItems } from "@/services/itemService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -280,6 +281,7 @@ const SuperAdminDashboard = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [items, setItems] = useState([]);
   const [profileName, setProfileName] = useState("");
+  const [coopSummaries, setCoopSummaries] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -287,6 +289,7 @@ const SuperAdminDashboard = () => {
       let c = [], u = [];
       try { c = extractList((await getAllCooperatives()).data); } catch (e) { console.error(e); }
       try { u = extractList((await getAllUsers()).data); } catch (e) { console.error(e); }
+      try { setCoopSummaries(extractList((await getCoopSummary()).data)); } catch (e) { console.error(e); }
       try {
         const profRes = await api.get('/profile/me');
         if (profRes?.data?.fullName) setProfileName(profRes.data.fullName);
@@ -295,6 +298,7 @@ const SuperAdminDashboard = () => {
       setCoops(c); setAllUsers(u); setLoading(false);
     })();
   }, []);
+
 
   const activeCoops = coops.filter(c => c.status?.toUpperCase() === "ACTIVE").length;
   const inactiveCoops = coops.length - activeCoops;
@@ -353,7 +357,49 @@ const SuperAdminDashboard = () => {
         <MetricCard icon={Layers} label="Categories" value={byCat.length} accent={P.amber} loading={loading} />
       </div>
 
+      {/* Cross-Cooperative Summary Table */}
+      {coopSummaries.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-sm">Cross-Cooperative Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <table className="min-w-full text-xs">
+              <thead>
+                <tr className="border-b">
+                  {['Cooperative', 'Status', 'Paying', 'Activities', 'Revenue (RWF)', 'Pending (RWF)', 'Members'].map(h => (
+                    <th key={h} className="px-3 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {coopSummaries.map(c => (
+                  <tr key={c.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-2 font-medium text-gray-900">{c.name}</td>
+                    <td className="px-3 py-2">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                        c.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                      }`}>{c.status}</span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                        c.isPayingCustomer ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-400'
+                      }`}>{c.isPayingCustomer ? 'Yes' : 'No'}</span>
+                    </td>
+                    <td className="px-3 py-2 text-right font-mono">{c.totalActivities?.toLocaleString() ?? 0}</td>
+                    <td className="px-3 py-2 text-right font-mono">{Number(c.totalRevenue || 0).toLocaleString()}</td>
+                    <td className="px-3 py-2 text-right font-mono">{Number(c.pendingPaymentsAmount || 0).toLocaleString()}</td>
+                    <td className="px-3 py-2 text-right font-mono">{c.memberCount?.toLocaleString() ?? 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      )}
+
       {/* ── Charts Row ────────────────────────────────────────── */}
+
       {!loading && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
           {/* Growth */}

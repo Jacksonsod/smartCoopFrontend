@@ -25,13 +25,20 @@ export const downloadActivityReportPdf = () =>
 
 /**
  * Downloads the payment summary Excel workbook.
+ * Accepts optional date range and status filters.
  * Accessible to ROLE_ACCOUNTANT and ROLE_COOP_ADMIN.
  */
-export const downloadPaymentSummaryExcel = () =>
-    downloadFile(
-        `/documents/payments/excel`,
+export const downloadPaymentSummaryExcel = (fromDate = null, toDate = null, status = null) => {
+    const params = new URLSearchParams();
+    if (fromDate) params.append('fromDate', fromDate);
+    if (toDate)   params.append('toDate', toDate);
+    if (status)   params.append('status', status);
+    const qs = params.toString();
+    return downloadFile(
+        `/documents/payments/excel${qs ? '?' + qs : ''}`,
         `payments-${today()}.xlsx`
     );
+};
 
 /**
  * Downloads the full audit log Excel workbook.
@@ -42,3 +49,18 @@ export const downloadAuditLogExcel = () =>
         `/documents/audit-logs/excel`,
         `audit-log-${today()}.xlsx`
     );
+
+/**
+ * Downloads the entity_audit_trail (payment state-transition) Excel export.
+ * SUPER_ADMIN only. Separate from /audit-logs/excel.
+ */
+export const downloadEntityAuditTrailExcel = (fromDate = null, toDate = null) => {
+    const params = new URLSearchParams();
+    if (fromDate) params.append('fromDate', fromDate);
+    if (toDate)   params.append('toDate', toDate);
+    const qs = params.toString();
+    return downloadFile(
+        `/documents/payment-audit-trail/excel${qs ? '?' + qs : ''}`,
+        `payment-audit-trail-${today()}.xlsx`
+    );
+};

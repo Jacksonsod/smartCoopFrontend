@@ -161,6 +161,61 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+// ─── Filter Row ───────────────────────────────────────────────────────────────
+
+const FilterRow = ({ fromDate, toDate, statusFilter, onFromDate, onToDate, onStatus, onReset }) => (
+  <div className="flex flex-wrap items-end gap-3 p-4 bg-gray-50 dark:bg-gray-950/50 rounded-xl border border-gray-100 dark:border-gray-800">
+    <div className="flex flex-col gap-1">
+      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+        From Date
+      </label>
+      <input
+        type="date"
+        value={fromDate}
+        onChange={(e) => onFromDate(e.target.value)}
+        className="h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+      />
+    </div>
+    <div className="flex flex-col gap-1">
+      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+        To Date
+      </label>
+      <input
+        type="date"
+        value={toDate}
+        onChange={(e) => onToDate(e.target.value)}
+        className="h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+      />
+    </div>
+    <div className="flex flex-col gap-1">
+      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+        Status
+      </label>
+      <select
+        value={statusFilter}
+        onChange={(e) => onStatus(e.target.value)}
+        className="h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+      >
+        <option value="">All statuses</option>
+        <option value="PENDING">PENDING</option>
+        <option value="PAID">PAID</option>
+        <option value="FAILED">FAILED</option>
+      </select>
+    </div>
+    {(fromDate || toDate || statusFilter) && (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onReset}
+        className="h-9 gap-1.5 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400"
+      >
+        <X className="h-3.5 w-3.5" />
+        Clear
+      </Button>
+    )}
+  </div>
+);
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const PaymentsManagement = () => {
@@ -168,6 +223,11 @@ const PaymentsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
   const [exporting, setExporting] = useState(false);
+
+  // Filter state
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const { toasts, toast, dismiss } = useToasts();
 
@@ -215,13 +275,23 @@ const PaymentsManagement = () => {
   const handleExportExcel = async () => {
     setExporting(true);
     try {
-      await downloadPaymentSummaryExcel();
+      await downloadPaymentSummaryExcel(
+        fromDate || null,
+        toDate || null,
+        statusFilter || null
+      );
       toast.success("Payment summary exported successfully.");
     } catch (err) {
       toast.error(err?.message || "Failed to export payments.");
     } finally {
       setExporting(false);
     }
+  };
+
+  const handleResetFilters = () => {
+    setFromDate("");
+    setToDate("");
+    setStatusFilter("");
   };
 
   // ── Derived stats ─────────────────────────────────────────────────────────
@@ -273,6 +343,17 @@ const PaymentsManagement = () => {
               </Button>
             </div>
           </div>
+
+          {/* Filter Row */}
+          <FilterRow
+            fromDate={fromDate}
+            toDate={toDate}
+            statusFilter={statusFilter}
+            onFromDate={setFromDate}
+            onToDate={setToDate}
+            onStatus={setStatusFilter}
+            onReset={handleResetFilters}
+          />
 
           {/* Summary Stats */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -464,6 +545,17 @@ const PaymentsManagement = () => {
             </Button>
           </div>
         </div>
+
+        {/* Filter Row */}
+        <FilterRow
+          fromDate={fromDate}
+          toDate={toDate}
+          statusFilter={statusFilter}
+          onFromDate={setFromDate}
+          onToDate={setToDate}
+          onStatus={setStatusFilter}
+          onReset={handleResetFilters}
+        />
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

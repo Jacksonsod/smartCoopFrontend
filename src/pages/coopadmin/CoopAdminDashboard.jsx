@@ -7,7 +7,6 @@ import {
   Loader2,
   Package,
   Plus,
-  TrendingUp,
   UserPlus,
   Users,
   DollarSign,
@@ -32,47 +31,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import StatCard from "@/components/shared/StatCard";
+import EmptyState from "@/components/shared/EmptyState";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
 const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
 const formatDate = (d) => { if (!d) return "-"; const date = new Date(d); return isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "short", day: "2-digit" }).format(date); };
-
-// Premium Metric Card Component
-const PremiumStatCard = ({ title, value, subtext, icon: Icon, color = "emerald", trend = null }) => {
-  const colorMap = {
-    emerald: { accent: "#10b981", bg: "bg-emerald-50/50", text: "text-emerald-600", border: "border-emerald-100" },
-    blue: { accent: "#3b82f6", bg: "bg-blue-50/50", text: "text-blue-600", border: "border-blue-100" },
-    amber: { accent: "#f59e0b", bg: "bg-amber-50/50", text: "text-amber-600", border: "border-amber-100" },
-    purple: { accent: "#8b5cf6", bg: "bg-purple-50/50", text: "text-purple-600", border: "border-purple-100" },
-  };
-  const cmap = colorMap[color] || colorMap.emerald;
-
-  return (
-    <Card className={`overflow-hidden border ${cmap.border} dark:border-gray-850 bg-white dark:bg-gray-900 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group`}>
-      <CardContent className="p-6 relative">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">{title}</p>
-            <p className="mt-3 text-3xl font-extrabold text-gray-950 dark:text-white tracking-tight">{value}</p>
-            {subtext && <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">{subtext}</p>}
-            {trend && (
-              <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                <TrendingUp className="h-3.5 w-3.5" />
-                {trend}
-              </div>
-            )}
-          </div>
-          <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${cmap.bg} dark:bg-gray-800 ${cmap.text} dark:text-emerald-400 transition-all duration-300 group-hover:scale-110`}>
-            <Icon className="h-6 w-6" />
-          </div>
-        </div>
-        {/* Decorative colored glow on the side */}
-        <div className="absolute right-0 top-0 bottom-0 w-[3px] transition-all duration-300" style={{ backgroundColor: cmap.accent }} />
-      </CardContent>
-    </Card>
-  );
-};
 
 const CoopAdminDashboard = () => {
   const { user } = useAuth();
@@ -167,33 +132,35 @@ const CoopAdminDashboard = () => {
         </div>
       )}
 
-      {/* Premium Metrics Grid */}
+      {/* Metrics Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
-        <PremiumStatCard
-          title="Total Deliveries"
+        <StatCard
+          label="Total Deliveries"
           value={stats.totalActivities}
           subtext="Activities recorded"
           icon={Activity}
           color="emerald"
-          trend={"+12% from last month"}
+          trend="+12% from last month"
+          trendDir="up"
         />
-        <PremiumStatCard
-          title="Total Volume"
+        <StatCard
+          label="Total Volume"
           value={`${stats.totalVolume.toLocaleString()} units`}
           subtext="Across all items"
           icon={Package}
           color="blue"
         />
-        <PremiumStatCard
-          title="Total Revenue"
+        <StatCard
+          label="Total Revenue"
           value={formatCurrency(stats.totalRevenue)}
           subtext={`${stats.totalVolume.toLocaleString()} units processed`}
           icon={DollarSign}
           color="emerald"
-          trend={"+8% growth"}
+          trend="+8% growth"
+          trendDir="up"
         />
-        <PremiumStatCard
-          title="Active Members"
+        <StatCard
+          label="Active Members"
           value={stats.memberCount}
           subtext={`${stats.staffCount} staff members`}
           icon={Users}
