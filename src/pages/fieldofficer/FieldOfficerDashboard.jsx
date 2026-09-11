@@ -15,39 +15,16 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { getCoopActivities } from "@/services/activityService";
 import { getMyCoopStaff } from "@/services/userService";
+import StatCard from "@/components/shared/StatCard";
+import ResponsiveTable from "@/components/shared/ResponsiveTable";
+import PageHeader from "@/components/shared/PageHeader";
+import EmptyState from "@/components/shared/EmptyState";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
 const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 const formatDate = (d) => { if (!d) return "-"; const date = new Date(d); return isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(date); };
 const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
 const parseNum = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
-
-const StatCard = ({ title, value, icon: Icon, color = "emerald" }) => {
-  const colorMap = {
-    emerald: { accent: "#10b981", bg: "bg-emerald-50/50 dark:bg-emerald-950/20", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-100 dark:border-emerald-900/30" },
-    blue: { accent: "#3b82f6", bg: "bg-blue-50/50 dark:bg-blue-950/20", text: "text-blue-600 dark:text-blue-400", border: "border-blue-100 dark:border-blue-900/30" },
-    amber: { accent: "#f59e0b", bg: "bg-amber-50/50 dark:bg-amber-950/20", text: "text-amber-600 dark:text-amber-400", border: "border-amber-100 dark:border-amber-900/30" },
-    purple: { accent: "#8b5cf6", bg: "bg-purple-50/50 dark:bg-purple-950/20", text: "text-purple-600 dark:text-purple-400", border: "border-purple-100 dark:border-purple-900/30" },
-  };
-  const cmap = colorMap[color] || colorMap.emerald;
-  return (
-    <Card className={`overflow-hidden border ${cmap.border} dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group`}>
-      <CardContent className="p-6 relative">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">{title}</p>
-            <p className="mt-3 text-3xl font-extrabold text-gray-950 dark:text-white tracking-tight">{value}</p>
-          </div>
-          <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${cmap.bg} ${cmap.text} transition-all duration-300 group-hover:scale-110`}>
-            <Icon className="h-6 w-6" />
-          </div>
-        </div>
-        {/* Decorative colored glow on the side */}
-        <div className="absolute right-0 top-0 bottom-0 w-[3px] transition-all duration-300" style={{ backgroundColor: cmap.accent }} />
-      </CardContent>
-    </Card>
-  );
-};
 
 const FieldOfficerDashboard = () => {
   const { user } = useAuth();
@@ -93,22 +70,22 @@ const FieldOfficerDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{greet()}, {user?.fullName || user?.username || "Field Officer"}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Record member activities and manage cooperative members</p>
-        </div>
-        <Button variant="outline" onClick={fetchData} disabled={loading} className="dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300">
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
-        </Button>
-      </div>
+      <PageHeader
+        title={`${greet()}, ${user?.fullName || user?.username || "Field Officer"}`}
+        subtitle="Record member activities and manage cooperative members"
+        actions={
+          <Button variant="outline" onClick={fetchData} disabled={loading} className="dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300">
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+          </Button>
+        }
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Activities" value={stats.total} icon={Activity} color="emerald" />
-        <StatCard title="Today" value={stats.today} icon={CalendarDays} color="blue" />
-        <StatCard title="Members" value={stats.memberCount} icon={Users} color="purple" />
-        <StatCard title="Revenue" value={formatCurrency(stats.totalRevenue)} icon={Activity} color="amber" />
+        <StatCard label="Total Activities" value={stats.total} icon={Activity} color="emerald" />
+        <StatCard label="Today" value={stats.today} icon={CalendarDays} color="blue" />
+        <StatCard label="Members" value={stats.memberCount} icon={Users} color="purple" />
+        <StatCard label="Revenue" value={formatCurrency(stats.totalRevenue)} icon={Activity} color="amber" />
       </div>
 
       {/* Quick Actions */}
@@ -153,13 +130,13 @@ const FieldOfficerDashboard = () => {
         </CardHeader>
         <CardContent className="pt-4">
           {recentActivities.length === 0 ? (
-            <div className="py-10 text-center">
-              <ClipboardList className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" />
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No activities recorded yet</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Start by recording a member activity</p>
-            </div>
+            <EmptyState
+              icon={ClipboardList}
+              title="No activities recorded yet"
+              subtitle="Start by recording a member activity"
+            />
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+            <ResponsiveTable minWidth="640px" className="rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
               <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                 <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                   <tr>
@@ -199,7 +176,7 @@ const FieldOfficerDashboard = () => {
                   })}
                 </tbody>
               </table>
-            </div>
+            </ResponsiveTable>
           )}
         </CardContent>
       </Card>
