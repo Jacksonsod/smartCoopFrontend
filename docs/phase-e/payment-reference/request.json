@@ -1,0 +1,12 @@
+{
+  "method": "PATCH",
+  "path": "/api/v1/payments/54/pay",
+  "query": {
+    "reference": "SC-QA-20260930-54/A&B"
+  },
+  "body": "null",
+  "status": 200,
+  "paymentId": 54,
+  "persistedStatus": "PAID",
+  "persistedReference": "SC-QA-20260930-54/A&B"
+}

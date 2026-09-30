@@ -52,7 +52,6 @@ const pageTitles = {
   "/items": "Catalog Items",
   "/logs": "System Logs",
   "/activities": "Activities",
-  "/my-activities": "My Activities",
   "/payments": "Payments",
   "/profile": "My Profile",
 };

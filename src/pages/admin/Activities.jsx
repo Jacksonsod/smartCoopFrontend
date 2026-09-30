@@ -1,3 +1,5 @@
+import RejectionReason from "@/components/shared/RejectionReason";
+import ActivityReviewActions from "@/components/shared/ActivityReviewActions";
 import api from "@/services/api";
 import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useMemo, useState } from "react";
@@ -39,6 +41,8 @@ const extractList = (p) => (Array.isArray(p) ? p : Array.isArray(p?.content) ? p
 const Activities = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const canRecord = ['COOP_ADMIN', 'FIELD_OFFICER'].includes(user?.role);
+  const canReview = user?.role === 'QUALITY_INSPECTOR';
   const [activities, setActivities] = useState([]);
   const [members, setMembers] = useState([]);
   const [catalogItems, setCatalogItems] = useState([]);
@@ -88,6 +92,7 @@ const Activities = () => {
   const handleFormChange = (e) => { const { name, value } = e.target; setForm(p => ({ ...p, [name]: value })); };
 
   const openModal = () => {
+    if (!canRecord) return;
     setForm({ memberId: "", itemId: "", metricValue: "", notes: "", activityDate: new Date().toISOString().slice(0, 10) });
     setError("");
     setPhoto(null);
@@ -101,6 +106,7 @@ const Activities = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!canRecord) return;
     if (photo && (!['image/jpeg', 'image/png', 'image/webp'].includes(photo.type) || photo.size > 5 * 1024 * 1024)) {
       setError(t('photos.invalid')); return;
     }
@@ -162,7 +168,7 @@ const Activities = () => {
         {/* Header */}
         <PageHeader
           title={t("activities.title")}
-          subtitle={t("activities.subtitle")}
+          subtitle={t("activityRoles." + user?.role)}
           actions={
             <>
               <Button
@@ -179,9 +185,9 @@ const Activities = () => {
                 )}
                 Export PDF
               </Button>
-              {(user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER") && (
+              {canRecord && (
                 <Button onClick={openModal} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                  <Plus className="mr-2 h-4 w-4" /> Record Activity
+                  <Plus className="mr-2 h-4 w-4" /> {t("activityRoles.record")}
                 </Button>
               )}
             </>
@@ -238,7 +244,7 @@ const Activities = () => {
               <table className="min-w-full">
                 <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800">
-                  {[t("activities.col.date"), t("activities.col.member"), t("activities.col.item"), t("activities.col.quantity"), t("activities.col.notes")].map(h => (
+                  {[t("activities.col.date"), t("activities.col.member"), t("activities.col.item"), t("activities.col.quantity"), t("activities.col.notes"), t("common.status"), ...(canReview ? [t("common.actions")] : [])].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
@@ -261,7 +267,9 @@ const Activities = () => {
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-350 whitespace-nowrap">{a.metricValue}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs">{a.notes || "-"}<ActivityPhoto activityId={a.id} allowUpload initialDocumentId={photoDocuments[a.id]} /></td>
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs">{a.notes || "-"}<ActivityPhoto activityId={a.id} allowUpload={canRecord} initialDocumentId={photoDocuments[a.id]} /></td>
+                    <td className="px-4 py-3 text-sm"><Badge variant="outline">{t('status.' + (a.paymentStatus || a.status || 'PENDING'), a.paymentStatus || a.status || 'PENDING')}</Badge>{(a.paymentStatus || a.status) === 'REJECTED' && (a.rejectionReason || a.rejection_reason) && <p className="mt-2 max-w-xs whitespace-normal break-words text-cherry">{a.rejectionReason || a.rejection_reason}</p>}</td>
+                    {canReview && <td className="px-4 py-3"><ActivityReviewActions activity={a} onUpdated={updated => setActivities(rows => rows.map(row => row.id === updated.id ? updated : row))} /></td>}
                   </tr>
                 ))}
                 </tbody>
@@ -271,7 +279,7 @@ const Activities = () => {
         )}
 
         {/* Record Activity Modal */}
-        <Dialog open={isModalOpen} onOpenChange={open => { if (!open && !isSubmitting) closeModal(); }}>
+        {canRecord && <Dialog open={isModalOpen} onOpenChange={open => { if (!open && !isSubmitting) closeModal(); }}>
           <DialogContent className="max-w-md bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white">
             <DialogHeader>
               <DialogTitle className="text-gray-900 dark:text-white">{ t("dashboard.recordActivity") }</DialogTitle>
@@ -331,12 +339,12 @@ const Activities = () => {
                 <Button type="button" variant="outline" disabled={isSubmitting} onClick={closeModal} className="dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">{ t("common.cancel") }</Button>
                 <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={isSubmitting}>
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isSubmitting ? t("common.loading") : "Record Activity"}
+                  {isSubmitting ? t("common.loading") : t("activityRoles.record")}
                 </Button>
               </div>
             </form>
           </DialogContent>
-        </Dialog>
+        </Dialog>}
       </div>
   );
 };

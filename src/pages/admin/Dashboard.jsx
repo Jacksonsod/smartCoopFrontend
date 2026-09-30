@@ -1,3 +1,4 @@
+import RejectionReason from "@/components/shared/RejectionReason";
 import ActivityPhoto from "@/components/shared/ActivityPhoto";
 // ═══════════════════════════════════════════════════════════════════
 // ─── FIELD OFFICER DASHBOARD ──────────────────────────────────────
@@ -128,7 +129,7 @@ const FieldOfficerDashboard = () => {
                           {activity.metricValue}
                         </td>
                         <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                          {activity.notes || "-"}<ActivityPhoto activityId={activity.id} />
+                          {activity.notes || "-"}<ActivityPhoto activityId={activity.id} /><RejectionReason activity={activity} showStatus />
                         </td>
                       </tr>
                     ))}
