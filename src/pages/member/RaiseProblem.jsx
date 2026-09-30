@@ -15,6 +15,7 @@ const extractList = (payload) => {
 };
 
 const RaiseProblem = () => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [myIssues, setMyIssues] = useState([]);
