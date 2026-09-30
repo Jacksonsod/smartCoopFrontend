@@ -81,8 +81,9 @@ export const getSectorUnits = async (sectorType) => {
     return api.get(`/sectors/${sectorType}/units`);
 };
 
-export const getReportSummary = async () => {
-    return api.get('/reports/summary');
+export const getReportSummary = async (filters = {}) => {
+    const params = Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== '' && value != null));
+    return api.get('/reports/summary', { params });
 };
 
 export const applyForCooperative = (data) => api.post('/public/cooperatives/apply', data);
