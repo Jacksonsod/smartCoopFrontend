@@ -404,5 +404,8 @@
   "photos.lookupHelp": "Utilisez l’identifiant noté après l’envoi. Les photos enregistrées ne peuvent pas encore être listées automatiquement.",
   "photos.documentId": "Identifiant du document",
   "photos.view": "Voir la photo",
-  "photos.recorded": "Activité enregistrée."
+  "photos.recorded": "Activité enregistrée.",
+  "paymentReference.label": "Référence de transaction",
+  "paymentReference.placeholder": "Référence Mobile Money ou bancaire",
+  "paymentReference.markPaid": "Marquer comme payé"
 }

@@ -404,5 +404,8 @@
   "photos.lookupHelp": "Use the document ID recorded after upload. Saved photos cannot yet be listed automatically.",
   "photos.documentId": "Document ID",
   "photos.view": "View photo",
-  "photos.recorded": "Activity recorded."
+  "photos.recorded": "Activity recorded.",
+  "paymentReference.label": "Transaction reference",
+  "paymentReference.placeholder": "Mobile Money or bank reference",
+  "paymentReference.markPaid": "Mark as paid"
 }

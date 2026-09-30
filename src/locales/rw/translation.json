@@ -404,5 +404,8 @@
   "photos.lookupHelp": "Koresha ID y’inyandiko wabonye wohereje ifoto. Amafoto abitswe ntaragaragazwa ku rutonde.",
   "photos.documentId": "ID y’inyandiko",
   "photos.view": "Reba ifoto",
-  "photos.recorded": "Igikorwa cyabitswe."
+  "photos.recorded": "Igikorwa cyabitswe.",
+  "paymentReference.label": "Nomero y’igikorwa cy’ubwishyu",
+  "paymentReference.placeholder": "Nomero ya Mobile Money cyangwa banki",
+  "paymentReference.markPaid": "Emeza ko byishyuwe"
 }
