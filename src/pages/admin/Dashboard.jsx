@@ -5,6 +5,7 @@ import ActivityPhoto from "@/components/shared/ActivityPhoto";
 // ═══════════════════════════════════════════════════════════════════
 import { getCoopActivities } from "@/services/activityService";
 import api from "@/services/api";
+import BillingToggle from "@/components/shared/BillingToggle";
 
 const FieldOfficerDashboard = () => {
   const { user } = useAuth();
@@ -286,6 +287,14 @@ const SuperAdminDashboard = () => {
   const [items, setItems] = useState([]);
   const [profileName, setProfileName] = useState("");
   const [coopSummaries, setCoopSummaries] = useState([]);
+  const [summaryError, setSummaryError] = useState(false);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const loadCoopSummary = async () => {
+    setSummaryError(false); setSummaryLoading(true);
+    try { setCoopSummaries(extractList((await getCoopSummary()).data)); }
+    catch { setSummaryError(true); }
+    finally { setSummaryLoading(false); }
+  };
 
   useEffect(() => {
     (async () => {
@@ -293,7 +302,7 @@ const SuperAdminDashboard = () => {
       let c = [], u = [];
       try { c = extractList((await getAllCooperatives()).data); } catch (e) { console.error(e); }
       try { u = extractList((await getAllUsers()).data); } catch (e) { console.error(e); }
-      try { setCoopSummaries(extractList((await getCoopSummary()).data)); } catch (e) { console.error(e); }
+      await loadCoopSummary();
       try {
         const profRes = await api.get('/profile/me');
         if (profRes?.data?.fullName) setProfileName(profRes.data.fullName);
@@ -361,6 +370,7 @@ const SuperAdminDashboard = () => {
         <MetricCard icon={Layers} label="Categories" value={byCat.length} accent={P.amber} loading={loading} />
       </div>
 
+      {summaryError && <div role="alert" className="rounded-xl border border-cherry p-4 space-y-2"><p>{t('billing.summaryError')}</p><Button variant="outline" disabled={summaryLoading} onClick={loadCoopSummary}>{t('billing.retry')}</Button></div>}
       {/* Cross-Cooperative Summary Table */}
       {coopSummaries.length > 0 && (
         <Card className="mt-6">
@@ -386,9 +396,7 @@ const SuperAdminDashboard = () => {
                       }`}>{c.status}</span>
                     </td>
                     <td className="px-3 py-2">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                        c.isPayingCustomer ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-400'
-                      }`}>{c.isPayingCustomer ? 'Yes' : 'No'}</span>
+                      <BillingToggle cooperative={c} onSaved={isPayingCustomer => setCoopSummaries(rows => rows.map(row => row.id === c.id ? { ...row, isPayingCustomer } : row))} />
                     </td>
                     <td className="px-3 py-2 text-right font-mono">{c.totalActivities?.toLocaleString() ?? 0}</td>
                     <td className="px-3 py-2 text-right font-mono">{Number(c.totalRevenue || 0).toLocaleString()}</td>
