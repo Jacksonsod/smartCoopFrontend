@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useState } from "react";
 import {
   CheckCircle2,
@@ -52,6 +53,7 @@ const roleColors = {
 
 // ═══════════════════════════════════════════════════════════════════
 const StaffAndUsers = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -156,7 +158,7 @@ const StaffAndUsers = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input placeholder="Search staff…" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
+          <Input placeholder={t("staff.search")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 rounded-md border border-input px-3 py-1.5 text-sm">
@@ -188,7 +190,7 @@ const StaffAndUsers = () => {
       {loading && (
         <div className="flex flex-col items-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-          <p className="text-sm text-gray-400">Loading staff…</p>
+          <p className="text-sm text-gray-400">{t("staff.loading")}</p>
         </div>
       )}
 
@@ -218,7 +220,7 @@ const StaffAndUsers = () => {
             <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
               <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                 <tr>
-                  {["User", "Contact", "Role", "Status", "Actions"].map(h => (
+                  {[t("staff.col.name"), t("staff.col.email"), t("staff.col.role"), t("common.status"), t("common.actions")].map(h => (
                     <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>

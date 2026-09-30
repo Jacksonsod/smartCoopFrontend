@@ -31,6 +31,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
 // ─── Constants ───────────────────────────────────────────────────
 const COOPERATIVE_TYPES = ["AGRICULTURE", "FINANCIAL", "SERVICE", "TRANSPORT", "ARTISAN"];
@@ -79,6 +80,7 @@ const Select = ({ id, label, options, placeholder, value, onChange }) => (
 
 // ═══════════════════════════════════════════════════════════════════
 const CooperativeManagement = () => {
+  const { t } = useTranslation();
   const [cooperatives, setCooperatives] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -202,7 +204,7 @@ const CooperativeManagement = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input placeholder="Search cooperatives…" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
+          <Input placeholder={t("cooperatives.search")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 rounded-md border border-input bg-transparent px-3 py-1.5 text-sm">
@@ -237,7 +239,7 @@ const CooperativeManagement = () => {
       {loading && (
         <div className="flex flex-col items-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-          <p className="text-sm text-gray-400">Loading cooperatives…</p>
+          <p className="text-sm text-gray-400">{t("cooperatives.loading")}</p>
         </div>
       )}
 
@@ -335,7 +337,7 @@ const CooperativeManagement = () => {
             <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
               <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                 <tr>
-                  {["Cooperative", "TIN", "Category", "Location", "Status", "Actions"].map(h => (
+                  {[t("cooperatives.col.name"), "TIN", t("cooperatives.col.type"), t("cooperatives.col.location"), t("cooperatives.col.status"), t("common.actions")].map(h => (
                     <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
@@ -433,7 +435,7 @@ const CooperativeManagement = () => {
             </div>
             <Separator />
             <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={() => { setShowModal(false); setFormData(initialFormState); setError(null); }}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => { setShowModal(false); setFormData(initialFormState); setError(null); }}>{t("common.cancel")}</Button>
               <Button type="submit" disabled={submitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {submitting ? "Registering…" : "Register Cooperative"}
@@ -478,7 +480,7 @@ const CooperativeManagement = () => {
             </div>
             <Separator />
             <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={() => { closeAdminModal(); setError(null); }}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => { closeAdminModal(); setError(null); }}>{t("common.cancel")}</Button>
               <Button type="submit" disabled={submittingAdmin} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 {submittingAdmin && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {submittingAdmin ? "Creating…" : "Create Admin"}

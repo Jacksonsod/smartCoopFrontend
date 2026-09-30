@@ -18,103 +18,131 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
 const navItems = [
   {
     title: "Dashboard",
+    key: "nav.dashboard",
     path: "/dashboard",
     icon: LayoutDashboard,
     allowedRoles: ["SUPER_ADMIN", "COOP_ADMIN", "ACCOUNTANT", "FIELD_OFFICER", "QUALITY_INSPECTOR", "MEMBER"],
     section: "Overview",
+    sectionKey: "section.overview",
   },
   {
     title: "Cooperatives",
+    key: "nav.cooperatives",
     path: "/cooperatives",
     icon: Building2,
     allowedRoles: ["SUPER_ADMIN"],
     section: "Management",
+    sectionKey: "section.management",
   },
   {
     title: "Pending Cooperatives",
+    key: "nav.pendingCoops",
     path: "/pending-cooperatives",
     icon: ClipboardList,
     allowedRoles: ["SUPER_ADMIN"],
     section: "Management",
+    sectionKey: "section.management",
   },
   {
     title: "Staff & Users",
+    key: "nav.staffUsers",
     path: "/users",
     icon: Users,
     allowedRoles: ["SUPER_ADMIN", "COOP_ADMIN", "FIELD_OFFICER"],
     section: "Management",
+    sectionKey: "section.management",
   },
   {
     title: "System Logs",
+    key: "nav.systemLogs",
     path: "/logs",
     icon: FileText,
     allowedRoles: ["SUPER_ADMIN"],
     section: "Management",
+    sectionKey: "section.management",
   },
   {
     title: "Catalog Items",
+    key: "nav.catalogItems",
     path: "/items",
     icon: Package,
     allowedRoles: ["COOP_ADMIN"],
     section: "Operations",
+    sectionKey: "section.operations",
   },
   {
     title: "Activities",
+    key: "nav.activities",
     path: "/activities",
     icon: ClipboardList,
     allowedRoles: ["COOP_ADMIN", "FIELD_OFFICER", "ACCOUNTANT", "QUALITY_INSPECTOR"],
     section: "Operations",
+    sectionKey: "section.operations",
   },
   {
     title: "Helpdesk",
+    key: "nav.helpdesk",
     path: "/helpdesk",
     icon: MessageSquare,
     allowedRoles: ["COOP_ADMIN"],
     section: "Operations",
+    sectionKey: "section.operations",
   },
   {
     title: "Pending Payments",
+    key: "nav.pendingPayments",
     path: "/payments",
     icon: CreditCard,
     allowedRoles: ["COOP_ADMIN"],
     section: "Finance",
+    sectionKey: "section.finance",
   },
   {
     title: "Manage Payments",
+    key: "nav.managePayments",
     path: "/payments-manage",
     icon: ReceiptText,
     allowedRoles: ["ACCOUNTANT"],
     section: "Finance",
+    sectionKey: "section.finance",
   },
   {
     title: "Activities Ledger",
+    key: "nav.activitiesLedger",
     path: "/ledger",
     icon: BookOpen,
     allowedRoles: ["ACCOUNTANT"],
     section: "Finance",
+    sectionKey: "section.finance",
   },
   {
     title: "Report Problem",
+    key: "nav.reportProblem",
     path: "/report-problem",
     icon: FileText,
     allowedRoles: ["MEMBER"],
     section: "Personal",
+    sectionKey: "section.personal",
   },
   {
     title: "My Profile",
+    key: "nav.myProfile",
     path: "/profile",
     icon: UserCircle,
     allowedRoles: ["SUPER_ADMIN", "COOP_ADMIN", "ACCOUNTANT", "FIELD_OFFICER", "QUALITY_INSPECTOR", "MEMBER"],
     section: "Personal",
+    sectionKey: "section.personal",
   },
 ];
 
 const SidebarContent = ({ onLinkClick }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const allowedNavItems = navItems.filter(
     (item) => Array.isArray(item.allowedRoles) && item.allowedRoles.includes(user?.role)
@@ -124,7 +152,7 @@ const SidebarContent = ({ onLinkClick }) => {
   let lastSection = null;
   allowedNavItems.forEach((item) => {
     if (item.section !== lastSection) {
-      sections.push({ label: item.section, items: [item] });
+      sections.push({ label: item.section, sectionKey: item.sectionKey, items: [item] });
       lastSection = item.section;
     } else {
       sections[sections.length - 1].items.push(item);
@@ -149,7 +177,7 @@ const SidebarContent = ({ onLinkClick }) => {
         {sections.map((section) => (
           <div key={section.label} className="space-y-2">
             <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-sidebar-foreground/45">
-              {section.label}
+              {t(section.sectionKey, section.label)}
             </p>
             <div className="space-y-1">
               {section.items.map((item) => {
@@ -176,7 +204,7 @@ const SidebarContent = ({ onLinkClick }) => {
                             isActive ? "text-white" : "text-sidebar-foreground/50 group-hover:text-sidebar-accent-foreground",
                           ].join(" ")}
                         />
-                        <span>{item.title}</span>
+                        <span>{t(item.key, item.title)}</span>
                       </>
                     )}
                   </NavLink>

@@ -30,10 +30,12 @@ import PageHeader from "@/components/shared/PageHeader";
 import ResponsiveTable from "@/components/shared/ResponsiveTable";
 import EmptyState from "@/components/shared/EmptyState";
 import { toast } from "@/lib/toast";
+import { useTranslation } from "react-i18next";
 
 const extractList = (p) => (Array.isArray(p) ? p : Array.isArray(p?.content) ? p.content : Array.isArray(p?.data) ? p.data : []);
 
 const Activities = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [activities, setActivities] = useState([]);
   const [members, setMembers] = useState([]);
@@ -142,8 +144,8 @@ const Activities = () => {
       <div className="space-y-6">
         {/* Header */}
         <PageHeader
-          title="Activities"
-          subtitle="Record and track member activities, deliveries, and transactions."
+          title={t("activities.title")}
+          subtitle={t("activities.subtitle")}
           actions={
             <>
               <Button
@@ -180,7 +182,7 @@ const Activities = () => {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-            <Input placeholder="Search by member or item..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700" />
+            <Input placeholder={t("activities.search")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700" />
           </div>
           <Button variant="outline" size="icon" onClick={fetchAll} disabled={loading} className="dark:border-gray-700 dark:hover:bg-gray-800">
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -195,7 +197,7 @@ const Activities = () => {
         {loading && (
             <div className="flex flex-col items-center py-16">
               <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-              <p className="text-sm text-gray-400 dark:text-gray-500">Loading activities...</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">{ t("activities.loading") }</p>
             </div>
         )}
 
@@ -203,7 +205,7 @@ const Activities = () => {
         {!loading && activities.length === 0 && (
           <EmptyState
             icon={ClipboardList}
-            title="No activities recorded yet"
+            title={t("activities.noActivities")}
             subtitle={
               (user?.role === "COOP_ADMIN" || user?.role === "FIELD_OFFICER")
                 ? "Use the Record Activity button above to log the first activity."
@@ -219,7 +221,7 @@ const Activities = () => {
               <table className="min-w-full">
                 <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800">
-                  {["Date", "Member", "Item / Service", "Quantity", "Notes"].map(h => (
+                  {[t("activities.col.date"), t("activities.col.member"), t("activities.col.item"), t("activities.col.quantity"), t("activities.col.notes")].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
@@ -255,7 +257,7 @@ const Activities = () => {
         <Dialog open={isModalOpen} onOpenChange={open => { if (!open) closeModal(); }}>
           <DialogContent className="max-w-md bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white">
             <DialogHeader>
-              <DialogTitle className="text-gray-900 dark:text-white">Record Activity</DialogTitle>
+              <DialogTitle className="text-gray-900 dark:text-white">{ t("dashboard.recordActivity") }</DialogTitle>
               <DialogDescription className="text-gray-500 dark:text-gray-400">Log a member transaction, delivery, or service record</DialogDescription>
             </DialogHeader>
             <form className="space-y-4 pt-2" onSubmit={handleSubmit}>
@@ -265,7 +267,7 @@ const Activities = () => {
                   </Alert>
               )}
               <div className="space-y-1.5">
-                <Label htmlFor="memberId" className="text-gray-700 dark:text-gray-350">Member</Label>
+                <Label htmlFor="memberId" className="text-gray-700 dark:text-gray-350">{ t("common.member") }</Label>
                 <select id="memberId" name="memberId" value={form.memberId} onChange={handleFormChange} required
                         className="flex h-9 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-1 text-sm text-gray-900 dark:text-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus:border-emerald-500">
                   <option value="" disabled className="dark:bg-gray-900 dark:text-white">Select member</option>
@@ -279,7 +281,7 @@ const Activities = () => {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="itemId" className="text-gray-700 dark:text-gray-350">Item / Service</Label>
+                <Label htmlFor="itemId" className="text-gray-700 dark:text-gray-350">{ t("activities.col.item") }</Label>
                 <select id="itemId" name="itemId" value={form.itemId} onChange={handleFormChange} required
                         className="flex h-9 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-1 text-sm text-gray-900 dark:text-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus:border-emerald-500">
                   <option value="" disabled className="dark:bg-gray-900 dark:text-white">Select item</option>
@@ -308,10 +310,10 @@ const Activities = () => {
                           className="flex w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus:border-emerald-500" />
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <Button type="button" variant="outline" onClick={closeModal} className="dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">Cancel</Button>
+                <Button type="button" variant="outline" onClick={closeModal} className="dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">{ t("common.cancel") }</Button>
                 <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={isSubmitting}>
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isSubmitting ? "Recording..." : "Record Activity"}
+                  {isSubmitting ? t("common.loading") : "Record Activity"}
                 </Button>
               </div>
             </form>

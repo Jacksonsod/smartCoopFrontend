@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 // ─── Helpers ─────────────────────────────────────────────────────
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
@@ -44,6 +45,7 @@ const ALL_ROLES = ["SUPER_ADMIN", "COOP_ADMIN", "ACCOUNTANT", "FIELD_OFFICER", "
 // ═══════════════════════════════════════════════════════════════════
 const UserManagement = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
@@ -189,7 +191,7 @@ const UserManagement = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
           <Input
-            placeholder="Search users…"
+            placeholder={t("users.search")}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className="pl-10 border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -232,7 +234,7 @@ const UserManagement = () => {
       {loading && (
         <div className="flex flex-col items-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-          <p className="text-sm text-gray-400">Loading users…</p>
+          <p className="text-sm text-gray-400">{t("users.loading")}</p>
         </div>
       )}
 
@@ -259,7 +261,7 @@ const UserManagement = () => {
             <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
               <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                 <tr>
-                  {["User", "Role", "Cooperative", "Status", "Actions"].map(h => (
+                  {[t("users.col.name"), t("users.col.role"), t("users.col.cooperative"), t("users.col.status"), t("users.col.actions")].map(h => (
                     <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
@@ -429,7 +431,7 @@ const UserManagement = () => {
               <div className="flex justify-end gap-2 mt-5">
                 <Button type="button" variant="outline" onClick={handleEditClose} className="dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300">Cancel</Button>
                 <Button type="submit" disabled={editLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
-                  {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Changes'}
+                  {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
                 </Button>
               </div>
             </form>

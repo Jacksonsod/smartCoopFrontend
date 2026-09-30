@@ -13,8 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useTranslation } from "react-i18next";
 
 const PendingCooperatives = () => {
+  const { t } = useTranslation();
   const [cooperatives, setCooperatives] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activatingId, setActivatingId] = useState(null);
@@ -56,8 +58,8 @@ const PendingCooperatives = () => {
 
   const filtered = cooperatives.filter(c => {
     if (!searchTerm) return true;
-    const t = searchTerm.toLowerCase();
-    return (c.name || "").toLowerCase().includes(t) || (c.representativeName || "").toLowerCase().includes(t);
+    const term = searchTerm.toLowerCase();
+    return (c.name || "").toLowerCase().includes(term) || (c.representativeName || "").toLowerCase().includes(term);
   });
 
   const pendingCount = cooperatives.filter(c => c.status === "INACTIVE").length;
@@ -67,13 +69,13 @@ const PendingCooperatives = () => {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cooperative Applications</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("pendingCoops.title")}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-450 mt-1">
-            Review and approve cooperative registrations. <span className="font-semibold text-amber-600 dark:text-amber-400">{pendingCount} pending</span>
+            {t("pendingCoops.subtitle")} <span className="font-semibold text-amber-600 dark:text-amber-400">{pendingCount} pending</span>
           </p>
         </div>
         <Button variant="outline" onClick={fetchCooperatives} disabled={loading} className="dark:border-gray-700 dark:hover:bg-gray-800">
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> {t("common.refresh")}
         </Button>
       </div>
 
@@ -93,14 +95,14 @@ const PendingCooperatives = () => {
       {/* Search */}
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-        <Input placeholder="Search by name or representative..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:border-emerald-500" />
+        <Input placeholder={t("cooperatives.search")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:border-emerald-500" />
       </div>
 
       {/* Loading */}
       {loading && (
         <div className="flex flex-col items-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-          <p className="text-sm text-gray-400 dark:text-gray-500">Loading cooperatives...</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">{t("pendingCoops.loading")}</p>
         </div>
       )}
 
@@ -108,7 +110,8 @@ const PendingCooperatives = () => {
       {!loading && cooperatives.length === 0 && (
         <Card className="py-16 text-center border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-xl">
           <Building2 className="mx-auto h-10 w-10 text-gray-350 dark:text-gray-650 mb-3" />
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No cooperative applications found</p>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("pendingCoops.noPending")}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t("pendingCoops.noPendingSubtitle")}</p>
         </Card>
       )}
 
@@ -119,7 +122,7 @@ const PendingCooperatives = () => {
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800">
-                  {["Name", "RCA Number", "Category", "Representative", "Email", "Status", "Action"].map(h => (
+                  {[t("common.name"), "RCA Number", t("common.type"), "Representative", t("common.email"), t("common.status"), t("common.actions")].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
@@ -135,10 +138,10 @@ const PendingCooperatives = () => {
                     <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{coop.representativeName || "-"}</td>
                     <td className="px-4 py-3 text-sm text-gray-450 dark:text-gray-450 whitespace-nowrap truncate max-w-[12rem]">{coop.representativeEmail || "-"}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={coop.status === "ACTIVE" 
-                        ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30" 
+                      <Badge className={coop.status === "ACTIVE"
+                        ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30"
                         : "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 border border-amber-100 dark:border-amber-900/30"} variant="secondary">
-                        {coop.status}
+                        {t("status." + coop.status, coop.status)}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -146,14 +149,14 @@ const PendingCooperatives = () => {
                         <Button size="sm" onClick={() => handleActivate(coop.id)} disabled={activatingId === coop.id}
                           className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white">
                           {activatingId === coop.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
-                          Approve
+                          {t("common.approve")}
                         </Button>
                       )}
                       {coop.status === "ACTIVE" && (
                         <Button size="sm" variant="outline" onClick={() => handleDeactivate(coop.id)} disabled={deactivatingId === coop.id}
                           className="text-xs text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950/20">
                           {deactivatingId === coop.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <XCircle className="h-3 w-3 mr-1" />}
-                          Deactivate
+                          {t("superAdmin.deactivate")}
                         </Button>
                       )}
                     </td>

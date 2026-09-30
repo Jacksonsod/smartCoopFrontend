@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bell, LogOut, Menu } from "lucide-react";
+import { Bell, LogOut, Menu, Globe } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -15,6 +16,31 @@ import { Button } from "@/components/ui/button";
 import { getMyNotifications, getUnreadCount, markAsRead } from "@/services/notificationService";
 import api from "@/services/api";
 import EditProfileModal from "./EditProfileModal";
+
+const LanguageSwitcher = () => {
+  const { i18n } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const langs = [{ code: 'en', label: 'EN' }, { code: 'rw', label: 'RW' }, { code: 'fr', label: 'FR' }];
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(o => !o)} className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100/85 dark:hover:bg-gray-900 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-all">
+        <Globe className="h-[18px] w-[18px]" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-28 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl py-1.5 z-50">
+          {langs.map(l => (
+            <button key={l.code} onClick={() => { i18n.changeLanguage(l.code); setOpen(false); }}
+              className={`w-full px-3 py-2 text-xs font-semibold text-left transition-colors ${
+                i18n.language === l.code ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+              }`}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const formatRole = (role = "") =>
   role.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -239,6 +265,8 @@ const Header = ({ onMenuClick }) => {
             Original
           </button>
         </div>
+
+        <LanguageSwitcher />
 
         {/* Notification Bell */}
         <div className="relative" ref={dropdownRef}>

@@ -13,8 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useTranslation } from "react-i18next";
 
 const AdminHelpdesk = () => {
+  const { t } = useTranslation();
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState("");
@@ -45,10 +47,10 @@ const AdminHelpdesk = () => {
 
   const filtered = issues.filter(i => {
     if (!searchTerm) return true;
-    const t = searchTerm.toLowerCase();
-    return (i.title || "").toLowerCase().includes(t) ||
-      (i.memberName || i.member?.name || "").toLowerCase().includes(t) ||
-      (i.description || "").toLowerCase().includes(t);
+    const term = searchTerm.toLowerCase();
+    return (i.title || "").toLowerCase().includes(term) ||
+      (i.memberName || i.member?.name || "").toLowerCase().includes(term) ||
+      (i.description || "").toLowerCase().includes(term);
   });
 
   const openCount = issues.filter(i => i.status === "OPEN").length;
@@ -58,13 +60,13 @@ const AdminHelpdesk = () => {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Helpdesk</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("helpdesk.title")}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-450 mt-1">
-            View and resolve member-reported issues. <span className="font-semibold text-amber-600 dark:text-amber-450">{openCount} open</span>
+            {t("helpdesk.subtitle")} <span className="font-semibold text-amber-600 dark:text-amber-450">{openCount} open</span>
           </p>
         </div>
         <Button variant="outline" onClick={fetchIssues} disabled={loading} className="dark:border-gray-700 dark:hover:bg-gray-800">
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> {t("common.refresh")}
         </Button>
       </div>
 
@@ -84,14 +86,14 @@ const AdminHelpdesk = () => {
       {/* Search */}
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-        <Input placeholder="Search issues..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:border-emerald-500" />
+        <Input placeholder={t("helpdesk.search")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:border-emerald-500" />
       </div>
 
       {/* Loading */}
       {loading && (
         <div className="flex flex-col items-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-          <p className="text-sm text-gray-400 dark:text-gray-500">Loading issues...</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">{t("helpdesk.loading")}</p>
         </div>
       )}
 
@@ -99,7 +101,8 @@ const AdminHelpdesk = () => {
       {!loading && issues.length === 0 && (
         <Card className="py-16 text-center border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900">
           <MessageSquare className="mx-auto h-10 w-10 text-gray-350 dark:text-gray-650 mb-3" />
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No issues reported yet</p>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t("helpdesk.noIssues")}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t("helpdesk.noIssuesSubtitle")}</p>
         </Card>
       )}
 
@@ -110,7 +113,7 @@ const AdminHelpdesk = () => {
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800">
-                  {["Date", "Member", "Title", "Description", "Status", "Action"].map(h => (
+                  {[t("common.date"), t("common.member"), t("helpdesk.col.subject"), "Description", t("common.status"), t("common.actions")].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                   ))}
                 </tr>
@@ -127,10 +130,10 @@ const AdminHelpdesk = () => {
                     <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">{issue.title}</td>
                     <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" title={issue.description}>{issue.description}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge className={issue.status === "RESOLVED" 
-                        ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30" 
+                      <Badge className={issue.status === "RESOLVED"
+                        ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30"
                         : "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 border border-amber-100 dark:border-amber-900/30"} variant="secondary">
-                        {issue.status}
+                        {t("status." + issue.status, issue.status)}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -138,10 +141,10 @@ const AdminHelpdesk = () => {
                         <Button size="sm" onClick={() => handleResolve(issue.id)} disabled={resolvingId === issue.id}
                           className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white">
                           {resolvingId === issue.id ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
-                          Resolve
+                          {t("helpdesk.markResolved")}
                         </Button>
                       ) : (
-                        <span className="text-xs text-gray-400 dark:text-gray-500">Resolved</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">{t("status.RESOLVED", "Resolved")}</span>
                       )}
                     </td>
                   </tr>

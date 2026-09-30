@@ -18,6 +18,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import ResponsiveTable from "@/components/shared/ResponsiveTable";
 import EmptyState from "@/components/shared/EmptyState";
 import { toast } from "@/lib/toast";
+import { useTranslation } from "react-i18next";
 
 const extractList = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -77,6 +78,7 @@ const formatTimestamp = (value) => {
 };
 
 const SystemLogs = () => {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -155,8 +157,8 @@ const SystemLogs = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="System Audit Logs"
-        subtitle="End-to-end traceability of actions performed across the platform."
+        title={t("logs.title")}
+        subtitle={t("logs.subtitle")}
         actions={
           <>
             <Button
@@ -168,7 +170,7 @@ const SystemLogs = () => {
               {exporting
                 ? <Loader2 className="h-4 w-4 animate-spin" />
                 : <FileDown className="h-4 w-4" />}
-              Export Audit Log
+              {t("logs.exportExcel")}
             </Button>
             <Button
               variant="outline"
@@ -178,7 +180,7 @@ const SystemLogs = () => {
               className="flex items-center gap-1.5"
             >
               {exportingTrail ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-              Export Payment Trail
+              {t("logs.exportAuditTrail")}
             </Button>
           </>
         }
@@ -188,30 +190,30 @@ const SystemLogs = () => {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-gray-900 dark:text-white">
             <FileText className="h-4 w-4 text-emerald-600" />
-            Action Trace
+            {t("logs.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="flex h-40 items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
               <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
-              <span className="text-sm text-gray-500 dark:text-gray-400">Loading audit logs...</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{t("logs.loading")}</span>
             </div>
           ) : rows.length === 0 ? (
             <EmptyState
-              title="No audit logs available yet."
-              subtitle="Actions performed on the platform will appear here."
+              title={t("logs.noLogs")}
+              subtitle={t("logs.noLogsSubtitle")}
             />
           ) : (
             <ResponsiveTable minWidth="980px">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Endpoint</TableHead>
+                    <TableHead>{t("logs.col.timestamp")}</TableHead>
+                    <TableHead>{t("logs.col.user")}</TableHead>
+                    <TableHead>{t("logs.col.role")}</TableHead>
+                    <TableHead>{t("logs.col.method")}</TableHead>
+                    <TableHead>{t("logs.col.endpoint")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

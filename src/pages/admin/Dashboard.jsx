@@ -74,7 +74,7 @@ const FieldOfficerDashboard = () => {
 
       {/* Metrics */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard icon={Activity} label="Total Activities" value={stats.total} accent={P.emerald} loading={loading} />
+        <MetricCard icon={Activity} label={t("coopAdmin.totalActivities")} value={stats.total} accent={P.emerald} loading={loading} />
         <MetricCard icon={Calendar} label="Today's Activities" value={stats.today} accent={P.blue} loading={loading} />
         <MetricCard icon={Package} label="Total Volume" value={stats.volume.toLocaleString()} accent={P.amber} loading={loading} />
         <MetricCard icon={Users} label="Unique Members" value={stats.members} accent={P.purple} loading={loading} />
@@ -89,7 +89,7 @@ const FieldOfficerDashboard = () => {
             {loading ? (
               <div className="flex h-20 items-center justify-center gap-2">
                 <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
-                <span className="text-sm text-gray-500">Loading activities...</span>
+                <span className="text-sm text-gray-500">{t("activities.loading")}</span>
               </div>
             ) : error ? (
               <Alert>
@@ -162,6 +162,7 @@ import { getAllCooperatives, getCoopSummary } from "@/services/cooperativeServic
 
 import { getAllUsers, getMyCoopStaff } from "@/services/userService";
 import { getAllItems } from "@/services/itemService";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -274,6 +275,7 @@ const ActivityRow = ({ icon: Icon, bg, title, sub, time }) => (
 // ─── SUPER ADMIN DASHBOARD ───────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════
 const SuperAdminDashboard = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -351,9 +353,9 @@ const SuperAdminDashboard = () => {
 
       {/* ── Metrics ───────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard icon={Building2} label="Cooperatives" value={coops.length} accent={P.emerald} loading={loading} />
-        <MetricCard icon={Zap} label="Active Coops" value={activeCoops} accent={P.blue} loading={loading} />
-        <MetricCard icon={Users} label="Total Users" value={allUsers.length} accent={P.purple} loading={loading} />
+        <MetricCard icon={Building2} label={t("superAdmin.totalCooperatives")} value={coops.length} accent={P.emerald} loading={loading} />
+        <MetricCard icon={Zap} label={t("superAdmin.activeCooperatives")} value={activeCoops} accent={P.blue} loading={loading} />
+        <MetricCard icon={Users} label={t("superAdmin.totalMembers")} value={allUsers.length} accent={P.purple} loading={loading} />
         <MetricCard icon={Layers} label="Categories" value={byCat.length} accent={P.amber} loading={loading} />
       </div>
 
@@ -648,8 +650,8 @@ const CoopAdminDashboard = () => {
 
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <MetricCard icon={Users} label="Total Staff" value={staff.length} accent={P.emerald} loading={loading} />
-        <MetricCard icon={Zap} label="Active Staff" value={activeStaff.length} accent={P.blue} loading={loading} />
+        <MetricCard icon={Users} label={t("superAdmin.totalMembers")} value={staff.length} accent={P.emerald} loading={loading} />
+        <MetricCard icon={Zap} label={t("superAdmin.activeCooperatives")} value={activeStaff.length} accent={P.blue} loading={loading} />
         <MetricCard icon={Package} label="Catalog Items" value={items.length} accent={P.amber} loading={loading} />
         <MetricCard icon={TrendingUp} label="Members" value={memberCount} accent={P.purple} loading={loading} />
       </div>
@@ -766,7 +768,7 @@ const CoopAdminDashboard = () => {
                       <p className="text-[11px] text-gray-400">{m.role?.replace(/_/g, " ")}</p>
                     </div>
                     <Badge variant={active ? "default" : "secondary"} className={active ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50" : ""}>
-                      {active ? "Active" : "Inactive"}
+                      {active ? t("status.ACTIVE") : t("status.INACTIVE")}
                     </Badge>
                   </div>
                 );
@@ -842,7 +844,7 @@ const AccountantDashboard = () => {
         <p className="text-sm text-gray-500 mt-1">Your payments and activities overview.</p>
       </div>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <MetricCard icon={Package} label="Pending Payments" value={stats.pendingCount} accent={P.emerald} loading={loading} />
+        <MetricCard icon={Package} label={t("coopAdmin.pendingPayments")} value={stats.pendingCount} accent={P.emerald} loading={loading} />
         <MetricCard icon={Zap} label="Completed Payments" value={stats.completedAmount} accent={P.blue} loading={loading} />
         <MetricCard icon={Users} label="Activities" value={stats.activityCount} accent={P.purple} loading={loading} />
       </div>
@@ -854,7 +856,7 @@ const AccountantDashboard = () => {
           {loading ? (
             <div className="flex h-20 items-center justify-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
-              <span className="text-sm text-gray-500">Loading payments...</span>
+              <span className="text-sm text-gray-500">{t("payments.loading")}</span>
             </div>
           ) : error ? (
             <Alert>
@@ -910,7 +912,7 @@ const Dashboard = () => {
   return (
     <div className="flex h-64 items-center justify-center gap-3">
       <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
-      <p className="text-sm text-gray-400">Loading dashboard…</p>
+      <p className="text-sm text-gray-400">{t("common.loading")}</p>
     </div>
   );
 };
