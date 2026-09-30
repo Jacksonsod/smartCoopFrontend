@@ -373,5 +373,12 @@
   "header.unreadMessages": "{{count}} messages non lus",
   "header.noNotifications": "Aucune notification pour l'instant.",
   "header.editProfile": "Modifier le profil",
-  "header.logout": "Se déconnecter"
+  "header.logout": "Se déconnecter",
+  "billing.confirm": "Changer le statut de facturation de {{name}} en {{status}} ?",
+  "billing.paying": "Payant",
+  "billing.notPaying": "Non payant",
+  "billing.label": "Statut de facturation de {{name}}",
+  "billing.error": "Échec de la modification. Réessayez.",
+  "billing.summaryError": "Impossible de charger les statuts de facturation des coopératives.",
+  "billing.retry": "Réessayer"
 }

@@ -373,5 +373,12 @@
   "header.unreadMessages": "{{count}} unread messages",
   "header.noNotifications": "No notifications yet.",
   "header.editProfile": "Edit Profile",
-  "header.logout": "Logout"
+  "header.logout": "Logout",
+  "billing.confirm": "Change billing status for {{name}} to {{status}}?",
+  "billing.paying": "Paying",
+  "billing.notPaying": "Not paying",
+  "billing.label": "Billing status for {{name}}",
+  "billing.error": "Change failed. Please try again.",
+  "billing.summaryError": "Could not load cooperative billing statuses.",
+  "billing.retry": "Retry"
 }

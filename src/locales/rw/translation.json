@@ -373,5 +373,12 @@
   "header.unreadMessages": "Ubutumwa {{count}} butasomwe",
   "header.noNotifications": "Nta butumwa bugeza ubu.",
   "header.editProfile": "Hindura umwirondoro",
-  "header.logout": "Sohoka"
+  "header.logout": "Sohoka",
+  "billing.confirm": "Hindura imiterere y’ubwishyu ya {{name}} ibe {{status}}?",
+  "billing.paying": "Arishyura",
+  "billing.notPaying": "Ntiyishyura",
+  "billing.label": "Imiterere y’ubwishyu ya {{name}}",
+  "billing.error": "Guhindura byanze. Ongera ugerageze.",
+  "billing.summaryError": "Imiterere y’ubwishyu bwa koperative ntiyabonetse.",
+  "billing.retry": "Ongera ugerageze"
 }
