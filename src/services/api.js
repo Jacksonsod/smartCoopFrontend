@@ -55,7 +55,7 @@ api.interceptors.response.use(
             localStorage.removeItem('token');
             // Short delay so the toast is visible before navigation.
             setTimeout(() => { window.location.href = '/login'; }, 1200);
-        } else if (status === 403) {
+        } else if (status === 403 && !error.config?.quietForbidden) {
             console.error(
                 `[API 403] ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
                 '\nAuth header sent:', error.config?.headers?.Authorization ? 'YES' : 'NO',
@@ -81,8 +81,9 @@ export const getSectorUnits = async (sectorType) => {
     return api.get(`/sectors/${sectorType}/units`);
 };
 
-export const getReportSummary = async () => {
-    return api.get('/reports/summary');
+export const getReportSummary = async (filters = {}) => {
+    const params = Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== '' && value != null));
+    return api.get('/reports/summary', { params });
 };
 
 export const applyForCooperative = (data) => api.post('/public/cooperatives/apply', data);

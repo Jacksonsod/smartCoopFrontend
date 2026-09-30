@@ -1,3 +1,4 @@
+import PaymentReferenceAction from "@/components/shared/PaymentReferenceAction";
 // src/pages/accountant/PaymentsManagement.jsx
 import { useEffect, useRef, useState } from "react";
 import {
@@ -251,11 +252,12 @@ const PaymentsManagement = () => {
   }, []);
 
   // ── Approve Payout ───────────────────────────────────────────────────────
-  const handleApprovePayout = async (payment) => {
+  const handleApprovePayout = async (payment, reference) => {
+    if (!reference?.trim() || processingId !== null) return;
     const id = payment.id;
     setProcessingId(id);
     try {
-      await markPaymentAsPaid(id, "");
+      await markPaymentAsPaid(id, reference.trim());
       // Optimistic UI: remove from list immediately
       setPayments((prev) => prev.filter((p) => p.id !== id));
       toast.success(
@@ -466,32 +468,7 @@ const PaymentsManagement = () => {
                             <StatusBadge status={p.status || "PENDING"} />
                           </TableCell>
                           <TableCell className="pr-4 py-3.5 text-right">
-                            <Button
-                              id={`btn-approve-payout-${p.id}`}
-                              size="sm"
-                              onClick={() => handleApprovePayout(p)}
-                              disabled={isProcessing || processingId !== null}
-                              className={`
-                                gap-1.5 text-xs font-semibold transition-all
-                                ${
-                                  isProcessing
-                                    ? "bg-emerald-600 text-white opacity-90"
-                                    : "bg-emerald-600 hover:bg-emerald-700 text-white"
-                                }
-                              `}
-                            >
-                              {isProcessing ? (
-                                <>
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                  Processing…
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle2 className="h-3.5 w-3.5" />
-                                  Approve Payout
-                                </>
-                              )}
-                            </Button>
+                            <PaymentReferenceAction paymentId={p.id} busy={isProcessing} disabled={processingId !== null} onConfirm={reference => handleApprovePayout(p, reference)} />
                           </TableCell>
                         </TableRow>
                       );
@@ -693,32 +670,7 @@ const PaymentsManagement = () => {
                             </Badge>
                           </td>
                           <td className="px-5 py-4 whitespace-nowrap text-right">
-                            <Button
-                              id={`btn-approve-payout-${p.id}`}
-                              size="sm"
-                              onClick={() => handleApprovePayout(p)}
-                              disabled={isProcessing || processingId !== null}
-                              className={`
-                                text-xs font-bold px-3 py-1.5 h-8.5 rounded-lg shadow-xs flex items-center justify-center gap-1.5 ml-auto active:scale-[0.98] transition-transform duration-100
-                                ${
-                                  isProcessing
-                                    ? "bg-emerald-600 text-white opacity-90"
-                                    : "bg-emerald-600 hover:bg-emerald-700 text-white"
-                                }
-                              `}
-                            >
-                              {isProcessing ? (
-                                <>
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                  Processing…
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle2 className="h-3.5 w-3.5" />
-                                  Approve Payout
-                                </>
-                              )}
-                            </Button>
+                            <PaymentReferenceAction paymentId={p.id} busy={isProcessing} disabled={processingId !== null} onConfirm={reference => handleApprovePayout(p, reference)} />
                           </td>
                         </tr>
                       );
@@ -778,32 +730,7 @@ const PaymentsManagement = () => {
                     </div>
 
                     <div className="pt-1 border-t border-gray-50 dark:border-gray-800 flex justify-end">
-                      <Button
-                        id={`btn-approve-payout-${p.id}`}
-                        size="sm"
-                        onClick={() => handleApprovePayout(p)}
-                        disabled={isProcessing || processingId !== null}
-                        className={`
-                          w-full sm:w-auto text-xs font-bold py-2 px-4 h-9 rounded-lg shadow-xs flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform duration-100
-                          ${
-                            isProcessing
-                              ? "bg-emerald-600 text-white opacity-90"
-                              : "bg-emerald-600 hover:bg-emerald-700 text-white"
-                          }
-                        `}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            Processing…
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            Approve Payout
-                          </>
-                        )}
-                      </Button>
+                      <PaymentReferenceAction paymentId={p.id} busy={isProcessing} disabled={processingId !== null} onConfirm={reference => handleApprovePayout(p, reference)} />
                     </div>
                   </div>
                 );

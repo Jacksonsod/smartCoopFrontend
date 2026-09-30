@@ -29,6 +29,7 @@ import QualityInspectorDashboard from "./pages/inspector/QualityInspectorDashboa
 import FieldOfficerDashboard from "./pages/fieldofficer/FieldOfficerDashboard";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
+import SyncConflicts from "./pages/coopadmin/SyncConflicts";
 import ThemeToggle from "./components/layout/ThemeToggle";
 
 
@@ -126,14 +127,6 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/my-activities"
-                  element={
-                    <ProtectedRoute allowedRoles={["MEMBER"]}>
-                      <MemberDashboard />
-                    </ProtectedRoute>
-                  }
-                />
                 <Route path="/report-problem" element={
                     <ProtectedRoute allowedRoles={["MEMBER"]}>
                       <RaiseProblem />
@@ -158,6 +151,7 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/sync-conflicts" element={<ProtectedRoute allowedRoles={["COOP_ADMIN"]}><SyncConflicts /></ProtectedRoute>} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/helpdesk" element={
                     <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>

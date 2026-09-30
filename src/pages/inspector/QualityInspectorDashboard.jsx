@@ -1,3 +1,5 @@
+import RejectionReason from "@/components/shared/RejectionReason";
+import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
@@ -139,7 +141,7 @@ const QualityInspectorDashboard = () => {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-xs font-mono font-medium text-gray-600 dark:text-gray-350 whitespace-nowrap">{a.metricValue || 0}</td>
-                    <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
+                    <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs">{a.notes || "-"}<ActivityPhoto activityId={a.id} /><RejectionReason activity={a} /></td>
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       {(!a.paymentStatus || a.paymentStatus.toUpperCase() === "PENDING") ? (
                         <div className="flex items-center gap-2">

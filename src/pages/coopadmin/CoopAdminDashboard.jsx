@@ -1,3 +1,5 @@
+import RejectionReason from "@/components/shared/RejectionReason";
+import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
@@ -33,11 +35,12 @@ import {
 } from "recharts";
 import StatCard from "@/components/shared/StatCard";
 import { useTranslation } from "react-i18next";
+import ReportSummary from "@/components/shared/ReportSummary";
 import EmptyState from "@/components/shared/EmptyState";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
 const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
-const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
+const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 2 }).format(a || 0);
 const formatDate = (d) => { if (!d) return "-"; const date = new Date(d); return isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "short", day: "2-digit" }).format(date); };
 
 const CoopAdminDashboard = () => {
@@ -47,6 +50,9 @@ const CoopAdminDashboard = () => {
   const [activities, setActivities] = useState([]);
   const [items, setItems] = useState([]);
   const [reportSummary, setReportSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [summaryError, setSummaryError] = useState(false);
+  const [summaryRevision, setSummaryRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -55,16 +61,14 @@ const CoopAdminDashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const [sRes, aRes, iRes, rRes] = await Promise.all([
+        const [sRes, aRes, iRes] = await Promise.all([
           getMyCoopStaff().catch(() => ({ data: [] })),
           getCoopActivities().catch(() => ({ data: [] })),
           getAllItems().catch(() => ({ data: [] })),
-          getReportSummary().catch(() => ({ data: {} })),
         ]);
         setStaff(extractList(sRes?.data));
         setActivities(extractList(aRes?.data));
         setItems(extractList(iRes?.data));
-        setReportSummary(rRes?.data || {});
       } catch (err) {
         console.error("Dashboard fetch error:", err);
         setError("Failed to load dashboard data");
@@ -73,18 +77,22 @@ const CoopAdminDashboard = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    setSummaryLoading(true); setSummaryError(false); setReportSummary(null);
+    getReportSummary().then(({ data }) => {
+      if (typeof data?.totalRevenue !== "number" || !Number.isFinite(data.totalRevenue)) throw new Error("Invalid summary");
+      if (active) setReportSummary(data);
+    }).catch(() => { if (active) setSummaryError(true); })
+      .finally(() => { if (active) setSummaryLoading(false); });
+    return () => { active = false; };
+  }, [summaryRevision]);
+
   const stats = useMemo(() => {
     const members = staff.filter(s => String(s.role).toUpperCase() === "MEMBER");
     const activeStaff = staff.filter(s => ["FIELD_OFFICER", "ACCOUNTANT", "QUALITY_INSPECTOR"].includes(String(s.role).toUpperCase()));
     const totalVolume = activities.reduce((s, a) => s + (Number(a.metricValue) || 0), 0);
-    const totalRevenue = activities.reduce((s, a) => {
-      const direct = Number(a.totalRevenue || a.totalAmount) || 0;
-      if (direct > 0) return s + direct;
-      const qty = Number(a.metricValue) || 0;
-      const price = Number(a.unitPrice || a.item?.defaultUnitPrice || a.defaultUnitPrice) || 0;
-      return s + (qty * price);
-    }, 0);
-    return { memberCount: members.length, staffCount: activeStaff.length, totalActivities: activities.length, activeItems: items.filter(i => i.active !== false).length, totalVolume, totalRevenue };
+    return { memberCount: members.length, staffCount: activeStaff.length, totalActivities: activities.length, activeItems: items.filter(i => i.active !== false).length, totalVolume };
   }, [staff, activities, items]);
 
   // Activity chart data (last 7 days)
@@ -134,6 +142,8 @@ const CoopAdminDashboard = () => {
         </div>
       )}
 
+      {summaryError && <div role="alert" className="rounded-xl border border-cherry p-4 space-y-2"><p>{t('revenue.error')}</p><Button variant="outline" onClick={() => setSummaryRevision(value => value + 1)}>{t('revenue.retry')}</Button></div>}
+      <ReportSummary items={items} members={staff.filter(s => String(s.role).toUpperCase() === "MEMBER")} />
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
         <StatCard
@@ -152,15 +162,16 @@ const CoopAdminDashboard = () => {
           icon={Package}
           color="blue"
         />
+        <div data-testid="summary-revenue" aria-busy={summaryLoading} aria-label={t("coopAdmin.totalRevenue")}>
         <StatCard
           label={t("coopAdmin.totalRevenue")}
-          value={formatCurrency(stats.totalRevenue)}
-          subtext={`${stats.totalVolume.toLocaleString()} units processed`}
+          value={reportSummary ? formatCurrency(reportSummary.totalRevenue) : t("revenue.unavailable")}
+          loading={summaryLoading}
+          subtext={t("revenue.authoritative")}
           icon={DollarSign}
           color="emerald"
-          trend="+8% growth"
-          trendDir="up"
         />
+        </div>
         <StatCard
           label="Active Members"
           value={stats.memberCount}
@@ -180,7 +191,7 @@ const CoopAdminDashboard = () => {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">Pending Payments</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{reportSummary?.pendingPaymentsAmount || 0}</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{summaryLoading ? t("common.loading") : reportSummary ? formatCurrency(reportSummary.pendingPaymentsAmount) : t("revenue.unavailable")}</p>
               </div>
             </div>
           </CardContent>
@@ -193,7 +204,7 @@ const CoopAdminDashboard = () => {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-450">Completed Payments</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{reportSummary?.totalActivities || activities.filter(a => (a.paymentStatus || a.status) === 'PAID').length}</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{activities.filter(a => (a.paymentStatus || a.status) === 'PAID').length}</p>
               </div>
             </div>
           </CardContent>
@@ -307,7 +318,7 @@ const CoopAdminDashboard = () => {
                         </span>
                       </td>
                       <td className="px-5 py-3.5 text-xs font-mono font-medium text-gray-600 dark:text-gray-350 whitespace-nowrap">{a.metricValue}</td>
-                      <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
+                      <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs">{a.notes || "-"}<ActivityPhoto activityId={a.id} /><RejectionReason activity={a} showStatus /></td>
                     </tr>
                   ))}
                 </tbody>
