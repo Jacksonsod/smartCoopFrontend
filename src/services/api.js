@@ -55,7 +55,7 @@ api.interceptors.response.use(
             localStorage.removeItem('token');
             // Short delay so the toast is visible before navigation.
             setTimeout(() => { window.location.href = '/login'; }, 1200);
-        } else if (status === 403) {
+        } else if (status === 403 && !error.config?.quietForbidden) {
             console.error(
                 `[API 403] ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
                 '\nAuth header sent:', error.config?.headers?.Authorization ? 'YES' : 'NO',
