@@ -404,5 +404,9 @@
   "photos.lookupHelp": "Utilisez l’identifiant noté après l’envoi. Les photos enregistrées ne peuvent pas encore être listées automatiquement.",
   "photos.documentId": "Identifiant du document",
   "photos.view": "Voir la photo",
-  "photos.recorded": "Activité enregistrée."
+  "photos.recorded": "Activité enregistrée.",
+  "revenue.unavailable": "Indisponible",
+  "revenue.authoritative": "D’après le résumé de la coopérative",
+  "revenue.error": "Impossible de charger le résumé financier. Les revenus sont indisponibles tant que la requête échoue.",
+  "revenue.retry": "Réessayer le résumé"
 }

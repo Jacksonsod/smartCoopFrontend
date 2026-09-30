@@ -404,5 +404,9 @@
   "photos.lookupHelp": "Use the document ID recorded after upload. Saved photos cannot yet be listed automatically.",
   "photos.documentId": "Document ID",
   "photos.view": "View photo",
-  "photos.recorded": "Activity recorded."
+  "photos.recorded": "Activity recorded.",
+  "revenue.unavailable": "Unavailable",
+  "revenue.authoritative": "Reported by the cooperative summary",
+  "revenue.error": "Could not load the financial summary. Revenue is unavailable until the request succeeds.",
+  "revenue.retry": "Retry summary"
 }

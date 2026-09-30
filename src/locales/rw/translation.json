@@ -404,5 +404,9 @@
   "photos.lookupHelp": "Koresha ID y’inyandiko wabonye wohereje ifoto. Amafoto abitswe ntaragaragazwa ku rutonde.",
   "photos.documentId": "ID y’inyandiko",
   "photos.view": "Reba ifoto",
-  "photos.recorded": "Igikorwa cyabitswe."
+  "photos.recorded": "Igikorwa cyabitswe.",
+  "revenue.unavailable": "Ntibiboneka",
+  "revenue.authoritative": "Biva mu ncamake ya koperative",
+  "revenue.error": "Incamake y’imari ntiyabonetse. Amafaranga yinjiye ntaragaragara.",
+  "revenue.retry": "Ongera usabe incamake"
 }
