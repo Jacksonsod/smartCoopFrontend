@@ -12,8 +12,11 @@ export const getPendingPayments = async () =>
  * Mark a payment as paid, triggering a MoMo payout via Africa's Talking.
  * PATCH /api/v1/payments/{paymentId}/pay?reference={reference}
  */
-export const markPaymentAsPaid = async (paymentId, reference = "web-portal") =>
-  api.patch(`/payments/${paymentId}/pay?reference=${reference}`);
+export const markPaymentAsPaid = async (paymentId, reference) => {
+  const value = typeof reference === "string" ? reference.trim() : "";
+  if (!value) throw new Error("PAYMENT_REFERENCE_REQUIRED");
+  return api.patch(`/payments/${paymentId}/pay`, null, { params: { reference: value } });
+};
 
 // ── Legacy alias kept for backward compatibility with other pages ──────────
 /** @deprecated Use getPendingPayments() instead */

@@ -34,6 +34,7 @@ import {
 } from "recharts";
 import StatCard from "@/components/shared/StatCard";
 import { useTranslation } from "react-i18next";
+import ReportSummary from "@/components/shared/ReportSummary";
 import EmptyState from "@/components/shared/EmptyState";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
@@ -141,6 +142,7 @@ const CoopAdminDashboard = () => {
       )}
 
       {summaryError && <div role="alert" className="rounded-xl border border-cherry p-4 space-y-2"><p>{t('revenue.error')}</p><Button variant="outline" onClick={() => setSummaryRevision(value => value + 1)}>{t('revenue.retry')}</Button></div>}
+      <ReportSummary items={items} members={staff.filter(s => String(s.role).toUpperCase() === "MEMBER")} />
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
         <StatCard
