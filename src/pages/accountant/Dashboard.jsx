@@ -1,3 +1,4 @@
+import RejectionReason from "@/components/shared/RejectionReason";
 import { useEffect, useState } from "react";
 import {
   Banknote,
@@ -168,7 +169,7 @@ const AccountantDashboard = () => {
                           }
                         >
                           {t("status." + status, status === "UNPROCESSED" ? "PENDING REVIEW" : status)}
-                        </Badge>
+                        </Badge><RejectionReason activity={a} />
                       </td>
                     </tr>
                   );

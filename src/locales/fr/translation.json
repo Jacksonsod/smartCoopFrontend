@@ -373,5 +373,7 @@
   "header.unreadMessages": "{{count}} messages non lus",
   "header.noNotifications": "Aucune notification pour l'instant.",
   "header.editProfile": "Modifier le profil",
-  "header.logout": "Se déconnecter"
+  "header.logout": "Se déconnecter",
+  "rejection.reason": "Motif : {{reason}}",
+  "rejection.missing": "Aucun motif de rejet fourni."
 }

@@ -1,3 +1,4 @@
+import RejectionReason from "@/components/shared/RejectionReason";
 import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
@@ -172,7 +173,7 @@ const FieldOfficerDashboard = () => {
                         </td>
                         <td className="px-5 py-3.5 text-xs font-mono font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">{a.metricValue || 0}</td>
                         <td className="px-5 py-3.5 text-xs font-mono font-bold text-gray-950 dark:text-white whitespace-nowrap">{formatCurrency(revenue)}</td>
-                        <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
+                        <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs">{a.notes || "-"}<RejectionReason activity={a} showStatus /></td>
                       </tr>
                     );
                   })}

@@ -1,3 +1,4 @@
+import RejectionReason from "@/components/shared/RejectionReason";
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -244,7 +245,7 @@ const Activities = () => {
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-350 whitespace-nowrap">{a.metricValue}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs">{a.notes || "-"}<RejectionReason activity={a} showStatus /></td>
                   </tr>
                 ))}
                 </tbody>

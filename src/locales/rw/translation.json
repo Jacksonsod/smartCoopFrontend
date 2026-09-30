@@ -373,5 +373,7 @@
   "header.unreadMessages": "Ubutumwa {{count}} butasomwe",
   "header.noNotifications": "Nta butumwa bugeza ubu.",
   "header.editProfile": "Hindura umwirondoro",
-  "header.logout": "Sohoka"
+  "header.logout": "Sohoka",
+  "rejection.reason": "Impamvu: {{reason}}",
+  "rejection.missing": "Nta mpamvu yo kwanga yatanzwe."
 }

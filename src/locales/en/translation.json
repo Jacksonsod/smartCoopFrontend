@@ -373,5 +373,7 @@
   "header.unreadMessages": "{{count}} unread messages",
   "header.noNotifications": "No notifications yet.",
   "header.editProfile": "Edit Profile",
-  "header.logout": "Logout"
+  "header.logout": "Logout",
+  "rejection.reason": "Reason: {{reason}}",
+  "rejection.missing": "No rejection reason provided."
 }
