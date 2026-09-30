@@ -400,5 +400,16 @@
   "photos.lookupHelp": "Use the document ID recorded after upload. Saved photos cannot yet be listed automatically.",
   "photos.documentId": "Document ID",
   "photos.view": "View photo",
-  "photos.recorded": "Activity recorded."
+  "photos.recorded": "Activity recorded.",
+  "activityRoles.ACCOUNTANT": "Review activities and their status. Recording is not available in this view.",
+  "activityRoles.QUALITY_INSPECTOR": "Review pending activities, approve accepted work, or reject it with a reason.",
+  "activityRoles.COOP_ADMIN": "Record member activities and oversee cooperative records.",
+  "activityRoles.FIELD_OFFICER": "Record field activities for cooperative members.",
+  "activityRoles.record": "Record Activity",
+  "activityRoles.approve": "Approve",
+  "activityRoles.reject": "Reject activity",
+  "activityRoles.reason": "Rejection reason",
+  "activityRoles.reasonHelp": "Explain why this activity is rejected. The member will see this reason.",
+  "activityRoles.forbidden": "Your account cannot review this activity.",
+  "activityRoles.failed": "Could not update the activity. Refresh and try again."
 }

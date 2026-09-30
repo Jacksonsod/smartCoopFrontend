@@ -418,5 +418,16 @@
   "photos.lookupHelp": "Utilisez l’identifiant noté après l’envoi. Les photos enregistrées ne peuvent pas encore être listées automatiquement.",
   "photos.documentId": "Identifiant du document",
   "photos.view": "Voir la photo",
-  "photos.recorded": "Activité enregistrée."
+  "photos.recorded": "Activité enregistrée.",
+  "activityRoles.ACCOUNTANT": "Consultez les activités et leur statut. La saisie est indisponible dans cette vue.",
+  "activityRoles.QUALITY_INSPECTOR": "Examinez les activités en attente, approuvez-les ou rejetez-les avec un motif.",
+  "activityRoles.COOP_ADMIN": "Enregistrez les activités des membres et suivez les dossiers de la coopérative.",
+  "activityRoles.FIELD_OFFICER": "Enregistrez les activités de terrain des membres.",
+  "activityRoles.record": "Enregistrer une activité",
+  "activityRoles.approve": "Approuver",
+  "activityRoles.reject": "Rejeter l’activité",
+  "activityRoles.reason": "Motif du rejet",
+  "activityRoles.reasonHelp": "Expliquez pourquoi cette activité est rejetée. Le membre verra ce motif.",
+  "activityRoles.forbidden": "Votre compte ne peut pas examiner cette activité.",
+  "activityRoles.failed": "Impossible de modifier l’activité. Actualisez et réessayez."
 }
