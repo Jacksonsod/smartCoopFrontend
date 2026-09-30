@@ -29,6 +29,7 @@ import QualityInspectorDashboard from "./pages/inspector/QualityInspectorDashboa
 import FieldOfficerDashboard from "./pages/fieldofficer/FieldOfficerDashboard";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
+import InvestorTokens from "./pages/superadmin/InvestorTokens";
 import ThemeToggle from "./components/layout/ThemeToggle";
 
 
@@ -158,6 +159,7 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/investor-tokens" element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><InvestorTokens /></ProtectedRoute>} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/helpdesk" element={
                     <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>

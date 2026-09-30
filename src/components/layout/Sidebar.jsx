@@ -57,6 +57,7 @@ const navItems = [
     section: "Management",
     sectionKey: "section.management",
   },
+  { key: "investors.title", path: "/investor-tokens", icon: FileText, allowedRoles: ["SUPER_ADMIN"], section: "Management", sectionKey: "section.management" },
   {
     title: "System Logs",
     key: "nav.systemLogs",
