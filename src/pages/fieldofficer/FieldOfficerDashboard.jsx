@@ -19,6 +19,7 @@ import StatCard from "@/components/shared/StatCard";
 import ResponsiveTable from "@/components/shared/ResponsiveTable";
 import PageHeader from "@/components/shared/PageHeader";
 import EmptyState from "@/components/shared/EmptyState";
+import { useTranslation } from "react-i18next";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
 const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
@@ -27,6 +28,7 @@ const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency"
 const parseNum = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 
 const FieldOfficerDashboard = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [activities, setActivities] = useState([]);
   const [members, setMembers] = useState([]);
@@ -62,7 +64,7 @@ const FieldOfficerDashboard = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-background">
         <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-        <p className="text-sm text-gray-400 dark:text-gray-500">Loading dashboard...</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">{t("common.loading")}</p>
       </div>
     );
   }
@@ -72,20 +74,20 @@ const FieldOfficerDashboard = () => {
       {/* Header */}
       <PageHeader
         title={`${greet()}, ${user?.fullName || user?.username || "Field Officer"}`}
-        subtitle="Record member activities and manage cooperative members"
+        subtitle={t("fieldOfficer.subtitle")}
         actions={
           <Button variant="outline" onClick={fetchData} disabled={loading} className="dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300">
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> {t("common.refresh")}
           </Button>
         }
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total Activities" value={stats.total} icon={Activity} color="emerald" />
-        <StatCard label="Today" value={stats.today} icon={CalendarDays} color="blue" />
-        <StatCard label="Members" value={stats.memberCount} icon={Users} color="purple" />
-        <StatCard label="Revenue" value={formatCurrency(stats.totalRevenue)} icon={Activity} color="amber" />
+        <StatCard label={t("fieldOfficer.totalActivities")} value={stats.total} icon={Activity} color="emerald" />
+        <StatCard label={t("fieldOfficer.today")} value={stats.today} icon={CalendarDays} color="blue" />
+        <StatCard label={t("fieldOfficer.members")} value={stats.memberCount} icon={Users} color="purple" />
+        <StatCard label={t("fieldOfficer.revenue")} value={formatCurrency(stats.totalRevenue)} icon={Activity} color="amber" />
       </div>
 
       {/* Quick Actions */}
@@ -97,8 +99,8 @@ const FieldOfficerDashboard = () => {
                 <ClipboardList className="h-6 w-6" />
               </div>
               <div>
-                <p className="font-bold text-gray-950 dark:text-white text-base">Record Activity</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Log a member delivery or service</p>
+                <p className="font-bold text-gray-950 dark:text-white text-base">{t("fieldOfficer.recentActivities")}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t("activities.noActivitiesSubtitle")}</p>
               </div>
             </CardContent>
           </Card>
@@ -110,8 +112,8 @@ const FieldOfficerDashboard = () => {
                 <UserPlus className="h-6 w-6" />
               </div>
               <div>
-                <p className="font-bold text-gray-950 dark:text-white text-base">Add Member</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Register a new cooperative member</p>
+                <p className="font-bold text-gray-950 dark:text-white text-base">{t("fieldOfficer.addMember")}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t("staff.addMember")}</p>
               </div>
             </CardContent>
           </Card>
@@ -122,9 +124,9 @@ const FieldOfficerDashboard = () => {
       <Card className="border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
         <CardHeader className="pb-3 border-b border-gray-50 dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base text-gray-900 dark:text-white">Recent Activities</CardTitle>
+            <CardTitle className="text-base text-gray-900 dark:text-white">{t("fieldOfficer.recentActivities")}</CardTitle>
             <Link to="/activities">
-              <Button size="sm" variant="outline" className="text-xs dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300">View All</Button>
+              <Button size="sm" variant="outline" className="text-xs dark:border-gray-800 dark:hover:bg-gray-800 dark:text-gray-300">{t("fieldOfficer.viewAll")}</Button>
             </Link>
           </div>
         </CardHeader>
@@ -132,15 +134,15 @@ const FieldOfficerDashboard = () => {
           {recentActivities.length === 0 ? (
             <EmptyState
               icon={ClipboardList}
-              title="No activities recorded yet"
-              subtitle="Start by recording a member activity"
+              title={t("fieldOfficer.noActivities")}
+              subtitle={t("fieldOfficer.noActivitiesSubtitle")}
             />
           ) : (
             <ResponsiveTable minWidth="640px" className="rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
               <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                 <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                   <tr>
-                    {["Date", "Member", "Item", "Quantity", "Revenue", "Notes"].map(h => (
+                    {[t("fieldOfficer.col.date"), t("fieldOfficer.col.member"), t("fieldOfficer.col.item"), t("fieldOfficer.col.qty"), t("fieldOfficer.col.revenue"), t("fieldOfficer.col.notes")].map(h => (
                       <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-550">{h}</th>
                     ))}
                   </tr>

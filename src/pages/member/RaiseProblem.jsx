@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { raiseIssue, getMyIssues } from '@/services/issueService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +62,7 @@ const RaiseProblem = () => {
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Title */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Report a Problem</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{ t("problem.title") }</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Submit any issues or concerns to cooperative administrators.
           </p>
@@ -166,7 +167,7 @@ const RaiseProblem = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-extrabold text-gray-950 dark:text-white tracking-tight">Report a Problem</h1>
+        <h1 className="text-2xl font-extrabold text-gray-950 dark:text-white tracking-tight">{ t("problem.title") }</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Submit any issues or concerns to cooperative administrators.
         </p>

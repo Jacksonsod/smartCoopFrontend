@@ -14,8 +14,9 @@ import { useAuth } from "@/context/AuthContext";
 import StatCard from "@/components/shared/StatCard";
 import EmptyState from "@/components/shared/EmptyState";
 import ResponsiveTable from "@/components/shared/ResponsiveTable";
+import { useTranslation } from "react-i18next";
 
-const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
+const greetKey = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 
 const parseNumeric = (value) => {
   const parsed = Number(value);
@@ -47,11 +48,10 @@ const formatDate = (value) => {
   return new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "short", day: "2-digit" }).format(date);
 };
 
-
-
 const extractList = (p) => (Array.isArray(p) ? p : Array.isArray(p?.content) ? p.content : Array.isArray(p?.data) ? p.data : []);
 
 const MemberDashboard = () => {
+  const { t } = useTranslation();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -83,25 +83,25 @@ const MemberDashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {greet()}, {user?.fullName || user?.username || "Member"}
+          {greetKey()}, {user?.fullName || user?.username || "Member"}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Track your deliveries, service records, and payment progress.
+          {t("member.subtitle")}
         </p>
       </div>
 
       {loading ? (
         <div className="flex h-48 items-center justify-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
           <Loader2 className="h-5 w-5 animate-spin text-emerald-600 dark:text-emerald-400" />
-          <span className="text-sm text-gray-500 dark:text-gray-400">Loading your activities...</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">{t("common.loading")}</span>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <StatCard label="Total Activities" value={stats.totalActivities} icon={Package} color="emerald" />
-            <StatCard label="Total Volume / Units" value={stats.totalVolume.toLocaleString()} icon={Layers} color="blue" />
+            <StatCard label={t("member.totalActivities")} value={stats.totalActivities} icon={Package} color="emerald" />
+            <StatCard label={t("fieldOfficer.members", "Total Volume / Units")} value={stats.totalVolume.toLocaleString()} icon={Layers} color="blue" />
             <StatCard
-              label="Revenue (RWF)"
+              label={t("member.totalEarnings")}
               value={formatCurrency(stats.totalRevenue)}
               icon={Banknote}
               color="gold"
@@ -110,23 +110,23 @@ const MemberDashboard = () => {
 
           <Card className="border border-gray-200 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900">
             <CardHeader className="pb-3 border-b dark:border-gray-800">
-              <CardTitle className="text-base text-gray-900 dark:text-white">My Activities</CardTitle>
+              <CardTitle className="text-base text-gray-900 dark:text-white">{t("member.recentActivities")}</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
               {activities.length === 0 ? (
                 <EmptyState
-                  title="No activities assigned to you yet."
-                  subtitle="Your recorded deliveries and activities will appear here."
+                  title={t("member.noActivities")}
+                  subtitle={t("member.noActivitiesSubtitle")}
                 />
               ) : (
                 <ResponsiveTable minWidth="540px">
                   <Table>
                   <TableHeader>
                     <TableRow className="dark:border-gray-800">
-                      <TableHead className="dark:text-gray-450">Date</TableHead>
-                      <TableHead className="dark:text-gray-450">Item / Service</TableHead>
-                      <TableHead className="dark:text-gray-450">Quantity</TableHead>
-                      <TableHead className="dark:text-gray-450">Revenue (RWF)</TableHead>
+                      <TableHead className="dark:text-gray-450">{t("member.col.date")}</TableHead>
+                      <TableHead className="dark:text-gray-450">{t("member.col.item")}</TableHead>
+                      <TableHead className="dark:text-gray-450">{t("member.col.qty")}</TableHead>
+                      <TableHead className="dark:text-gray-450">{t("member.col.amount")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
