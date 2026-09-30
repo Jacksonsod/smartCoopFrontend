@@ -373,5 +373,19 @@
   "header.unreadMessages": "{{count}} unread messages",
   "header.noNotifications": "No notifications yet.",
   "header.editProfile": "Edit Profile",
-  "header.logout": "Logout"
+  "header.logout": "Logout",
+  "report.title": "Filtered report summary",
+  "report.scope": "Filters apply to this summary. Other dashboard sections show all activities.",
+  "report.fromDate": "From date",
+  "report.toDate": "To date",
+  "report.status": "Status",
+  "report.item": "Item",
+  "report.member": "Member",
+  "report.all": "All",
+  "report.apply": "Apply",
+  "report.reset": "Reset",
+  "report.error": "Could not load the report. Apply the filters to retry.",
+  "report.totalActivities": "Activities",
+  "report.totalRevenue": "Revenue",
+  "report.pendingPaymentsAmount": "Pending payments"
 }

@@ -373,5 +373,19 @@
   "header.unreadMessages": "{{count}} messages non lus",
   "header.noNotifications": "Aucune notification pour l'instant.",
   "header.editProfile": "Modifier le profil",
-  "header.logout": "Se déconnecter"
+  "header.logout": "Se déconnecter",
+  "report.title": "Résumé du rapport filtré",
+  "report.scope": "Les filtres concernent ce résumé. Les autres sections affichent toutes les activités.",
+  "report.fromDate": "Date de début",
+  "report.toDate": "Date de fin",
+  "report.status": "Statut",
+  "report.item": "Article",
+  "report.member": "Membre",
+  "report.all": "Tous",
+  "report.apply": "Appliquer",
+  "report.reset": "Réinitialiser",
+  "report.error": "Impossible de charger le rapport. Réappliquez les filtres.",
+  "report.totalActivities": "Activités",
+  "report.totalRevenue": "Revenus",
+  "report.pendingPaymentsAmount": "Paiements en attente"
 }

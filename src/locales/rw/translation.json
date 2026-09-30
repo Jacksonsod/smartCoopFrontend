@@ -373,5 +373,19 @@
   "header.unreadMessages": "Ubutumwa {{count}} butasomwe",
   "header.noNotifications": "Nta butumwa bugeza ubu.",
   "header.editProfile": "Hindura umwirondoro",
-  "header.logout": "Sohoka"
+  "header.logout": "Sohoka",
+  "report.title": "Incamake ya raporo iyunguruye",
+  "report.scope": "Akayunguruzo kareba iyi ncamake. Ibindi bice byerekana ibikorwa byose.",
+  "report.fromDate": "Kuva ku itariki",
+  "report.toDate": "Kugeza ku itariki",
+  "report.status": "Imiterere",
+  "report.item": "Igicuruzwa",
+  "report.member": "Umunyamuryango",
+  "report.all": "Byose",
+  "report.apply": "Emeza",
+  "report.reset": "Subizaho",
+  "report.error": "Raporo ntiyabonetse. Ongera wemeze akayunguruzo.",
+  "report.totalActivities": "Ibikorwa",
+  "report.totalRevenue": "Amafaranga yinjiye",
+  "report.pendingPaymentsAmount": "Ubwishyu butarakozwe"
 }
