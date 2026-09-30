@@ -1,3 +1,4 @@
+import RejectionReason from "@/components/shared/RejectionReason";
 import ActivityReviewActions from "@/components/shared/ActivityReviewActions";
 import api from "@/services/api";
 import ActivityPhoto from "@/components/shared/ActivityPhoto";

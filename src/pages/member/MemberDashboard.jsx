@@ -1,3 +1,4 @@
+import RejectionReason from "@/components/shared/RejectionReason";
 import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useMemo, useState } from "react";
 import { Banknote, Layers, Package, Loader2 } from "lucide-react";
@@ -141,7 +142,7 @@ const MemberDashboard = () => {
                       return (
                         <TableRow key={activity?.id || `${itemName}-${index}`} className="dark:border-gray-800 hover:bg-emerald-50/10 dark:hover:bg-emerald-950/10">
                           <TableCell className="text-gray-600 dark:text-gray-400">{formatDate(activityDate)}</TableCell>
-                          <TableCell className="font-medium text-gray-900 dark:text-white">{itemName}<ActivityPhoto activityId={activity.id} /></TableCell>
+                          <TableCell className="font-medium text-gray-900 dark:text-white">{itemName}<ActivityPhoto activityId={activity.id} /><RejectionReason activity={activity} showStatus /></TableCell>
                           <TableCell className="text-gray-600 dark:text-gray-450">{`${quantity.toLocaleString()} ${unit}`.trim()}</TableCell>
                           <TableCell className="font-medium text-gray-900 dark:text-white">{formatCurrency(revenue)}</TableCell>
                         </TableRow>

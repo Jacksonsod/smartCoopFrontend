@@ -374,6 +374,8 @@
   "header.noNotifications": "Nta butumwa bugeza ubu.",
   "header.editProfile": "Hindura umwirondoro",
   "header.logout": "Sohoka",
+  "rejection.reason": "Impamvu: {{reason}}",
+  "rejection.missing": "Nta mpamvu yo kwanga yatanzwe.",
   "report.title": "Incamake ya raporo iyunguruye",
   "report.scope": "Akayunguruzo kareba iyi ncamake. Ibindi bice byerekana ibikorwa byose.",
   "report.fromDate": "Kuva ku itariki",
