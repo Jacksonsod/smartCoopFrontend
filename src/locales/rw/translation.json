@@ -404,5 +404,16 @@
   "photos.lookupHelp": "Koresha ID y’inyandiko wabonye wohereje ifoto. Amafoto abitswe ntaragaragazwa ku rutonde.",
   "photos.documentId": "ID y’inyandiko",
   "photos.view": "Reba ifoto",
-  "photos.recorded": "Igikorwa cyabitswe."
+  "photos.recorded": "Igikorwa cyabitswe.",
+  "activityRoles.ACCOUNTANT": "Reba ibikorwa n’imiterere yabyo. Kwandika ibikorwa ntibiboneka hano.",
+  "activityRoles.QUALITY_INSPECTOR": "Suzuma ibikorwa bitegereje, ubyemeze cyangwa ubyange utanze impamvu.",
+  "activityRoles.COOP_ADMIN": "Andika ibikorwa by’abanyamuryango kandi ukurikirane inyandiko za koperative.",
+  "activityRoles.FIELD_OFFICER": "Andika ibikorwa by’abanyamuryango mu murima.",
+  "activityRoles.record": "Andika igikorwa",
+  "activityRoles.approve": "Emeza",
+  "activityRoles.reject": "Anga igikorwa",
+  "activityRoles.reason": "Impamvu yo kwanga",
+  "activityRoles.reasonHelp": "Sobanura impamvu igikorwa cyanzwe. Umunyamuryango azabona iyi mpamvu.",
+  "activityRoles.forbidden": "Konti yawe ntishobora gusuzuma iki gikorwa.",
+  "activityRoles.failed": "Kuvugurura igikorwa byanze. Vugurura urupapuro wongere ugerageze."
 }
