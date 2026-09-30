@@ -1,4 +1,5 @@
 import RejectionReason from "@/components/shared/RejectionReason";
+import PaymentReferenceAction from "@/components/shared/PaymentReferenceAction";
 import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useState } from "react";
 import {
@@ -19,6 +20,7 @@ const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d
 const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
 
 const Payments = () => {
+  const { t } = useTranslation();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isUnauthorized, setIsUnauthorized] = useState(false);
@@ -43,10 +45,11 @@ const Payments = () => {
 
   useEffect(() => { fetchPending(); }, []);
 
-  const handleApprove = async (id) => {
+  const handleApprove = async (id, reference) => {
+    if (!reference?.trim() || processingId !== null) return;
     setProcessingId(id); setError("");
     try {
-      await api.patch(`/payments/${id}/pay?reference=`);
+      await api.patch(`/payments/${id}/pay`, null, { params: { reference: reference.trim() } });
       setSuccessMsg("Payment approved!"); setTimeout(() => setSuccessMsg(""), 4000);
       fetchPending();
     } catch { setError("Failed to approve payment."); }
@@ -120,11 +123,7 @@ const Payments = () => {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         {a.status !== "COMPLETED" && (
-                          <Button size="sm" onClick={() => handleApprove(a.id)} disabled={processingId === a.id}
-                            className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white">
-                            {processingId === a.id && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
-                            Approve
-                          </Button>
+                          <PaymentReferenceAction paymentId={a.id} busy={processingId === a.id} disabled={processingId !== null} onConfirm={reference => handleApprove(a.id, reference)} />
                         )}
                       </td>
                     </tr>
@@ -251,15 +250,7 @@ const Payments = () => {
                         </td>
                         <td className="px-5 py-4 whitespace-nowrap">
                           {a.status !== "COMPLETED" && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleApprove(a.id)}
-                              disabled={processingId === a.id}
-                              className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 h-8 rounded-lg shadow-xs active:scale-[0.98] transition-transform duration-100 flex items-center justify-center gap-1"
-                            >
-                              {processingId === a.id && <Loader2 className="h-3 w-3 animate-spin" />}
-                              Approve
-                            </Button>
+                            <PaymentReferenceAction paymentId={a.id} busy={processingId === a.id} disabled={processingId !== null} onConfirm={reference => handleApprove(a.id, reference)} />
                           )}
                         </td>
                       </tr>
@@ -322,15 +313,7 @@ const Payments = () => {
                     </div>
 
                     {a.status !== "COMPLETED" && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleApprove(a.id)}
-                        disabled={processingId === a.id}
-                        className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 h-8.5 rounded-lg shadow-xs active:scale-[0.98] transition-transform duration-100 flex items-center justify-center gap-1"
-                      >
-                        {processingId === a.id && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                        Approve
-                      </Button>
+                      <PaymentReferenceAction paymentId={a.id} busy={processingId === a.id} disabled={processingId !== null} onConfirm={reference => handleApprove(a.id, reference)} />
                     )}
                   </div>
                 </div>

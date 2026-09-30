@@ -127,14 +127,6 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/my-activities"
-                  element={
-                    <ProtectedRoute allowedRoles={["MEMBER"]}>
-                      <MemberDashboard />
-                    </ProtectedRoute>
-                  }
-                />
                 <Route path="/report-problem" element={
                     <ProtectedRoute allowedRoles={["MEMBER"]}>
                       <RaiseProblem />
