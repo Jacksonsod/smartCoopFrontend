@@ -373,5 +373,18 @@
   "header.unreadMessages": "{{count}} messages non lus",
   "header.noNotifications": "Aucune notification pour l'instant.",
   "header.editProfile": "Modifier le profil",
-  "header.logout": "Se déconnecter"
+  "header.logout": "Se déconnecter",
+  "photos.upload": "Joindre une photo (JPEG, PNG ou WebP, 5 Mo maximum)",
+  "photos.loading": "Chargement de la photo…",
+  "photos.unavailable": "Photo indisponible. L’accès peut être refusé ou le fichier absent.",
+  "photos.invalid": "Choisissez une image JPEG, PNG ou WebP de 5 Mo maximum.",
+  "photos.uploadError": "Échec de l’envoi. L’activité est enregistrée ; réessayez ici.",
+  "photos.id": "Identifiant du document photo : {{id}}",
+  "photos.expand": "Agrandir la photo",
+  "photos.alt": "Photo de l’activité",
+  "photos.open": "Ouvrir une photo enregistrée",
+  "photos.lookupHelp": "Utilisez l’identifiant noté après l’envoi. Les photos enregistrées ne peuvent pas encore être listées automatiquement.",
+  "photos.documentId": "Identifiant du document",
+  "photos.view": "Voir la photo",
+  "photos.recorded": "Activité enregistrée."
 }

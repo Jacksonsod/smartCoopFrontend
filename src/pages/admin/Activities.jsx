@@ -1,3 +1,5 @@
+import api from "@/services/api";
+import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -43,6 +45,8 @@ const Activities = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState({ memberId: "", itemId: "", metricValue: "", notes: "", activityDate: new Date().toISOString().slice(0, 10) });
+  const [photo, setPhoto] = useState(null);
+  const [photoDocuments, setPhotoDocuments] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -86,6 +90,7 @@ const Activities = () => {
   const openModal = () => {
     setForm({ memberId: "", itemId: "", metricValue: "", notes: "", activityDate: new Date().toISOString().slice(0, 10) });
     setError("");
+    setPhoto(null);
     setIsModalOpen(true);
   };
 
@@ -96,11 +101,14 @@ const Activities = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (photo && (!['image/jpeg', 'image/png', 'image/webp'].includes(photo.type) || photo.size > 5 * 1024 * 1024)) {
+      setError(t('photos.invalid')); return;
+    }
     setIsSubmitting(true);
     setError("");
 
     try {
-      await recordActivity({
+      const { data: recorded } = await recordActivity({
         // FIX: Converted string IDs to Numbers for the backend
         memberId: Number(form.memberId),
         itemId: Number(form.itemId),
@@ -109,9 +117,18 @@ const Activities = () => {
         activityDate: form.activityDate
       });
 
+      let photoFailed = false;
+      if (photo) {
+        try {
+          const upload = new FormData(); upload.append('file', photo);
+          const { data: document } = await api.post(`/activities/${recorded.id}/photo`, upload, { headers: { 'Content-Type': undefined }, quietForbidden: true });
+          if (!document?.id) throw Error();
+          setPhotoDocuments(current => ({ ...current, [recorded.id]: document.id }));
+        } catch { photoFailed = true; }
+      }
       closeModal();
-      setSuccessMsg("Activity recorded!");
-      setTimeout(() => setSuccessMsg(""), 4000);
+      setSuccessMsg(t(photoFailed ? 'photos.uploadError' : 'photos.recorded'));
+      if (!photoFailed) setTimeout(() => setSuccessMsg(""), 4000);
       await fetchAll();
 
     } catch (err) {
@@ -244,7 +261,7 @@ const Activities = () => {
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-350 whitespace-nowrap">{a.metricValue}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{a.notes || "-"}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs">{a.notes || "-"}<ActivityPhoto activityId={a.id} allowUpload initialDocumentId={photoDocuments[a.id]} /></td>
                   </tr>
                 ))}
                 </tbody>
@@ -254,7 +271,7 @@ const Activities = () => {
         )}
 
         {/* Record Activity Modal */}
-        <Dialog open={isModalOpen} onOpenChange={open => { if (!open) closeModal(); }}>
+        <Dialog open={isModalOpen} onOpenChange={open => { if (!open && !isSubmitting) closeModal(); }}>
           <DialogContent className="max-w-md bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white">
             <DialogHeader>
               <DialogTitle className="text-gray-900 dark:text-white">{ t("dashboard.recordActivity") }</DialogTitle>
@@ -309,8 +326,9 @@ const Activities = () => {
                 <textarea id="notes" name="notes" value={form.notes} onChange={handleFormChange} rows={3} placeholder="Optional details"
                           className="flex w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus:border-emerald-500" />
               </div>
+              <label className="block text-sm">{t('photos.upload')}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={isSubmitting} onChange={e => setPhoto(e.target.files?.[0] || null)} className="block w-full mt-1" /></label>
               <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <Button type="button" variant="outline" onClick={closeModal} className="dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">{ t("common.cancel") }</Button>
+                <Button type="button" variant="outline" disabled={isSubmitting} onClick={closeModal} className="dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">{ t("common.cancel") }</Button>
                 <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={isSubmitting}>
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isSubmitting ? t("common.loading") : "Record Activity"}

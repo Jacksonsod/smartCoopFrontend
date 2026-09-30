@@ -1,3 +1,4 @@
+import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useState } from "react";
 import {
   CheckCircle2,
@@ -114,7 +115,7 @@ const Payments = () => {
                             : "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 dark:border-amber-900/50"
                         } variant="secondary">
                           {a.status || "PENDING"}
-                        </Badge>
+                        </Badge><ActivityPhoto activityId={a.id} />
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         {a.status !== "COMPLETED" && (
@@ -245,7 +246,7 @@ const Payments = () => {
                             variant="outline"
                           >
                             {a.status || "PENDING"}
-                          </Badge>
+                          </Badge><ActivityPhoto activityId={a.id} />
                         </td>
                         <td className="px-5 py-4 whitespace-nowrap">
                           {a.status !== "COMPLETED" && (
@@ -297,7 +298,7 @@ const Payments = () => {
                       variant="outline"
                     >
                       {a.status || "PENDING"}
-                    </Badge>
+                    </Badge><ActivityPhoto activityId={a.id} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs border-y border-gray-50 dark:border-gray-800 py-2.5">

@@ -373,5 +373,18 @@
   "header.unreadMessages": "{{count}} unread messages",
   "header.noNotifications": "No notifications yet.",
   "header.editProfile": "Edit Profile",
-  "header.logout": "Logout"
+  "header.logout": "Logout",
+  "photos.upload": "Attach photo (JPEG, PNG or WebP, up to 5 MB)",
+  "photos.loading": "Loading photo…",
+  "photos.unavailable": "Photo not available. You may not have access, or the file may be missing.",
+  "photos.invalid": "Choose a JPEG, PNG or WebP image no larger than 5 MB.",
+  "photos.uploadError": "Photo upload failed. The activity is saved; retry the photo here.",
+  "photos.id": "Photo document ID: {{id}}",
+  "photos.expand": "Expand photo",
+  "photos.alt": "Activity photo",
+  "photos.open": "Open a saved photo",
+  "photos.lookupHelp": "Use the document ID recorded after upload. Saved photos cannot yet be listed automatically.",
+  "photos.documentId": "Document ID",
+  "photos.view": "View photo",
+  "photos.recorded": "Activity recorded."
 }
