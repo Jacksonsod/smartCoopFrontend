@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { getPendingPayments, markPaymentAsPaid } from "@/services/paymentService";
+import { useTranslation } from "react-i18next";
 import { downloadPaymentSummaryExcel } from "@/services/documentService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -220,6 +221,7 @@ const FilterRow = ({ fromDate, toDate, statusFilter, onFromDate, onToDate, onSta
 
 const PaymentsManagement = () => {
   const [payments, setPayments] = useState([]);
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
   const [exporting, setExporting] = useState(false);
@@ -329,7 +331,7 @@ const PaymentsManagement = () => {
                 ) : (
                   <FileDown className="h-4 w-4" />
                 )}
-                Export Excel
+                t("payments.exportExcel")
               </Button>
               <Button
                 variant="outline"
@@ -358,19 +360,19 @@ const PaymentsManagement = () => {
           {/* Summary Stats */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard
-              title="Pending Payouts"
+              title={t("accountantDash.pendingPayouts")}
               value={loading ? "—" : totalPending}
               icon={Clock}
               colorClass="bg-amber-100 text-amber-600"
             />
             <StatCard
-              title="Total Amount Due"
+              title={t("accountantDash.totalRevenue")}
               value={loading ? "—" : formatCurrency(totalAmount)}
               icon={Banknote}
               colorClass="bg-emerald-100 text-emerald-600"
             />
             <StatCard
-              title="Members Awaiting"
+              title={t("fieldOfficer.members")}
               value={loading ? "—" : uniqueMembers}
               icon={Smartphone}
               colorClass="bg-blue-100 text-blue-600"
@@ -531,7 +533,7 @@ const PaymentsManagement = () => {
               ) : (
                 <FileDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               )}
-              Export Excel
+              t("payments.exportExcel")
             </Button>
             <Button
               variant="outline"
@@ -642,7 +644,7 @@ const PaymentsManagement = () => {
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                   <thead className="bg-gray-50/75 dark:bg-gray-950/50">
                     <tr>
-                      {["Member Name", "Phone Number", "Amount", "Date", "Status", "Action"].map((h) => (
+                      {[t("payments.col.member"), t("payments.col.phone"), t("payments.col.amount"), t("payments.col.date"), t("payments.col.status"), t("common.actions")].map((h) => (
                         <th
                            key={h}
                            className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"

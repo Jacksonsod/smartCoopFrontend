@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import api from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
 
@@ -40,6 +41,7 @@ const ActivitiesLedger = () => {
   const [processingId, setProcessingId] = useState(null);
   const [downloading, setDownloading] = useState(false);
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState(null);
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const fetchActivities = async () => {
@@ -129,7 +131,7 @@ const ActivitiesLedger = () => {
         {loading && (
             <div className="flex flex-col items-center py-16">
               <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-              <p className="text-sm text-gray-400 dark:text-gray-500">Loading activities...</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">{t("ledger.loading")}</p>
             </div>
         )}
 

@@ -32,6 +32,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import StatCard from "@/components/shared/StatCard";
+import { useTranslation } from "react-i18next";
 import EmptyState from "@/components/shared/EmptyState";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
@@ -40,6 +41,7 @@ const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency"
 const formatDate = (d) => { if (!d) return "-"; const date = new Date(d); return isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "short", day: "2-digit" }).format(date); };
 
 const CoopAdminDashboard = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [staff, setStaff] = useState([]);
   const [activities, setActivities] = useState([]);
@@ -104,7 +106,7 @@ const CoopAdminDashboard = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-emerald-500 mb-2" />
-        <p className="text-sm text-gray-400">Loading dashboard...</p>
+        <p className="text-sm text-gray-400">{ t("common.loading") }</p>
       </div>
     );
   }
@@ -115,12 +117,12 @@ const CoopAdminDashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{greet()}, {user?.fullName || user?.username || "Admin"}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Manage cooperative members, activities, and operations</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{t("coopAdmin.subtitle")}</p>
         </div>
         <Link to="/activities">
           <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2" size="lg">
             <Plus className="h-4 w-4" />
-            Record Activity
+            {t("coopAdmin.recordActivity")}
           </Button>
         </Link>
       </div>
@@ -135,7 +137,7 @@ const CoopAdminDashboard = () => {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
         <StatCard
-          label="Total Deliveries"
+          label={t("coopAdmin.totalActivities")}
           value={stats.totalActivities}
           subtext="Activities recorded"
           icon={Activity}
@@ -151,7 +153,7 @@ const CoopAdminDashboard = () => {
           color="blue"
         />
         <StatCard
-          label="Total Revenue"
+          label={t("coopAdmin.totalRevenue")}
           value={formatCurrency(stats.totalRevenue)}
           subtext={`${stats.totalVolume.toLocaleString()} units processed`}
           icon={DollarSign}
@@ -237,12 +239,12 @@ const CoopAdminDashboard = () => {
         {/* Quick Actions */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Quick Actions</CardTitle>
+            <CardTitle className="text-base">{ t("coopAdmin.quickActions") }</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Link to="/activities">
               <Button className="w-full justify-start bg-emerald-600 hover:bg-emerald-700 text-white mb-2">
-                <ClipboardList className="mr-2 h-4 w-4" /> Record Activity
+                <ClipboardList className="mr-2 h-4 w-4" /> {t("coopAdmin.recordActivity")}
               </Button>
             </Link>
             <Link to="/users">
@@ -268,9 +270,9 @@ const CoopAdminDashboard = () => {
       <Card className="dark:bg-gray-900 dark:border-gray-800">
         <CardHeader className="pb-3 border-b dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base text-gray-900 dark:text-white">Recent Activities</CardTitle>
+            <CardTitle className="text-base text-gray-900 dark:text-white">{ t("coopAdmin.recentActivities") }</CardTitle>
             <Link to="/activities">
-              <Button size="sm" variant="outline" className="text-xs dark:border-gray-850 dark:hover:bg-gray-800">View All</Button>
+              <Button size="sm" variant="outline" className="text-xs dark:border-gray-850 dark:hover:bg-gray-800">{ t("fieldOfficer.viewAll") }</Button>
             </Link>
           </div>
         </CardHeader>
@@ -282,7 +284,7 @@ const CoopAdminDashboard = () => {
               <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                 <thead className="bg-gray-50/75 dark:bg-gray-800/70">
                   <tr>
-                    {["Date", "Member", "Item", "Quantity", "Notes"].map(h => (
+                    {[t("activities.col.date"), t("activities.col.member"), t("activities.col.item"), t("activities.col.quantity"), t("activities.col.notes")].map(h => (
                       <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{h}</th>
                     ))}
                   </tr>

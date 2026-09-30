@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useTranslation } from "react-i18next";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
 const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
@@ -94,7 +95,7 @@ const Payments = () => {
               <table className="min-w-full">
                 <thead>
                   <tr className="border-b dark:border-gray-800">
-                    {["Member", "Item", "Quantity", "Revenue (RWF)", "Status", "Action"].map(h => (
+                    {[t("payments.col.member"), t("common.type"), t("activities.col.quantity"), t("common.amount"), t("common.status"), t("common.actions")].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">{h}</th>
                     ))}
                   </tr>
@@ -200,7 +201,7 @@ const Payments = () => {
               <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-850">
                 <thead className="bg-gray-50/75 dark:bg-gray-800/70">
                   <tr>
-                    {["Member", "Item", "Quantity", "Revenue", "Status", "Action"].map(h => (
+                    {[t("payments.col.member"), t("common.type"), t("activities.col.quantity"), t("common.amount"), t("common.status"), t("common.actions")].map(h => (
                       <th
                         key={h}
                         className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"

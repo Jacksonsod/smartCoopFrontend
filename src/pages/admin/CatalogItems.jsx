@@ -34,6 +34,7 @@ const SECTOR_OPTIONS = ["AGRICULTURE", "MINING", "TRANSPORT", "ARTISAN", "SERVIC
 const initialFormState = { name: "", sectorType: "", unitOfMeasure: "", defaultUnitPrice: "", category: "" };
 
 const CatalogItems = () => {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -332,7 +333,7 @@ const CatalogItems = () => {
                </div>
 
                <div className="flex justify-end gap-3 pt-4 border-t">
-                 <Button type="button" variant="outline" onClick={closeModal} disabled={submitting}>Cancel</Button>
+                 <Button type="button" variant="outline" onClick={closeModal} disabled={submitting}>{t("common.cancel")}</Button>
                  <Button type="submit" disabled={submitting || loadingUnits} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                    {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                    {submitting ? (editingItem ? "Updating…" : "Creating…") : (editingItem ? "Update Item" : "Create Item")}
