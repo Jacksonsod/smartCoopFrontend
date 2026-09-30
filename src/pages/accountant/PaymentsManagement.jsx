@@ -1,3 +1,4 @@
+import PaymentTable from "@/components/shared/PaymentTable";
 import PaymentReferenceAction from "@/components/shared/PaymentReferenceAction";
 // src/pages/accountant/PaymentsManagement.jsx
 import { useEffect, useRef, useState } from "react";
@@ -19,14 +20,6 @@ import { downloadPaymentSummaryExcel } from "@/services/documentService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -149,19 +142,6 @@ const StatCard = ({ title, value, icon: Icon, colorClass }) => (
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
-const StatusBadge = ({ status }) => {
-  const s = (status || "").toUpperCase();
-  const styles = {
-    PENDING: "bg-amber-50 text-amber-700 border-amber-200",
-    PAID: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    FAILED: "bg-red-50 text-red-700 border-red-200",
-  };
-  return (
-    <Badge variant="outline" className={styles[s] ?? "bg-gray-50 text-gray-600 border-gray-200"}>
-      {s}
-    </Badge>
-  );
-};
 
 // ─── Filter Row ───────────────────────────────────────────────────────────────
 
@@ -304,6 +284,13 @@ const PaymentsManagement = () => {
   const uniqueMembers = new Set(payments.map((p) => p.memberName || p.memberId)).size;
 
   // ── Render ────────────────────────────────────────────────────────────────
+  const renderPaymentActions = payment => !['PAID', 'COMPLETED'].includes(payment.status) && (
+    <PaymentReferenceAction paymentId={payment.id} busy={processingId === payment.id} disabled={processingId !== null} onConfirm={reference => handleApprovePayout(payment, reference)} />
+  );
+  const tableProps = {
+    payments, columns: ['member', 'phone', 'amount', 'date', 'status'],
+    processingId, renderActions: renderPaymentActions,
+  };
   const isLegacy = localStorage.getItem("designMode") === "legacy";
 
   if (isLegacy) {
@@ -333,7 +320,7 @@ const PaymentsManagement = () => {
                 ) : (
                   <FileDown className="h-4 w-4" />
                 )}
-                t("payments.exportExcel")
+                {t("payments.exportExcel")}
               </Button>
               <Button
                 variant="outline"
@@ -413,68 +400,7 @@ const PaymentsManagement = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50/80">
-                      <TableHead className="pl-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Member Name
-                      </TableHead>
-                      <TableHead className="py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Phone Number
-                      </TableHead>
-                      <TableHead className="py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Amount (RWF)
-                      </TableHead>
-                      <TableHead className="py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Date
-                      </TableHead>
-                      <TableHead className="py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Status
-                      </TableHead>
-                      <TableHead className="pr-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 text-right">
-                        Action
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {payments.map((p) => {
-                      const isProcessing = processingId === p.id;
-                      return (
-                        <TableRow
-                          key={p.id}
-                          className={`transition-colors ${isProcessing ? "bg-emerald-50/40" : "hover:bg-gray-50/70"}`}
-                        >
-                          <TableCell className="pl-4 py-3.5">
-                            <span className="text-sm font-medium text-gray-900">
-                              {p.memberName || p.memberUsername || "—"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="py-3.5">
-                            <span className="text-sm font-mono text-gray-600">
-                              {p.phoneNumber || p.phone || "—"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="py-3.5">
-                            <span className="text-sm font-mono font-semibold text-gray-800">
-                              {formatCurrency(p.amount)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="py-3.5">
-                            <span className="text-sm text-gray-500">
-                              {formatDate(p.date || p.createdAt || p.paymentDate)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="py-3.5">
-                            <StatusBadge status={p.status || "PENDING"} />
-                          </TableCell>
-                          <TableCell className="pr-4 py-3.5 text-right">
-                            <PaymentReferenceAction paymentId={p.id} busy={isProcessing} disabled={processingId !== null} onConfirm={reference => handleApprovePayout(p, reference)} />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                <PaymentTable {...tableProps} legacy />
               </CardContent>
             </Card>
           )}
@@ -510,7 +436,7 @@ const PaymentsManagement = () => {
               ) : (
                 <FileDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               )}
-              t("payments.exportExcel")
+              {t("payments.exportExcel")}
             </Button>
             <Button
               variant="outline"
@@ -614,129 +540,7 @@ const PaymentsManagement = () => {
             </CardContent>
           </Card>
         ) : (
-          <>
-            {/* Desktop View (Table) */}
-            <Card className="hidden md:block overflow-hidden border border-gray-150 dark:border-gray-800 shadow-xs rounded-xl bg-white dark:bg-gray-900">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
-                  <thead className="bg-gray-50/75 dark:bg-gray-950/50">
-                    <tr>
-                      {[t("payments.col.member"), t("payments.col.phone"), t("payments.col.amount"), t("payments.col.date"), t("payments.col.status"), t("common.actions")].map((h) => (
-                        <th
-                           key={h}
-                           className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
-                    {payments.map((p) => {
-                      const isProcessing = processingId === p.id;
-                      const memberName = p.memberName || p.memberUsername || "—";
-                      const initial = memberName.charAt(0).toUpperCase();
-
-                      return (
-                        <tr
-                          key={p.id}
-                          className={`hover:bg-emerald-50/10 dark:hover:bg-emerald-950/10 transition-colors duration-150 ${
-                            isProcessing ? "bg-emerald-50/30 dark:bg-emerald-950/20 animate-pulse" : ""
-                          }`}
-                        >
-                          <td className="px-5 py-4 whitespace-nowrap">
-                            <div className="flex items-center gap-2.5">
-                              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-xs">
-                                {initial}
-                              </div>
-                              <span className="text-xs font-semibold text-gray-900 dark:text-white">{memberName}</span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 whitespace-nowrap text-xs font-mono font-semibold text-gray-600 dark:text-gray-400">
-                            {p.phoneNumber || p.phone || "—"}
-                          </td>
-                          <td className="px-5 py-4 whitespace-nowrap text-xs font-mono font-bold text-gray-900 dark:text-white">
-                            {formatCurrency(p.amount)}
-                          </td>
-                          <td className="px-5 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
-                            {formatDate(p.date || p.createdAt || p.paymentDate)}
-                          </td>
-                          <td className="px-5 py-4 whitespace-nowrap">
-                            <Badge
-                              variant="outline"
-                              className="bg-amber-50 dark:bg-amber-955/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30 text-[10px] px-2 py-0.5 rounded-md font-bold"
-                            >
-                              {p.status || "PENDING"}
-                            </Badge>
-                          </td>
-                          <td className="px-5 py-4 whitespace-nowrap text-right">
-                            <PaymentReferenceAction paymentId={p.id} busy={isProcessing} disabled={processingId !== null} onConfirm={reference => handleApprovePayout(p, reference)} />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-
-            {/* Mobile View (Card List) */}
-            <div className="grid grid-cols-1 gap-4 md:hidden">
-              {payments.map((p) => {
-                const isProcessing = processingId === p.id;
-                const memberName = p.memberName || p.memberUsername || "—";
-                const initial = memberName.charAt(0).toUpperCase();
-
-                return (
-                  <div
-                    key={p.id}
-                    className={`bg-white dark:bg-gray-900 rounded-xl border border-gray-150 dark:border-gray-800 p-4 shadow-xs space-y-3 transition-colors ${
-                      isProcessing ? "bg-emerald-50/20 dark:bg-emerald-950/10 border-emerald-200 dark:border-emerald-800" : ""
-                    }`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2.5">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white text-xs font-semibold shadow-xs">
-                          {initial}
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{memberName}</p>
-                          <p className="text-[11px] text-gray-400 dark:text-gray-500 font-mono">
-                            {p.phoneNumber || p.phone || "—"}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className="bg-amber-50 dark:bg-amber-955/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30 text-[10px] px-2 py-0.5 rounded-md font-bold"
-                      >
-                        {p.status || "PENDING"}
-                      </Badge>
-                    </div>
-
-                    <div className="flex justify-between items-center text-xs border-t border-gray-50 dark:border-gray-800 pt-3">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 block tracking-wider">Amount</span>
-                        <span className="text-sm font-bold text-gray-950 dark:text-white font-mono">
-                          {formatCurrency(p.amount)}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 block tracking-wider">Date</span>
-                        <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                          {formatDate(p.date || p.createdAt || p.paymentDate)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="pt-1 border-t border-gray-50 dark:border-gray-800 flex justify-end">
-                      <PaymentReferenceAction paymentId={p.id} busy={isProcessing} disabled={processingId !== null} onConfirm={reference => handleApprovePayout(p, reference)} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </>
+          <PaymentTable {...tableProps} />
         )}
       </div>
     </>

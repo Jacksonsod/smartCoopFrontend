@@ -1,3 +1,5 @@
+import PaymentTable from "@/components/shared/PaymentTable";
+import { useAuth } from "@/context/AuthContext";
 import PaymentReferenceAction from "@/components/shared/PaymentReferenceAction";
 import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useState } from "react";
@@ -10,16 +12,16 @@ import {
 } from "lucide-react";
 import api from "@/services/api";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useTranslation } from "react-i18next";
 
 const extractList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.content) ? d.content : Array.isArray(d?.data) ? d.data : []);
-const formatCurrency = (a) => new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(a || 0);
 
 const Payments = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const canProcess = user?.role === "ACCOUNTANT";
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isUnauthorized, setIsUnauthorized] = useState(false);
@@ -45,7 +47,7 @@ const Payments = () => {
   useEffect(() => { fetchPending(); }, []);
 
   const handleApprove = async (id, reference) => {
-    if (!reference?.trim() || processingId !== null) return;
+    if (!canProcess || !reference?.trim() || processingId !== null) return;
     setProcessingId(id); setError("");
     try {
       await api.patch(`/payments/${id}/pay`, null, { params: { reference: reference.trim() } });
@@ -55,6 +57,14 @@ const Payments = () => {
     finally { setProcessingId(null); }
   };
 
+  const renderPaymentActions = canProcess ? payment => !['PAID', 'COMPLETED'].includes(payment.status) && (
+    <PaymentReferenceAction paymentId={payment.id} busy={processingId === payment.id} disabled={processingId !== null} onConfirm={reference => handleApprove(payment.id, reference)} />
+  ) : undefined;
+  const tableProps = {
+    payments: activities, columns: ['member', 'item', 'quantity', 'amount', 'status'],
+    processingId, renderActions: renderPaymentActions,
+    renderDetails: payment => <ActivityPhoto activityId={payment.id} />,
+  };
   const isLegacy = localStorage.getItem("designMode") === "legacy";
 
   if (isLegacy) {
@@ -95,41 +105,7 @@ const Payments = () => {
           </Card>
         ) : (
           <Card className="dark:bg-gray-900 dark:border-gray-800">
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead>
-                  <tr className="border-b dark:border-gray-800">
-                    {[t("payments.col.member"), t("common.type"), t("activities.col.quantity"), t("common.amount"), t("common.status"), t("common.actions")].map(h => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                  {activities.map(a => (
-                    <tr key={a.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">{a.memberName || "-"}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{a.itemName || "-"}</td>
-                      <td className="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-350 whitespace-nowrap">{a.metricValue || 0}</td>
-                      <td className="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatCurrency(a.revenue || a.totalAmount)}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge className={
-                          a.status === "COMPLETED" 
-                            ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 dark:border-emerald-900/50" 
-                            : "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 dark:border-amber-900/50"
-                        } variant="secondary">
-                          {a.status || "PENDING"}
-                        </Badge><ActivityPhoto activityId={a.id} />
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        {a.status !== "COMPLETED" && (
-                          <PaymentReferenceAction paymentId={a.id} busy={processingId === a.id} disabled={processingId !== null} onConfirm={reference => handleApprove(a.id, reference)} />
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <PaymentTable {...tableProps} legacy />
           </Card>
         )}
       </div>
@@ -195,131 +171,7 @@ const Payments = () => {
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-1 max-w-xs mx-auto">No pending payments. All member activities are fully processed.</p>
         </Card>
       ) : (
-        <>
-          <Card className="hidden md:block overflow-hidden border border-gray-150 dark:border-gray-800 shadow-xs rounded-xl bg-white dark:bg-gray-900">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-850">
-                <thead className="bg-gray-50/75 dark:bg-gray-800/70">
-                  <tr>
-                    {[t("payments.col.member"), t("common.type"), t("activities.col.quantity"), t("common.amount"), t("common.status"), t("common.actions")].map(h => (
-                      <th
-                        key={h}
-                        className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50 dark:divide-gray-800 bg-white dark:bg-gray-900">
-                  {activities.map(a => {
-                    const memberName = a.memberName || "-";
-                    const initial = memberName.charAt(0).toUpperCase();
-
-                    return (
-                      <tr key={a.id} className="hover:bg-emerald-50/10 dark:hover:bg-emerald-950/10 transition-colors duration-150">
-                        <td className="px-5 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2.5">
-                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-xs">
-                              {initial}
-                            </div>
-                            <span className="text-xs font-semibold text-gray-900 dark:text-white">{memberName}</span>
-                          </div>
-                        </td>
-                        <td className="px-5 py-4 text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                          {a.itemName || "—"}
-                        </td>
-                        <td className="px-5 py-4 text-xs font-mono font-medium text-gray-650 dark:text-gray-400 whitespace-nowrap">
-                          {a.metricValue || 0}
-                        </td>
-                        <td className="px-5 py-4 text-xs font-mono font-bold text-gray-950 dark:text-white whitespace-nowrap">
-                          {formatCurrency(a.revenue || a.totalAmount)}
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap">
-                          <Badge
-                            className={
-                              a.status === "COMPLETED"
-                                ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-250 dark:border-emerald-900 text-[10px]"
-                                : "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 border-amber-250 dark:border-amber-900 text-[10px]"
-                            }
-                            variant="outline"
-                          >
-                            {a.status || "PENDING"}
-                          </Badge><ActivityPhoto activityId={a.id} />
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap">
-                          {a.status !== "COMPLETED" && (
-                            <PaymentReferenceAction paymentId={a.id} busy={processingId === a.id} disabled={processingId !== null} onConfirm={reference => handleApprove(a.id, reference)} />
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            {activities.map(a => {
-              const memberName = a.memberName || "-";
-              const initial = memberName.charAt(0).toUpperCase();
-
-              return (
-                <div
-                  key={a.id}
-                  className="bg-white dark:bg-gray-900 rounded-xl border border-gray-150 dark:border-gray-800 p-4 shadow-xs space-y-3"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white text-xs font-semibold shadow-xs">
-                        {initial}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{memberName}</p>
-                        <p className="text-[10px] text-gray-400 dark:text-gray-550 font-medium">Activity Payment</p>
-                      </div>
-                    </div>
-                    <Badge
-                      className={
-                        a.status === "COMPLETED"
-                          ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-250 dark:border-emerald-900 text-[10px]"
-                          : "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 border-amber-250 dark:border-amber-900 text-[10px]"
-                      }
-                      variant="outline"
-                    >
-                      {a.status || "PENDING"}
-                    </Badge><ActivityPhoto activityId={a.id} />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs border-y border-gray-50 dark:border-gray-800 py-2.5">
-                    <div>
-                      <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-550 block tracking-wider">Item</span>
-                      <span className="text-gray-800 dark:text-gray-300 font-medium">{a.itemName || "—"}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-550 block tracking-wider">Quantity</span>
-                      <span className="text-gray-800 dark:text-gray-350 font-mono font-medium">{a.metricValue || 0}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-1">
-                    <div>
-                      <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-550 block tracking-wider">Revenue</span>
-                      <span className="text-sm font-bold text-gray-950 dark:text-white font-mono">
-                        {formatCurrency(a.revenue || a.totalAmount)}
-                      </span>
-                    </div>
-
-                    {a.status !== "COMPLETED" && (
-                      <PaymentReferenceAction paymentId={a.id} busy={processingId === a.id} disabled={processingId !== null} onConfirm={reference => handleApprove(a.id, reference)} />
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
+        <PaymentTable {...tableProps} />
       )}
     </div>
   );
