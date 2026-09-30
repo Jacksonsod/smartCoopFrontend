@@ -1,4 +1,5 @@
 import RejectionReason from "@/components/shared/RejectionReason";
+import ActivityPhoto from "@/components/shared/ActivityPhoto";
 import { useEffect, useState } from "react";
 import {
   BookOpen,
@@ -207,7 +208,7 @@ const ActivitiesLedger = () => {
                               }
                             >
                               {displayStatus}
-                            </Badge><RejectionReason activity={a} />
+                            </Badge><ActivityPhoto activityId={a.id} /><RejectionReason activity={a} />
 
                             {user?.role === "ACCOUNTANT" && currentStatus === "APPROVED" && (
                               <Button
@@ -277,7 +278,7 @@ const ActivitiesLedger = () => {
                       }
                     >
                       {displayStatus}
-                    </Badge><RejectionReason activity={a} />
+                    </Badge><ActivityPhoto activityId={a.id} /><RejectionReason activity={a} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs border-y border-gray-50 dark:border-gray-800 py-2.5">
