@@ -391,5 +391,18 @@
   "conflicts.resolveError": "Gukemura byanze. Vugurura wongere ugerageze.",
   "conflicts.loadError": "Ibibazo ntibyabonetse. Ongera uvugurure.",
   "conflicts.empty": "Nta bibazo bitarakemurwa.",
-  "conflicts.saved": "Ikibazo cyakemutse."
+  "conflicts.saved": "Ikibazo cyakemutse.",
+  "photos.upload": "Ongeraho ifoto (JPEG, PNG cyangwa WebP, kugeza kuri MB 5)",
+  "photos.loading": "Ifoto iri gufunguka…",
+  "photos.unavailable": "Ifoto ntiboneka. Ushobora kuba udafite uburenganzira cyangwa dosiye itaboneka.",
+  "photos.invalid": "Hitamo ifoto ya JPEG, PNG cyangwa WebP itarengeje MB 5.",
+  "photos.uploadError": "Kohereza ifoto byanze. Igikorwa kirabitswe; ongera wohereze ifoto hano.",
+  "photos.id": "ID y’inyandiko y’ifoto: {{id}}",
+  "photos.expand": "Agura ifoto",
+  "photos.alt": "Ifoto y’igikorwa",
+  "photos.open": "Fungura ifoto ibitswe",
+  "photos.lookupHelp": "Koresha ID y’inyandiko wabonye wohereje ifoto. Amafoto abitswe ntaragaragazwa ku rutonde.",
+  "photos.documentId": "ID y’inyandiko",
+  "photos.view": "Reba ifoto",
+  "photos.recorded": "Igikorwa cyabitswe."
 }

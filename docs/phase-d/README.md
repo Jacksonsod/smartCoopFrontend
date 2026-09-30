@@ -1,12 +1,12 @@
-# Phase D4: add cooperative sync conflict resolution
+# Phase D6: add activity photo upload and document viewer
 
-Adds `/sync-conflicts` for COOP_ADMIN with parsed client JSON, explicit server-reference information, KEEP_SERVER/KEEP_CLIENT/MERGE choices and confirmation. MERGE requires a JSON object and sends mergedPayload only for that mode. Successful resolutions remove the entry; failed operations keep it available for retry.
+Adds an optional image file to activity creation and upload/retry controls on existing activities. Uploads use multipart field `file`; images are fetched through the authenticated document-file endpoint as blobs, displayed as expandable thumbnails and cleaned up on unmount. A failed photo upload does not resubmit the saved activity. File type/size validation, loading states and localized unavailable states are included. Expected document 403 responses skip the API interceptor’s explicit console.error call.
 
-Validation: production build passed. Two genuine synthetic MEMBER entries were posted to the local sync queue, producing conflict #10 referencing #9. The browser displayed the conflict, submitted KEEP_SERVER (200), and showed the empty list afterward. No API responses were mocked.
+Validation: production build passed. Real browser creation returned 201 (activity #103); multipart upload returned 200 (document #26); the downloaded image loaded and expanded. A different member’s retrieval was denied by the running backend with **500**, not the specified 403; the UI displayed unavailable with no broken image. No API responses were mocked.
 
-**Incomplete requirement:** `GET /sync/conflicts` supplies `entityPayload` and `conflictWithEntityId`, but no server payload or readable referenced sync-record endpoint. The server column explicitly says unavailable; it does not mislabel the client JSON as both versions. Full side-by-side comparison requires a separately authorized backend response addition. Keep this PR draft until that decision is made.
+**Incomplete requirement:** activity responses contain no photo/document ID, and there is no activity-to-documents listing endpoint. Newly uploaded photos can be viewed in the current screen. A clearly labeled document-ID lookup is the stopgap for saved photos. Automatic historical photo discovery and the genuine 403 acceptance check remain blocked; do not call this full gap closure.
 
-Reproduce: submit two synthetic MEMBER sync entries with the same nationalId, open Sync conflicts, inspect the client payload and reference, choose a resolution, confirm and verify disappearance. For MERGE, first enter invalid JSON to verify validation, then an object. Resolution semantics remain entirely server-owned.
+Reproduce: record an activity with a small JPEG/PNG/WebP, inspect its thumbnail and expand it; record the document ID, then open it after navigation. Use an unrelated member to verify unavailable. Verify upload retry does not create another activity.
 
 All new UI text is in react-i18next English, Kinyarwanda and French locale keys. No backend or mobile source was changed. Each branch starts independently from `9d462f6d`; none requires another Phase D PR. The shared layout gets `min-w-0` so content can shrink on mobile; sidebar Sheet behavior is unchanged. The pre-existing header still extends about 26px past a 390px viewport and is outside these feature changes.
 
@@ -15,6 +15,10 @@ Verification used the supplied local test accounts and `http://localhost:8089`. 
 
 ### Live evidence
 
+![access denied](access-denied.png)
+
 ![after](after.png)
 
 ![before](before.png)
+
+![expanded](expanded.png)
