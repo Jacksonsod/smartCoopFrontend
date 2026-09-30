@@ -85,6 +85,7 @@ const navItems = [
     section: "Operations",
     sectionKey: "section.operations",
   },
+  { key: "conflicts.title", path: "/sync-conflicts", icon: FileText, allowedRoles: ["COOP_ADMIN"], section: "Operations", sectionKey: "section.operations" },
   {
     title: "Helpdesk",
     key: "nav.helpdesk",

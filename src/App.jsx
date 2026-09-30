@@ -30,6 +30,7 @@ import FieldOfficerDashboard from "./pages/fieldofficer/FieldOfficerDashboard";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import InvestorTokens from "./pages/superadmin/InvestorTokens";
+import SyncConflicts from "./pages/coopadmin/SyncConflicts";
 import ThemeToggle from "./components/layout/ThemeToggle";
 
 
@@ -160,6 +161,7 @@ const App = () => {
                   }
                 />
                 <Route path="/investor-tokens" element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><InvestorTokens /></ProtectedRoute>} />
+                <Route path="/sync-conflicts" element={<ProtectedRoute allowedRoles={["COOP_ADMIN"]}><SyncConflicts /></ProtectedRoute>} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/helpdesk" element={
                     <ProtectedRoute allowedRoles={["COOP_ADMIN"]}>
